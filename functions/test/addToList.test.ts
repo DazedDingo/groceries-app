@@ -1,4 +1,4 @@
-import { buildHandleAddToList } from '../src/addToList';
+import { handleIftttWebhook, parseItemString } from '../src/addToList';
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
 
@@ -20,96 +20,144 @@ jest.mock('../src/firestoreWriter', () => ({
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function makeConv(overrides: {
-  user?: Partial<{ identityToken: string | undefined }>;
-  params?: Partial<{ item: string; quantity: number | undefined }>;
+function makeReq(overrides: {
+  body?: Record<string, unknown>;
+  query?: Record<string, string>;
+  headers?: Record<string, string>;
 } = {}) {
-  const messages: string[] = [];
   return {
-    user: { identityToken: 'valid-token', ...overrides.user },
-    session: { params: { item: 'milk', quantity: undefined, ...overrides.params } },
-    add: (msg: string) => { messages.push(msg); },
-    _messages: messages,
-  } as any;
+    method: 'POST',
+    body: { item: 'milk', ...overrides.body },
+    query: { key: 'test-secret', ...overrides.query },
+    headers: { ...overrides.headers },
+  };
 }
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
+function makeRes() {
+  const res: any = {
+    _status: 0,
+    _body: null,
+  };
+  res.status = (code: number) => { res._status = code; return res; };
+  res.json = (data: unknown) => { res._body = data; };
+  res.send = (data: string) => { res._body = data; };
+  return res;
+}
 
-describe('handleAddToList', () => {
-  const handler = buildHandleAddToList({
-    verifyToken: async (token: string) => {
-      if (token !== 'valid-token') throw new Error('invalid');
-      return 'uid-123';
-    },
+const deps = {
+  getSecret: () => 'test-secret',
+  getUserUid: () => 'uid-123',
+};
+
+// ── parseItemString ──────────────────────────────────────────────────────────
+
+describe('parseItemString', () => {
+  it('parses "3 eggs" into quantity 3, name "eggs"', () => {
+    expect(parseItemString('3 eggs')).toEqual({ quantity: 3, name: 'eggs' });
   });
 
+  it('defaults to quantity 1 when no number prefix', () => {
+    expect(parseItemString('milk')).toEqual({ quantity: 1, name: 'milk' });
+  });
+
+  it('clamps quantity to 99 max', () => {
+    expect(parseItemString('999 apples')).toEqual({ quantity: 99, name: 'apples' });
+  });
+
+  it('clamps quantity to 1 min', () => {
+    expect(parseItemString('0 apples')).toEqual({ quantity: 1, name: 'apples' });
+  });
+
+  it('trims whitespace', () => {
+    expect(parseItemString('  2  bananas  ')).toEqual({ quantity: 2, name: 'bananas' });
+  });
+});
+
+// ── handleIftttWebhook ───────────────────────────────────────────────────────
+
+describe('handleIftttWebhook', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockFirestoreGet.mockResolvedValue({ data: () => ({ householdId: 'hh-1' }) });
     mockFirestoreQuery.mockResolvedValue({ empty: true, docs: [] });
   });
 
-  it('adds item with quantity 1 when quantity not specified', async () => {
-    const conv = makeConv();
-    await handler(conv);
+  it('returns 401 when secret is wrong', async () => {
+    const req = makeReq({ query: { key: 'wrong' } });
+    const res = makeRes();
+    await handleIftttWebhook(req, res, deps);
+    expect(res._status).toBe(401);
+    expect(mockWriteItem).not.toHaveBeenCalled();
+  });
+
+  it('returns 401 when no secret provided', async () => {
+    const req = makeReq({ query: { key: '' } });
+    const res = makeRes();
+    await handleIftttWebhook(req, res, deps);
+    expect(res._status).toBe(401);
+  });
+
+  it('accepts secret via Authorization bearer header', async () => {
+    const req = makeReq({
+      query: {},
+      headers: { authorization: 'Bearer test-secret' },
+    });
+    const res = makeRes();
+    await handleIftttWebhook(req, res, deps);
+    expect(res._status).toBe(200);
+  });
+
+  it('returns 400 when item is missing', async () => {
+    const req = makeReq({ body: { item: '' } });
+    const res = makeRes();
+    await handleIftttWebhook(req, res, deps);
+    expect(res._status).toBe(400);
+  });
+
+  it('adds item with quantity 1 for plain name', async () => {
+    const req = makeReq({ body: { item: 'milk' } });
+    const res = makeRes();
+    await handleIftttWebhook(req, res, deps);
+    expect(res._status).toBe(200);
     expect(mockWriteItem).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'milk', quantity: 1, householdId: 'hh-1' })
     );
-    expect(conv._messages[0]).toBe('Added milk to your list.');
   });
 
-  it('adds item with specified quantity', async () => {
-    const conv = makeConv({ params: { item: 'eggs', quantity: 6 } });
-    await handler(conv);
+  it('parses quantity from item string like "3 eggs"', async () => {
+    const req = makeReq({ body: { item: '3 eggs' } });
+    const res = makeRes();
+    await handleIftttWebhook(req, res, deps);
     expect(mockWriteItem).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'eggs', quantity: 6 })
-    );
-    expect(conv._messages[0]).toBe('Added 6 eggs to your list.');
-  });
-
-  it('clamps quantity to 99 max', async () => {
-    const conv = makeConv({ params: { item: 'apples', quantity: 999 } });
-    await handler(conv);
-    expect(mockWriteItem).toHaveBeenCalledWith(
-      expect.objectContaining({ quantity: 99 })
+      expect.objectContaining({ name: 'eggs', quantity: 3 })
     );
   });
 
-  it('clamps quantity to 1 min', async () => {
-    const conv = makeConv({ params: { item: 'apples', quantity: -5 } });
-    await handler(conv);
+  it('reads IFTTT value1 field as fallback', async () => {
+    const req = makeReq({ body: { item: undefined, value1: 'bread' } as any });
+    const res = makeRes();
+    await handleIftttWebhook(req, res, deps);
     expect(mockWriteItem).toHaveBeenCalledWith(
-      expect.objectContaining({ quantity: 1 })
+      expect.objectContaining({ name: 'bread', quantity: 1 })
     );
   });
 
-  it('returns sign-in error when identity token is missing', async () => {
-    const conv = makeConv({ user: { identityToken: undefined } });
-    await handler(conv);
-    expect(mockWriteItem).not.toHaveBeenCalled();
-    expect(conv._messages[0]).toContain('sign in');
-  });
-
-  it('returns sign-in error when token verification fails', async () => {
-    const conv = makeConv({ user: { identityToken: 'bad-token' } });
-    await handler(conv);
-    expect(mockWriteItem).not.toHaveBeenCalled();
-    expect(conv._messages[0]).toContain('sign in');
-  });
-
-  it('returns setup error when user has no household', async () => {
+  it('returns 500 when user has no household', async () => {
     mockFirestoreGet.mockResolvedValue({ data: () => ({}) });
-    const conv = makeConv();
-    await handler(conv);
-    expect(mockWriteItem).not.toHaveBeenCalled();
-    expect(conv._messages[0]).toContain('setting up');
+    const req = makeReq();
+    const res = makeRes();
+    await handleIftttWebhook(req, res, deps);
+    expect(res._status).toBe(500);
+    expect(res._body).toEqual({ error: 'User has no household' });
   });
 
-  it('returns error when Firestore write fails', async () => {
+  it('returns 500 when Firestore write fails', async () => {
     mockWriteItem.mockRejectedValueOnce(new Error('timeout'));
-    const conv = makeConv();
-    await handler(conv);
-    expect(conv._messages[0]).toContain("couldn't add");
+    const req = makeReq();
+    const res = makeRes();
+    await handleIftttWebhook(req, res, deps);
+    expect(res._status).toBe(500);
+    expect(res._body).toEqual({ error: 'Failed to write item' });
   });
 
   it('resolves category from Firestore when keyword matches', async () => {
@@ -117,19 +165,29 @@ describe('handleAddToList', () => {
       empty: false,
       docs: [{ id: 'dairy-cat-id' }],
     });
-    const conv = makeConv({ params: { item: 'milk', quantity: 1 } });
-    await handler(conv);
+    const req = makeReq({ body: { item: 'milk' } });
+    const res = makeRes();
+    await handleIftttWebhook(req, res, deps);
     expect(mockWriteItem).toHaveBeenCalledWith(
       expect.objectContaining({ categoryId: 'dairy-cat-id' })
     );
   });
 
   it('falls back to uncategorised when category not in Firestore', async () => {
-    mockFirestoreQuery.mockResolvedValue({ empty: true, docs: [] });
-    const conv = makeConv({ params: { item: 'milk', quantity: 1 } });
-    await handler(conv);
+    const req = makeReq({ body: { item: 'milk' } });
+    const res = makeRes();
+    await handleIftttWebhook(req, res, deps);
     expect(mockWriteItem).toHaveBeenCalledWith(
       expect.objectContaining({ categoryId: 'uncategorised' })
+    );
+  });
+
+  it('returns success JSON with item details', async () => {
+    const req = makeReq({ body: { item: '2 eggs' } });
+    const res = makeRes();
+    await handleIftttWebhook(req, res, deps);
+    expect(res._body).toEqual(
+      expect.objectContaining({ ok: true, name: 'eggs', quantity: 2 })
     );
   });
 });
