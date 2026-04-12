@@ -215,6 +215,19 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       grouped.putIfAbsent(item.categoryId, () => []).add(item);
     }
 
+    final sortedGroups = grouped.entries.toList()
+      ..sort((a, b) {
+        final catA = categories.firstWhere(
+          (c) => c.id == a.key,
+          orElse: () => const GroceryCategory(id: '', name: 'zzz', color: Color(0xFF546E7A), addedBy: ''),
+        );
+        final catB = categories.firstWhere(
+          (c) => c.id == b.key,
+          orElse: () => const GroceryCategory(id: '', name: 'zzz', color: Color(0xFF546E7A), addedBy: ''),
+        );
+        return catA.name.compareTo(catB.name);
+      });
+
     return Scaffold(
       appBar: AppBar(
         title: _selecting
@@ -246,7 +259,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
           if (!_selecting) FilterBar(categories: categories, stores: stores),
           Expanded(
             child: ListView(
-              children: grouped.entries.expand((entry) {
+              children: sortedGroups.expand((entry) {
                 final cat = categories.firstWhere(
                   (c) => c.id == entry.key,
                   orElse: () => const GroceryCategory(id: '', name: 'Uncategorised',
