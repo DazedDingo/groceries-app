@@ -41,6 +41,10 @@ service cloud.firestore {
         allow create: if isMember(householdId);
         allow update, delete: if false;
       }
+
+      match /recipes/{recipeId} {
+        allow read, write: if isMember(householdId);
+      }
     }
 
     match /users/{uid} {
