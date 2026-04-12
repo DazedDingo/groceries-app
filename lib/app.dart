@@ -10,6 +10,9 @@ import 'screens/settings/settings_screen.dart';
 import 'screens/settings/manage_stores_screen.dart';
 import 'screens/settings/manage_categories_screen.dart';
 import 'screens/shopping_list/history_screen.dart';
+import 'screens/recipes/recipes_screen.dart';
+import 'screens/recipes/recipe_detail_screen.dart';
+import 'screens/recipes/add_recipe_screen.dart';
 
 final _router = GoRouter(
   initialLocation: '/login',
@@ -30,6 +33,30 @@ final _router = GoRouter(
         GoRoute(
           path: '/pantry/:itemId',
           builder: (_, state) => PantryItemDetailScreen(itemId: state.pathParameters['itemId']!),
+        ),
+        GoRoute(
+          path: '/recipes',
+          builder: (_, __) => const RecipesScreen(),
+          routes: [
+            GoRoute(
+              path: 'new',
+              builder: (_, __) => const AddRecipeScreen(),
+            ),
+            GoRoute(
+              path: ':recipeId',
+              builder: (_, state) => RecipeDetailScreen(
+                recipeId: state.pathParameters['recipeId']!,
+              ),
+              routes: [
+                GoRoute(
+                  path: 'edit',
+                  builder: (_, state) => AddRecipeScreen(
+                    recipeId: state.pathParameters['recipeId'],
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
         GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
         GoRoute(path: '/settings/stores', builder: (_, __) => const ManageStoresScreen()),
@@ -61,7 +88,8 @@ class ScaffoldWithNavBar extends StatelessWidget {
     final location = GoRouterState.of(context).uri.toString();
     int selectedIndex = 0;
     if (location.startsWith('/pantry')) selectedIndex = 1;
-    if (location.startsWith('/settings')) selectedIndex = 2;
+    if (location.startsWith('/recipes')) selectedIndex = 2;
+    if (location.startsWith('/settings')) selectedIndex = 3;
 
     return Scaffold(
       body: child,
@@ -70,10 +98,11 @@ class ScaffoldWithNavBar extends StatelessWidget {
         destinations: const [
           NavigationDestination(icon: Icon(Icons.shopping_cart), label: 'List'),
           NavigationDestination(icon: Icon(Icons.kitchen), label: 'Pantry'),
+          NavigationDestination(icon: Icon(Icons.restaurant_menu), label: 'Recipes'),
           NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
         ],
         onDestinationSelected: (i) {
-          const routes = ['/list', '/pantry', '/settings'];
+          const routes = ['/list', '/pantry', '/recipes', '/settings'];
           context.go(routes[i]);
         },
       ),
