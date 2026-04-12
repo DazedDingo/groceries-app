@@ -33,4 +33,8 @@ describe('guessCategoryName', () => {
   it('returns Household for washing up liquid', () => {
     expect(guessCategoryName('washing up liquid')).toBe('Household');
   });
+
+  it('returns Frozen for ice cream (not Dairy via cream)', () => {
+    expect(guessCategoryName('ice cream')).toBe('Frozen');
+  });
 });
