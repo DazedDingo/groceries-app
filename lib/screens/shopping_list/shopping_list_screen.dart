@@ -171,6 +171,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
     final nameCtrl = TextEditingController(text: item.name);
     final qtyCtrl = TextEditingController(text: item.quantity.toString());
     String categoryId = item.categoryId;
+    String? unit = item.unit;
 
     await showDialog(
       context: context,
@@ -187,6 +188,29 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
               controller: qtyCtrl,
               decoration: const InputDecoration(labelText: 'Quantity'),
               keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String?>(
+              initialValue: unit,
+              decoration: const InputDecoration(labelText: 'Unit (optional)', isDense: true),
+              items: const [
+                DropdownMenuItem(value: null, child: Text('None')),
+                DropdownMenuItem(value: 'g', child: Text('g')),
+                DropdownMenuItem(value: 'kg', child: Text('kg')),
+                DropdownMenuItem(value: 'ml', child: Text('ml')),
+                DropdownMenuItem(value: 'L', child: Text('L')),
+                DropdownMenuItem(value: 'oz', child: Text('oz')),
+                DropdownMenuItem(value: 'lb', child: Text('lb')),
+                DropdownMenuItem(value: 'cups', child: Text('cups')),
+                DropdownMenuItem(value: 'packs', child: Text('packs')),
+                DropdownMenuItem(value: 'bags', child: Text('bags')),
+                DropdownMenuItem(value: 'bottles', child: Text('bottles')),
+                DropdownMenuItem(value: 'cans', child: Text('cans')),
+                DropdownMenuItem(value: 'dozen', child: Text('dozen')),
+                DropdownMenuItem(value: 'loaves', child: Text('loaves')),
+                DropdownMenuItem(value: 'bunches', child: Text('bunches')),
+              ],
+              onChanged: (v) => setD(() => unit = v),
             ),
             const SizedBox(height: 8),
             InputDecorator(
@@ -213,6 +237,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                   itemId: item.id,
                   name: nameCtrl.text.trim(),
                   quantity: int.tryParse(qtyCtrl.text) ?? item.quantity,
+                  unit: unit,
                   categoryId: categoryId,
                 );
               },

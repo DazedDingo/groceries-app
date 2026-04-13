@@ -26,47 +26,58 @@ class GroceryListRemoteViewsFactory(
     override fun onCreate() {}
 
     override fun onDataSetChanged() {
-        // Fetch items synchronously (runs on binder thread, not main thread)
-        val user = FirebaseAuth.getInstance().currentUser ?: return
-        val db = FirebaseFirestore.getInstance()
-
-        val latch = CountDownLatch(1)
-        var householdId: String? = null
-
-        db.document("users/${user.uid}").get()
-            .addOnSuccessListener { doc ->
-                householdId = doc.getString("householdId")
-                latch.countDown()
+        // Fetch items synchronously (runs on binder thread, not main thread).
+        // Wrapped in try-catch: Firebase may not be initialized if the app
+        // hasn't been launched yet, and crashing here hides the widget entirely.
+        try {
+            val user = FirebaseAuth.getInstance().currentUser
+            if (user == null) {
+                items = emptyList()
+                return
             }
-            .addOnFailureListener { latch.countDown() }
+            val db = FirebaseFirestore.getInstance()
 
-        latch.await(5, TimeUnit.SECONDS)
+            val latch = CountDownLatch(1)
+            var householdId: String? = null
 
-        if (householdId.isNullOrEmpty()) {
-            items = emptyList()
-            return
-        }
-
-        val itemsLatch = CountDownLatch(1)
-        val fetched = mutableListOf<GroceryEntry>()
-
-        db.collection("households/$householdId/items")
-            .get()
-            .addOnSuccessListener { snapshot ->
-                for (doc in snapshot.documents) {
-                    val name = doc.getString("name") ?: continue
-                    val qty = (doc.getLong("quantity") ?: 1).toInt()
-                    val unit = doc.getString("unit")
-                    fetched.add(GroceryEntry(name, qty, unit))
+            db.document("users/${user.uid}").get()
+                .addOnSuccessListener { doc ->
+                    householdId = doc.getString("householdId")
+                    latch.countDown()
                 }
-                itemsLatch.countDown()
+                .addOnFailureListener { latch.countDown() }
+
+            latch.await(5, TimeUnit.SECONDS)
+
+            if (householdId.isNullOrEmpty()) {
+                items = emptyList()
+                return
             }
-            .addOnFailureListener { itemsLatch.countDown() }
 
-        itemsLatch.await(5, TimeUnit.SECONDS)
+            val itemsLatch = CountDownLatch(1)
+            val fetched = mutableListOf<GroceryEntry>()
 
-        // Sort alphabetically
-        items = fetched.sortedBy { it.name }
+            db.collection("households/$householdId/items")
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    for (doc in snapshot.documents) {
+                        val name = doc.getString("name") ?: continue
+                        val qty = (doc.getLong("quantity") ?: 1).toInt()
+                        val unit = doc.getString("unit")
+                        fetched.add(GroceryEntry(name, qty, unit))
+                    }
+                    itemsLatch.countDown()
+                }
+                .addOnFailureListener { itemsLatch.countDown() }
+
+            itemsLatch.await(5, TimeUnit.SECONDS)
+
+            // Sort alphabetically
+            items = fetched.sortedBy { it.name }
+        } catch (e: Exception) {
+            // Firebase not initialized or auth unavailable — show empty list
+            items = emptyList()
+        }
     }
 
     override fun onDestroy() {

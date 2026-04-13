@@ -55,7 +55,7 @@ class _Conversion {
 /// Format a quantity + unit for display, converting if needed.
 /// Returns e.g. "300 g" or "10.6 oz" depending on the unit system.
 String formatQuantityUnit(int quantity, String? unit, UnitSystem system) {
-  if (unit == null || unit.isEmpty) return 'qty $quantity';
+  if (unit == null || unit.isEmpty) return quantity > 1 ? '×$quantity' : '';
 
   if (system == UnitSystem.us) {
     final conv = _conversions[unit];

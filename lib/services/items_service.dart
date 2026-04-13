@@ -58,10 +58,12 @@ class ItemsService {
     required String itemId,
     required String name,
     required int quantity,
+    required String? unit,
     required String categoryId,
   }) async {
     await _db.doc('households/$householdId/items/$itemId').update({
-      'name': name, 'quantity': quantity, 'categoryId': categoryId,
+      'name': name, 'quantity': quantity, 'unit': unit,
+      'categoryId': categoryId,
     });
   }
 

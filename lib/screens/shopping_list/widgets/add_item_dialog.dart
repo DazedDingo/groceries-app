@@ -122,7 +122,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String?>(
-          value: _unit,
+          initialValue: _unit,
           decoration: const InputDecoration(labelText: 'Unit (optional)', isDense: true),
           items: const [
             DropdownMenuItem(value: null, child: Text('None (qty)')),

@@ -47,7 +47,9 @@ class ItemTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('${item.addedBy.displayName} · $qtyLabel'),
+          Text(qtyLabel.isEmpty
+              ? item.addedBy.displayName
+              : '${item.addedBy.displayName} · $qtyLabel'),
           if (item.recipeSource != null)
             Text(
               'from ${item.recipeSource}',
