@@ -1,17 +1,95 @@
-# groceries_app
+# Groceries
 
-A new Flutter project.
+A shared household grocery app built with Flutter and Firebase. Create a household, invite family members, and collaborate on shopping lists, pantry tracking, and meal planning — all in real time.
+
+## Features
+
+### Shopping List
+- Add items manually or by **voice** (speech-to-text)
+- Items are auto-categorized for aisle-efficient shopping
+- Filter by category, bulk-select to check off or delete
+- Purchase history — see what you've bought and when
+
+### Pantry
+- Track what's at home with quantities and units
+- Automatic restock nudges via push notifications (Cloud Function)
+- Drill into item details to adjust quantity or delete
+
+### Recipes
+- Save recipes with ingredient lists
+- **"Cook This"** adds all missing ingredients to your shopping list in one tap
+- Create, edit, and browse household recipes
+
+### Household Sharing
+- Google Sign-In authentication
+- Create or join a household with an invite code
+- All data syncs in real time across members via Firestore
+
+### Integrations
+- **Google Home / IFTTT** — "Hey Google, add milk to my grocery list" (via Cloud Function webhook)
+- **Google Tasks** sync — two-way sync between your shopping list and Google Tasks
+- **Google Wallet** quick-link in settings
+
+### Other
+- US / metric unit toggle with automatic conversion
+- Color-coded, customizable categories
+- Push notifications for restock nudges and household events
+- Material 3 themed UI
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Flutter (Dart) |
+| State management | Riverpod |
+| Routing | go_router |
+| Backend | Firebase (Auth, Firestore, Cloud Functions, Cloud Messaging) |
+| Cloud Functions | TypeScript — category guesser, Google Home webhook, restock nudges, Google Tasks sync |
+| Auth | Google Sign-In via Firebase Auth |
+
+## Project Structure
+
+```
+lib/
+├── models/          # Data models (Item, PantryItem, Recipe, Category, etc.)
+├── providers/       # Riverpod providers
+├── screens/
+│   ├── auth/        # Login
+│   ├── household/   # Household setup & invite flow
+│   ├── shopping_list/  # List, history, voice input
+│   ├── pantry/      # Pantry tracking
+│   ├── recipes/     # Recipe CRUD & "Cook This"
+│   └── settings/    # Unit toggle, categories, invites
+├── services/        # Firebase service layer
+└── theme/           # Material 3 theme
+
+functions/src/       # Firebase Cloud Functions (TypeScript)
+├── addToList.ts     # Google Home / IFTTT webhook
+├── categoryGuesser.ts
+├── nudgeRestock.ts  # Push notification nudges
+└── syncGoogleTasks.ts
+```
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Prerequisites
+- Flutter SDK (^3.11)
+- A Firebase project with Auth, Firestore, Cloud Messaging, and Cloud Functions enabled
+- `google-services.json` in `android/app/`
 
-A few resources to get you started if this is your first Flutter project:
+### Run locally
+```bash
+flutter pub get
+flutter run
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+### Deploy Cloud Functions
+```bash
+cd functions
+npm install
+firebase deploy --only functions
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## License
+
+This project is provided as-is for personal and educational use.
