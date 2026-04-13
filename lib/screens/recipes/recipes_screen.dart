@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/recipes_provider.dart';
+import '../shared/empty_state.dart';
+import '../shared/list_skeleton.dart';
 
 final _selectedTagProvider = StateProvider<String?>((ref) => null);
 
@@ -16,11 +18,24 @@ class RecipesScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Recipes')),
       body: recipes.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        loading: () => const ListSkeleton(),
+        error: (e, _) => const EmptyState(
+          icon: Icons.error_outline,
+          title: 'Something went wrong',
+          subtitle: 'Could not load recipes. Pull down to retry.',
+        ),
         data: (list) {
           if (list.isEmpty) {
-            return const Center(child: Text('No recipes yet. Tap + to create one.'));
+            return EmptyState(
+              icon: Icons.restaurant_menu,
+              title: 'No recipes yet',
+              subtitle: 'Save your favourite recipes and quickly add ingredients to your shopping list',
+              action: FilledButton.icon(
+                onPressed: () => context.go('/recipes/new'),
+                icon: const Icon(Icons.add),
+                label: const Text('Add recipe'),
+              ),
+            );
           }
 
           // Collect all unique tags

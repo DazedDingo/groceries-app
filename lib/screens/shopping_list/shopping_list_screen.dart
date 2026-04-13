@@ -13,9 +13,11 @@ import 'widgets/item_tile.dart';
 import 'widgets/filter_bar.dart';
 import 'widgets/voice_fab.dart';
 import 'widgets/add_item_dialog.dart';
+import 'widgets/barcode_scanner_dialog.dart';
 import '../../services/unit_converter.dart';
 import '../../services/category_guesser.dart';
 import '../shared/bulk_add_dialog.dart';
+import '../shared/empty_state.dart';
 import '../../services/text_item_parser.dart';
 import '../../providers/history_provider.dart';
 import '../../models/history_entry.dart';
@@ -60,6 +62,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
 
   Future<void> _showManualAddDialog(String householdId) async {
     final categories = ref.read(categoriesProvider).value ?? [];
+    final overrides = ref.read(categoryOverridesProvider).value ?? {};
     final history = ref.read(historyProvider(householdId)).value ?? [];
     final suggestions = history
         .where((h) => h.action == HistoryAction.bought)
@@ -71,9 +74,19 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       builder: (ctx) => AddItemDialog(
         categories: categories,
         historySuggestions: suggestions,
+        categoryOverrides: overrides,
       ),
     );
     if (result == null || !mounted) return;
+
+    // Save category override if user manually changed it
+    if (result.categoryOverridden && result.category != null) {
+      ref.read(categoryOverrideServiceProvider).saveOverride(
+        householdId: householdId,
+        itemName: result.name,
+        categoryId: result.category!.id,
+      );
+    }
 
     // Check for duplicate — offer to merge by bumping quantity
     final allItems = ref.read(itemsProvider).value ?? [];
@@ -133,6 +146,54 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
         );
       }
     }
+  }
+
+  Future<void> _scanBarcode(String householdId) async {
+    final productName = await Navigator.of(context).push<String>(
+      MaterialPageRoute(builder: (_) => const BarcodeScannerDialog()),
+    );
+    if (productName == null || !mounted) return;
+
+    // Open the add item dialog pre-filled with the scanned product name
+    final categories = ref.read(categoriesProvider).value ?? [];
+    final overrides = ref.read(categoryOverridesProvider).value ?? {};
+    final guessed = guessCategory(productName, categories, overrides);
+
+    final result = await showDialog<AddItemResult>(
+      context: context,
+      builder: (ctx) => AddItemDialog(
+        initialName: productName,
+        categories: categories,
+        initialCategory: guessed,
+        categoryOverrides: overrides,
+      ),
+    );
+    if (result == null || !mounted) return;
+
+    if (result.categoryOverridden && result.category != null) {
+      ref.read(categoryOverrideServiceProvider).saveOverride(
+        householdId: householdId,
+        itemName: result.name,
+        categoryId: result.category!.id,
+      );
+    }
+
+    final user = ref.read(authStateProvider).valueOrNull;
+    await ref.read(itemsServiceProvider).addItem(
+      householdId: householdId,
+      name: result.name,
+      categoryId: result.category?.id ?? 'uncategorised',
+      preferredStores: [],
+      pantryItemId: null,
+      quantity: result.quantity,
+      unit: result.unit,
+      note: result.note,
+      addedBy: AddedBy(
+        uid: user?.uid,
+        displayName: user?.displayName ?? 'Unknown',
+        source: ItemSource.app,
+      ),
+    );
   }
 
   Future<void> _showBulkAddDialog(String householdId) async {
@@ -220,17 +281,18 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
     final pantryList = ref.read(pantryProvider).value ?? [];
     final pantryMap = {for (final p in pantryList) p.id: p};
 
-    setState(() {
-      _selecting = false;
-      _selectedIds.clear();
-    });
-
     try {
       await ref.read(itemsServiceProvider).confirmBought(
         householdId: householdId,
         items: selected,
         pantryItems: pantryMap,
       );
+      if (mounted) {
+        setState(() {
+          _selecting = false;
+          _selectedIds.clear();
+        });
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -574,31 +636,29 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                 if (val == 'history') context.go('/list/history');
                 if (val == 'templates') context.go('/list/templates');
                 if (val == 'reorder') _showReorderLastTrip(householdId);
+                if (val == 'scan') _scanBarcode(householdId);
               },
               itemBuilder: (_) => const [
+                PopupMenuItem(value: 'scan', child: Text('Scan barcode')),
                 PopupMenuItem(value: 'reorder', child: Text('Reorder last trip')),
                 PopupMenuItem(value: 'templates', child: Text('Templates')),
                 PopupMenuItem(value: 'history', child: Text('History')),
               ],
-            ),
-            TextButton(
-              onPressed: () => ref.read(unitSystemProvider.notifier).toggle(),
-              child: Text(
-                unitSystem == UnitSystem.metric ? 'METRIC' : 'US',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
             ),
           ],
         ],
       ),
       body: Column(
         children: [
-          if (!_selecting) FilterBar(categories: categories),
+          FilterBar(categories: categories),
           Expanded(
-            child: ListView(
+            child: items.isEmpty
+              ? const EmptyState(
+                  icon: Icons.shopping_cart_outlined,
+                  title: 'Your list is empty',
+                  subtitle: 'Tap the microphone button or long-press to add items',
+                )
+              : ListView(
               children: sortedGroups.expand((entry) {
                 final cat = categories.firstWhere(
                   (c) => c.id == entry.key,

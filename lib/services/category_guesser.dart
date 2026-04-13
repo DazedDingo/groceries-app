@@ -41,8 +41,23 @@ const _keywords = <String, String>{
 
 /// Returns the matching [GroceryCategory] from [categories] for [itemName],
 /// or null if no match found.
-GroceryCategory? guessCategory(String itemName, List<GroceryCategory> categories) {
+///
+/// If [overrides] is provided, user corrections are checked first.
+GroceryCategory? guessCategory(
+  String itemName,
+  List<GroceryCategory> categories, [
+  Map<String, String> overrides = const {},
+]) {
   final lower = itemName.toLowerCase();
+
+  // Check user overrides first
+  final overrideId = overrides[lower];
+  if (overrideId != null) {
+    try {
+      return categories.firstWhere((c) => c.id == overrideId);
+    } catch (_) {}
+  }
+
   for (final entry in _keywords.entries) {
     if (lower.contains(entry.key)) {
       try {

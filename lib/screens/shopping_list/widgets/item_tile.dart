@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../models/item.dart';
 import '../../../services/unit_converter.dart';
 
@@ -108,6 +109,7 @@ class _ItemTileState extends State<ItemTile> {
       ),
       confirmDismiss: (dir) async {
         if (_pendingAction) return false;
+        HapticFeedback.mediumImpact();
         setState(() => _pendingAction = true);
         final action = dir == DismissDirection.startToEnd ? 'Marked as bought' : 'Deleted';
         final messenger = ScaffoldMessenger.of(context);

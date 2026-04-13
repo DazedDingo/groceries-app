@@ -8,6 +8,8 @@ import '../../providers/categories_provider.dart';
 import '../../models/shopping_template.dart';
 import '../../models/item.dart';
 import '../../services/category_guesser.dart';
+import '../shared/empty_state.dart';
+import '../shared/list_skeleton.dart';
 
 class TemplatesScreen extends ConsumerWidget {
   const TemplatesScreen({super.key});
@@ -20,18 +22,14 @@ class TemplatesScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Shopping Templates')),
       body: templates.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const ListSkeleton(),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (list) {
           if (list.isEmpty) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(32),
-                child: Text(
-                  'No templates yet.\nSave your weekly staples as a template to quickly add them to your list.',
-                  textAlign: TextAlign.center,
-                ),
-              ),
+            return const EmptyState(
+              icon: Icons.list_alt,
+              title: 'No templates yet',
+              subtitle: 'Save your weekly staples as a template to quickly add them to your list',
             );
           }
           return ListView.builder(
@@ -100,6 +98,19 @@ class TemplatesScreen extends ConsumerWidget {
     ShoppingTemplate template,
     String householdId,
   ) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Add "${template.name}"?'),
+        content: Text('This will add ${template.items.length} items to your shopping list.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Add all')),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+
     final user = ref.read(authStateProvider).valueOrNull;
     final addedBy = AddedBy(
       uid: user?.uid,

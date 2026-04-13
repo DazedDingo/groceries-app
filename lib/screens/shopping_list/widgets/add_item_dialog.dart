@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../models/category.dart';
 import '../../../services/category_guesser.dart';
 
@@ -8,7 +9,8 @@ class AddItemResult {
   final int quantity;
   final String? unit;
   final String? note;
-  AddItemResult({required this.name, required this.category, required this.quantity, this.unit, this.note});
+  final bool categoryOverridden;
+  AddItemResult({required this.name, required this.category, required this.quantity, this.unit, this.note, this.categoryOverridden = false});
 }
 
 class AddItemDialog extends StatefulWidget {
@@ -16,6 +18,7 @@ class AddItemDialog extends StatefulWidget {
   final List<GroceryCategory> categories;
   final GroceryCategory? initialCategory;
   final List<String> historySuggestions;
+  final Map<String, String> categoryOverrides;
 
   const AddItemDialog({
     super.key,
@@ -23,6 +26,7 @@ class AddItemDialog extends StatefulWidget {
     required this.categories,
     this.initialCategory,
     this.historySuggestions = const [],
+    this.categoryOverrides = const {},
   });
 
   @override
@@ -35,6 +39,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
   late final TextEditingController _qtyCtrl;
   late final TextEditingController _noteCtrl;
   GroceryCategory? _category;
+  bool _categoryManuallyChanged = false;
   int _quantity = 1;
   String? _unit;
 
@@ -58,14 +63,15 @@ class _AddItemDialogState extends State<AddItemDialog> {
 
   void _setQuantity(int val) {
     final clamped = val.clamp(1, 9999);
+    HapticFeedback.selectionClick();
     setState(() => _quantity = clamped);
     if (_qtyCtrl.text != '$clamped') _qtyCtrl.text = '$clamped';
   }
 
   void _onNameChanged(String val) {
-    final guess = guessCategory(val, widget.categories);
+    final guess = guessCategory(val, widget.categories, widget.categoryOverrides);
     setState(() {
-      if (guess != null && guess != _category) _category = guess;
+      if (guess != null && !_categoryManuallyChanged) _category = guess;
     });
   }
 
@@ -108,7 +114,10 @@ class _AddItemDialogState extends State<AddItemDialog> {
               items: widget.categories
                   .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
                   .toList(),
-              onChanged: (c) => setState(() => _category = c),
+              onChanged: (c) => setState(() {
+                _category = c;
+                _categoryManuallyChanged = true;
+              }),
             ),
           ),
         ),
@@ -195,6 +204,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
                       quantity: _quantity,
                       unit: _unit,
                       note: _noteCtrl.text.trim().isEmpty ? null : _noteCtrl.text.trim(),
+                      categoryOverridden: _categoryManuallyChanged,
                     ),
                   ),
           child: const Text('Add'),

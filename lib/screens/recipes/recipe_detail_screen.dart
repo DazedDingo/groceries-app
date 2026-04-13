@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -195,19 +196,14 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
       appBar: AppBar(
         title: Text(recipe.name),
         actions: [
-          TextButton(
-            onPressed: () => ref.read(unitSystemProvider.notifier).toggle(),
-            child: Text(
-              unitSystem == UnitSystem.metric ? 'METRIC' : 'US',
-              style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface),
-            ),
-          ),
           IconButton(
             icon: const Icon(Icons.edit),
+            tooltip: 'Edit recipe',
             onPressed: () => context.go('/recipes/${recipe.id}/edit'),
           ),
           IconButton(
             icon: const Icon(Icons.delete),
+            tooltip: 'Delete recipe',
             onPressed: () async {
               final confirm = await showDialog<bool>(
                 context: context,
@@ -269,7 +265,10 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
               IconButton(
                 icon: const Icon(Icons.remove, size: 18),
                 visualDensity: VisualDensity.compact,
-                onPressed: _multiplier > 1 ? () => setState(() => _multiplier--) : null,
+                onPressed: _multiplier > 1 ? () {
+                  HapticFeedback.selectionClick();
+                  setState(() => _multiplier--);
+                } : null,
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -287,7 +286,10 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
               IconButton(
                 icon: const Icon(Icons.add, size: 18),
                 visualDensity: VisualDensity.compact,
-                onPressed: _multiplier < 10 ? () => setState(() => _multiplier++) : null,
+                onPressed: _multiplier < 10 ? () {
+                  HapticFeedback.selectionClick();
+                  setState(() => _multiplier++);
+                } : null,
               ),
             ],
           ),

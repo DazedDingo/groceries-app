@@ -12,6 +12,7 @@ import '../../models/pantry_item.dart';
 import '../../services/category_guesser.dart';
 import '../../services/text_item_parser.dart';
 import '../shared/bulk_add_dialog.dart';
+import '../shared/empty_state.dart';
 import 'widgets/pantry_item_tile.dart';
 
 class PantryScreen extends ConsumerWidget {
@@ -109,7 +110,11 @@ class PantryScreen extends ConsumerWidget {
             ),
           Expanded(
             child: pantry.isEmpty
-                ? const Center(child: Text('No pantry items yet. Tap + to add one.'))
+                ? const EmptyState(
+                    icon: Icons.kitchen,
+                    title: 'Pantry is empty',
+                    subtitle: 'Track what you have at home so you never overbuy',
+                  )
                 : ListView(
                     children: [
                       if (expired.isNotEmpty) ...[
@@ -131,10 +136,25 @@ class PantryScreen extends ConsumerWidget {
                                 ),
                               ),
                               TextButton(
-                                onPressed: () => pantryService.clearExpired(
-                                  householdId,
-                                  expired.map((e) => e.id).toList(),
-                                ),
+                                onPressed: () async {
+                                  final confirm = await showDialog<bool>(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                      title: const Text('Clear expired items?'),
+                                      content: Text('This will remove ${expired.length} expired item${expired.length == 1 ? '' : 's'} from your pantry.'),
+                                      actions: [
+                                        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+                                        FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Clear')),
+                                      ],
+                                    ),
+                                  );
+                                  if (confirm == true) {
+                                    pantryService.clearExpired(
+                                      householdId,
+                                      expired.map((e) => e.id).toList(),
+                                    );
+                                  }
+                                },
                                 child: Text('Clear all',
                                   style: TextStyle(color: Theme.of(context).colorScheme.onErrorContainer)),
                               ),

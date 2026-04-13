@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/history_provider.dart';
 import '../../providers/household_provider.dart';
 import '../../models/history_entry.dart';
+import '../shared/empty_state.dart';
+import '../shared/list_skeleton.dart';
 
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
@@ -15,11 +17,19 @@ class HistoryScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Item History')),
       body: history.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        loading: () => const ListSkeleton(),
+        error: (e, _) => const EmptyState(
+          icon: Icons.error_outline,
+          title: 'Something went wrong',
+          subtitle: 'Could not load history.',
+        ),
         data: (entries) {
           if (entries.isEmpty) {
-            return const Center(child: Text('No history yet.'));
+            return const EmptyState(
+              icon: Icons.history,
+              title: 'No history yet',
+              subtitle: 'Items you add and check off will appear here',
+            );
           }
           return ListView.builder(
             itemCount: entries.length,

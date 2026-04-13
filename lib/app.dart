@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'main.dart' show pendingInviteToken;
 import 'theme/app_theme.dart';
+import 'providers/items_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/household/setup_screen.dart';
 import 'screens/shopping_list/shopping_list_screen.dart';
@@ -16,6 +18,7 @@ import 'screens/shopping_list/templates_screen.dart';
 import 'screens/recipes/recipes_screen.dart';
 import 'screens/recipes/recipe_detail_screen.dart';
 import 'screens/recipes/add_recipe_screen.dart';
+import 'screens/meal_plan/meal_plan_screen.dart';
 
 final _router = GoRouter(
   initialLocation: '/login',
@@ -69,6 +72,7 @@ final _router = GoRouter(
             ),
           ],
         ),
+        GoRoute(path: '/plan', builder: (_, __) => const MealPlanScreen()),
         GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
         GoRoute(path: '/settings/categories', builder: (_, __) => const ManageCategoriesScreen()),
       ],
@@ -133,30 +137,41 @@ class _GroceriesAppState extends State<GroceriesApp> {
   }
 }
 
-class ScaffoldWithNavBar extends StatelessWidget {
+class ScaffoldWithNavBar extends ConsumerWidget {
   final Widget child;
   const ScaffoldWithNavBar({super.key, required this.child});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final location = GoRouterState.of(context).uri.toString();
     int selectedIndex = 0;
     if (location.startsWith('/pantry')) selectedIndex = 1;
     if (location.startsWith('/recipes')) selectedIndex = 2;
-    if (location.startsWith('/settings')) selectedIndex = 3;
+    if (location.startsWith('/plan')) selectedIndex = 3;
+    if (location.startsWith('/settings')) selectedIndex = 4;
+
+    final itemCount = ref.watch(itemsProvider).value?.length ?? 0;
 
     return Scaffold(
       body: child,
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.shopping_cart), label: 'List'),
-          NavigationDestination(icon: Icon(Icons.kitchen), label: 'Pantry'),
-          NavigationDestination(icon: Icon(Icons.restaurant_menu), label: 'Recipes'),
-          NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
+        destinations: [
+          NavigationDestination(
+            icon: Badge(
+              isLabelVisible: itemCount > 0,
+              label: Text('$itemCount'),
+              child: const Icon(Icons.shopping_cart),
+            ),
+            label: 'List',
+          ),
+          const NavigationDestination(icon: Icon(Icons.kitchen), label: 'Pantry'),
+          const NavigationDestination(icon: Icon(Icons.restaurant_menu), label: 'Recipes'),
+          const NavigationDestination(icon: Icon(Icons.calendar_month), label: 'Plan'),
+          const NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
         ],
         onDestinationSelected: (i) {
-          const routes = ['/list', '/pantry', '/recipes', '/settings'];
+          const routes = ['/list', '/pantry', '/recipes', '/plan', '/settings'];
           context.go(routes[i]);
         },
       ),
