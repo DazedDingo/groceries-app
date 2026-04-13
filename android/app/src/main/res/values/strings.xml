@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_description">Tap to add items to your grocery list by voice</string>
+    <string name="list_widget_description">A fridge-shaped widget showing your grocery list</string>
+</resources>

@@ -4,9 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:android_intent_plus/android_intent.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/household_provider.dart';
 import '../../services/notification_service.dart';
+import '../../services/unit_converter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 final notificationServiceProvider = Provider<NotificationService>((ref) => NotificationService());
 
@@ -23,33 +26,69 @@ class SettingsScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
+          SwitchListTile(
+            title: const Text('Use US units'),
+            subtitle: Text(ref.watch(unitSystemProvider) == UnitSystem.us
+                ? 'oz, lb, fl oz, gal'
+                : 'g, kg, ml, L'),
+            value: ref.watch(unitSystemProvider) == UnitSystem.us,
+            onChanged: (_) => ref.read(unitSystemProvider.notifier).toggle(),
+          ),
           ListTile(
             title: const Text('Manage Categories'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.go('/settings/categories'),
           ),
-          ListTile(
-            title: const Text('Manage Stores'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.go('/settings/stores'),
-          ),
           const Divider(),
           ListTile(
-            title: const Text('Share invite link'),
-            onTap: () => Share.share('Join my grocery household: groceries://join/$householdId'),
+            title: const Text('Share invite code'),
+            subtitle: const Text('Share this code so others can join your household'),
+            onTap: () async {
+              try {
+                final doc = await FirebaseFirestore.instance.doc('households/$householdId').get();
+                final token = doc.data()?['inviteToken'] as String?;
+                if (token != null) {
+                  // Ensure invite lookup doc exists (self-healing for older households)
+                  final inviteRef = FirebaseFirestore.instance.doc('invites/$token');
+                  final inviteDoc = await inviteRef.get();
+                  if (!inviteDoc.exists) {
+                    await inviteRef.set({'householdId': householdId});
+                  }
+                  await Share.share('Join my grocery household! Use this invite code: $token');
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: $e')),
+                  );
+                }
+              }
+            },
           ),
           ListTile(
             leading: const Icon(Icons.wallet),
             title: const Text('Open Google Wallet'),
             subtitle: const Text('Quick access to store loyalty cards'),
             onTap: () async {
-              final uri = Uri.parse('https://wallet.google.com');
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
-              } else if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Could not open Google Wallet')),
-                );
+              const intent = AndroidIntent(
+                action: 'android.intent.action.MAIN',
+                package: 'com.google.android.apps.walletnfcrel',
+                componentName: 'com.google.android.apps.walletnfcrel.MainActivity',
+              );
+              try {
+                await intent.launch();
+              } catch (_) {
+                // App not installed — open Play Store listing
+                final playStore = Uri.parse('market://details?id=com.google.android.apps.walletnfcrel');
+                try {
+                  await launchUrl(playStore, mode: LaunchMode.externalApplication);
+                } catch (_) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Could not open Google Wallet')),
+                    );
+                  }
+                }
               }
             },
           ),

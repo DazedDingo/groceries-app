@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/fridge_bg"
+    android:padding="4dp">
+
+    <!-- Fridge "handle" / header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Groceries"
+            android:textColor="#FF5D4037"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:fontFamily="serif" />
+
+        <ImageView
+            android:id="@+id/refresh_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_popup_sync"
+            android:contentDescription="Refresh list"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+    <!-- The note / list area -->
+    <ListView
+        android:id="@+id/grocery_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:scrollbars="none" />
+
+    <TextView
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="List is empty!"
+        android:textColor="#FF8D6E63"
+        android:textSize="12sp"
+        android:fontFamily="serif"
+        android:visibility="gone" />
+
+</LinearLayout>

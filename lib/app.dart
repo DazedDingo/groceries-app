@@ -7,7 +7,6 @@ import 'screens/shopping_list/shopping_list_screen.dart';
 import 'screens/pantry/pantry_screen.dart';
 import 'screens/pantry/pantry_item_detail_screen.dart';
 import 'screens/settings/settings_screen.dart';
-import 'screens/settings/manage_stores_screen.dart';
 import 'screens/settings/manage_categories_screen.dart';
 import 'screens/shopping_list/history_screen.dart';
 import 'screens/recipes/recipes_screen.dart';
@@ -59,7 +58,6 @@ final _router = GoRouter(
           ],
         ),
         GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
-        GoRoute(path: '/settings/stores', builder: (_, __) => const ManageStoresScreen()),
         GoRoute(path: '/settings/categories', builder: (_, __) => const ManageCategoriesScreen()),
       ],
     ),

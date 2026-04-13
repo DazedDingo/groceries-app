@@ -25,7 +25,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
   void dispose() {
     _nameCtrl.dispose();
     _notesCtrl.dispose();
-    for (final e in _ingredients) { e.nameCtrl.dispose(); }
+    for (final e in _ingredients) { e.nameCtrl.dispose(); e.qtyCtrl.dispose(); }
     super.dispose();
   }
 
@@ -38,6 +38,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
       _ingredients.add(_IngredientEntry(
         nameCtrl: TextEditingController(text: ing.name),
         quantity: ing.quantity,
+        unit: ing.unit,
         categoryId: ing.categoryId,
       ));
     }
@@ -52,6 +53,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
   void _removeIngredient(int index) {
     setState(() {
       _ingredients[index].nameCtrl.dispose();
+      _ingredients[index].qtyCtrl.dispose();
       _ingredients.removeAt(index);
     });
   }
@@ -65,6 +67,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
     final ingredients = _ingredients.map((e) => RecipeIngredient(
       name: e.nameCtrl.text.trim(),
       quantity: e.quantity,
+      unit: e.unit,
       categoryId: e.categoryId,
     )).where((i) => i.name.isNotEmpty).toList();
 
@@ -155,28 +158,63 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
                       },
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 4),
                   SizedBox(
                     width: 80,
                     child: Row(
                       children: [
                         InkWell(
                           onTap: ing.quantity > 1
-                              ? () => setState(() => ing.quantity--)
+                              ? () => setState(() { ing.quantity--; ing.qtyCtrl.text = '${ing.quantity}'; })
                               : null,
                           child: const Icon(Icons.remove, size: 18),
                         ),
                         Expanded(
-                          child: Text(
-                            '${ing.quantity}',
+                          child: TextField(
+                            controller: ing.qtyCtrl,
                             textAlign: TextAlign.center,
+                            keyboardType: TextInputType.number,
+                            style: const TextStyle(fontSize: 14),
+                            decoration: const InputDecoration(
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(vertical: 4),
+                              border: InputBorder.none,
+                            ),
+                            onChanged: (val) {
+                              final n = int.tryParse(val);
+                              if (n != null && n >= 1) setState(() => ing.quantity = n);
+                            },
                           ),
                         ),
                         InkWell(
-                          onTap: () => setState(() => ing.quantity++),
+                          onTap: () => setState(() { ing.quantity++; ing.qtyCtrl.text = '${ing.quantity}'; }),
                           child: const Icon(Icons.add, size: 18),
                         ),
                       ],
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  SizedBox(
+                    width: 64,
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String?>(
+                        value: ing.unit,
+                        isDense: true,
+                        hint: const Text('unit', style: TextStyle(fontSize: 12)),
+                        style: Theme.of(context).textTheme.bodySmall,
+                        items: const [
+                          DropdownMenuItem(value: null, child: Text('—')),
+                          DropdownMenuItem(value: 'g', child: Text('g')),
+                          DropdownMenuItem(value: 'kg', child: Text('kg')),
+                          DropdownMenuItem(value: 'ml', child: Text('ml')),
+                          DropdownMenuItem(value: 'L', child: Text('L')),
+                          DropdownMenuItem(value: 'oz', child: Text('oz')),
+                          DropdownMenuItem(value: 'lb', child: Text('lb')),
+                          DropdownMenuItem(value: 'cups', child: Text('cups')),
+                          DropdownMenuItem(value: 'packs', child: Text('packs')),
+                        ],
+                        onChanged: (v) => setState(() => ing.unit = v),
+                      ),
                     ),
                   ),
                   IconButton(
@@ -203,8 +241,11 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
 
 class _IngredientEntry {
   final TextEditingController nameCtrl;
+  final TextEditingController qtyCtrl;
   int quantity;
+  String? unit;
   String? categoryId;
 
-  _IngredientEntry({required this.nameCtrl, this.quantity = 1, this.categoryId});
+  _IngredientEntry({required this.nameCtrl, this.quantity = 1, this.unit, this.categoryId})
+    : qtyCtrl = TextEditingController(text: '$quantity');
 }

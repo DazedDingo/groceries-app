@@ -11,6 +11,7 @@ export async function writeItem(params: WriteItemParams): Promise<void> {
   batch.set(itemRef, {
     name: params.name,
     quantity: params.quantity,
+    unit: params.unit ?? null,
     categoryId: params.categoryId,
     preferredStores: [],
     pantryItemId: null,

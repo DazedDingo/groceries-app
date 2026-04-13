@@ -71,6 +71,37 @@ describe('parseItemString', () => {
   it('trims whitespace', () => {
     expect(parseItemString('  2  bananas  ')).toEqual({ quantity: 2, name: 'bananas' });
   });
+
+  it('parses "pounds of" and returns unit', () => {
+    expect(parseItemString('2 pounds of cheese')).toEqual({ quantity: 2, name: 'cheese', unit: 'lb' });
+  });
+
+  it('parses "bags of" and returns unit', () => {
+    expect(parseItemString('3 bags of spinach')).toEqual({ quantity: 3, name: 'spinach', unit: 'bags' });
+  });
+
+  it('parses singular "bottle of" and returns unit', () => {
+    expect(parseItemString('1 bottle of wine')).toEqual({ quantity: 1, name: 'wine', unit: 'bottles' });
+  });
+
+  it('parses "dozen" and returns unit', () => {
+    expect(parseItemString('2 dozen eggs')).toEqual({ quantity: 2, name: 'eggs', unit: 'dozen' });
+  });
+
+  it('parses "lb" shorthand and returns unit', () => {
+    expect(parseItemString('5 lb ground beef')).toEqual({ quantity: 5, name: 'ground beef', unit: 'lb' });
+  });
+
+  it('parses "g" unit', () => {
+    expect(parseItemString('300 g flour')).toEqual({ quantity: 300, name: 'flour', unit: 'g' });
+  });
+
+  it('keeps name without unit when no unit match', () => {
+    const result = parseItemString('3 eggs');
+    expect(result.quantity).toBe(3);
+    expect(result.name).toBe('eggs');
+    expect(result.unit).toBeUndefined();
+  });
 });
 
 // ── handleIftttWebhook ───────────────────────────────────────────────────────

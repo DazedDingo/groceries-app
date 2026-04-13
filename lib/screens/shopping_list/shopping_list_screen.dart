@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/items_provider.dart';
 import '../../providers/categories_provider.dart';
-import '../../providers/stores_provider.dart';
 import '../../providers/household_provider.dart';
 import '../../providers/pantry_provider.dart';
 import '../../models/category.dart';
@@ -14,6 +13,7 @@ import 'widgets/item_tile.dart';
 import 'widgets/filter_bar.dart';
 import 'widgets/voice_fab.dart';
 import 'widgets/add_item_dialog.dart';
+import '../../services/unit_converter.dart';
 
 class ShoppingListScreen extends ConsumerStatefulWidget {
   const ShoppingListScreen({super.key});
@@ -58,6 +58,27 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       builder: (ctx) => AddItemDialog(categories: categories),
     );
     if (result == null || !mounted) return;
+
+    // Check for duplicate
+    final allItems = ref.read(itemsProvider).value ?? [];
+    final duplicate = allItems.any(
+      (item) => item.name.toLowerCase() == result.name.toLowerCase(),
+    );
+    if (duplicate && mounted) {
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Item already on list'),
+          content: Text('"${result.name}" is already on your shopping list. Add it again?'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Add anyway')),
+          ],
+        ),
+      );
+      if (confirm != true || !mounted) return;
+    }
+
     try {
       final user = ref.read(authStateProvider).valueOrNull;
       await ref.read(itemsServiceProvider).addItem(
@@ -67,6 +88,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
         preferredStores: [],
         pantryItemId: null,
         quantity: result.quantity,
+        unit: result.unit,
         addedBy: AddedBy(
           uid: user?.uid,
           displayName: user?.displayName ?? 'Unknown',
@@ -207,8 +229,8 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
     final items = ref.watch(filteredItemsProvider);
     final allItems = ref.watch(itemsProvider).value ?? [];
     final categories = ref.watch(categoriesProvider).value ?? [];
-    final stores = ref.watch(storesProvider).value ?? [];
     final householdId = ref.watch(householdIdProvider).value ?? '';
+    final unitSystem = ref.watch(unitSystemProvider);
 
     final grouped = <String, List<ShoppingItem>>{};
     for (final item in items) {
@@ -251,12 +273,22 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
               onPressed: () => context.go('/list/history'),
               tooltip: 'History',
             ),
+            TextButton(
+              onPressed: () => ref.read(unitSystemProvider.notifier).toggle(),
+              child: Text(
+                unitSystem == UnitSystem.metric ? 'METRIC' : 'US',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ),
           ],
         ],
       ),
       body: Column(
         children: [
-          if (!_selecting) FilterBar(categories: categories, stores: stores),
+          if (!_selecting) FilterBar(categories: categories),
           Expanded(
             child: ListView(
               children: sortedGroups.expand((entry) {
@@ -291,6 +323,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                   ),
                   ...entry.value.map((item) => ItemTile(
                     item: item,
+                    unitSystem: unitSystem,
                     isSelecting: _selecting,
                     isSelected: _selectedIds.contains(item.id),
                     onLongPress: () => _enterSelecting(item.id),

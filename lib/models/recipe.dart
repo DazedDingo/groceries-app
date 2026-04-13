@@ -3,17 +3,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class RecipeIngredient {
   final String name;
   final int quantity;
+  final String? unit;
   final String? categoryId;
 
-  const RecipeIngredient({required this.name, required this.quantity, this.categoryId});
+  const RecipeIngredient({required this.name, required this.quantity, this.unit, this.categoryId});
 
   Map<String, dynamic> toMap() => {
-    'name': name, 'quantity': quantity, 'categoryId': categoryId,
+    'name': name, 'quantity': quantity, 'unit': unit, 'categoryId': categoryId,
   };
 
   factory RecipeIngredient.fromMap(Map<String, dynamic> m) => RecipeIngredient(
     name: m['name'] ?? '',
     quantity: m['quantity'] ?? 1,
+    unit: m['unit'],
     categoryId: m['categoryId'],
   );
 }

@@ -6,6 +6,7 @@ import '../../providers/items_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/household_provider.dart';
 import '../../models/item.dart';
+import '../../services/unit_converter.dart';
 
 class RecipeDetailScreen extends ConsumerWidget {
   final String recipeId;
@@ -16,6 +17,7 @@ class RecipeDetailScreen extends ConsumerWidget {
     final recipes = ref.watch(recipesProvider).value ?? [];
     final recipe = recipes.where((r) => r.id == recipeId).firstOrNull;
     final householdId = ref.watch(householdIdProvider).value ?? '';
+    final unitSystem = ref.watch(unitSystemProvider);
 
     if (recipe == null) {
       return Scaffold(
@@ -28,6 +30,13 @@ class RecipeDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(recipe.name),
         actions: [
+          TextButton(
+            onPressed: () => ref.read(unitSystemProvider.notifier).toggle(),
+            child: Text(
+              unitSystem == UnitSystem.metric ? 'METRIC' : 'US',
+              style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () => context.go('/recipes/${recipe.id}/edit'),
@@ -69,13 +78,14 @@ class RecipeDetailScreen extends ConsumerWidget {
             dense: true,
             contentPadding: EdgeInsets.zero,
             title: Text(ing.name),
-            trailing: Text('x${ing.quantity}'),
+            trailing: Text(formatQuantityUnit(ing.quantity, ing.unit, unitSystem)),
           )),
           const SizedBox(height: 24),
           FilledButton.icon(
             onPressed: () async {
               final user = ref.read(authStateProvider).value;
               final itemsService = ref.read(itemsServiceProvider);
+
               for (final ing in recipe.ingredients) {
                 await itemsService.addItem(
                   householdId: householdId,
@@ -84,6 +94,8 @@ class RecipeDetailScreen extends ConsumerWidget {
                   preferredStores: [],
                   pantryItemId: null,
                   quantity: ing.quantity,
+                  unit: ing.unit,
+                  recipeSource: recipe.name,
                   addedBy: AddedBy(
                     uid: user?.uid,
                     displayName: user?.displayName ?? 'Unknown',
@@ -91,10 +103,23 @@ class RecipeDetailScreen extends ConsumerWidget {
                   ),
                 );
               }
+
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Added ${recipe.ingredients.length} items to shopping list')),
-                );
+                // Check for duplicates and mention in snackbar
+                final existingItems = ref.read(itemsProvider).value ?? [];
+                final counts = <String, int>{};
+                for (final item in existingItems) {
+                  counts[item.name.toLowerCase()] = (counts[item.name.toLowerCase()] ?? 0) + 1;
+                }
+                final dupes = counts.entries
+                    .where((e) => e.value > 1)
+                    .map((e) => e.key)
+                    .toList();
+
+                final msg = dupes.isEmpty
+                    ? 'Added ${recipe.ingredients.length} items to shopping list'
+                    : 'Added ${recipe.ingredients.length} items (${dupes.join(", ")} already on list)';
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
               }
             },
             icon: const Icon(Icons.restaurant),

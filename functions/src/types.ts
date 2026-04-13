@@ -3,5 +3,6 @@ export interface WriteItemParams {
   uid: string;
   name: string;
   quantity: number;
+  unit?: string;
   categoryId: string;
 }
