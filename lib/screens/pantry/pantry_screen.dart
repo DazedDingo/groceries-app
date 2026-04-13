@@ -10,6 +10,8 @@ import '../../models/item.dart';
 import '../../models/category.dart';
 import '../../models/pantry_item.dart';
 import '../../services/category_guesser.dart';
+import '../../services/text_item_parser.dart';
+import '../shared/bulk_add_dialog.dart';
 import 'widgets/pantry_item_tile.dart';
 
 class PantryScreen extends ConsumerWidget {
@@ -71,7 +73,16 @@ class PantryScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Pantry')),
+      appBar: AppBar(
+        title: const Text('Pantry'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.playlist_add),
+            onPressed: () => _showBulkAddDialog(context, ref, householdId, categories),
+            tooltip: 'Bulk add',
+          ),
+        ],
+      ),
       body: Column(
         children: [
           if (categories.isNotEmpty)
@@ -126,6 +137,43 @@ class PantryScreen extends ConsumerWidget {
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  void _showBulkAddDialog(BuildContext context, WidgetRef ref,
+      String householdId, List<GroceryCategory> categories) async {
+    final items = await showDialog<List<ParsedTextItem>>(
+      context: context,
+      builder: (_) => const BulkAddDialog(
+        title: 'Bulk add to pantry',
+        hint: 'One item per line, e.g.:\nchicken\npasta\nmilk\neggs',
+      ),
+    );
+    if (items == null || items.isEmpty || !context.mounted) return;
+
+    try {
+      for (final item in items) {
+        final cat = guessCategory(item.name, categories);
+        await ref.read(pantryServiceProvider).addItem(
+          householdId: householdId,
+          name: item.name,
+          categoryId: cat?.id ?? 'uncategorised',
+          preferredStores: [],
+          optimalQuantity: item.quantity,
+          currentQuantity: 0,
+        );
+      }
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Added ${items.length} pantry items')),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add items: $e')),
+        );
+      }
+    }
   }
 
   void _showAddDialog(BuildContext context, WidgetRef ref, String householdId,

@@ -17,12 +17,16 @@ class RecipesService {
     required String householdId,
     required String name,
     required List<RecipeIngredient> ingredients,
+    List<String> instructions = const [],
     String? notes,
+    String? sourceUrl,
   }) async {
     final ref = await _db.collection('households/$householdId/recipes').add({
       'name': name,
       'ingredients': ingredients.map((i) => i.toMap()).toList(),
+      'instructions': instructions,
       'notes': notes,
+      'sourceUrl': sourceUrl,
       'updatedAt': FieldValue.serverTimestamp(),
     });
     return ref.id;
@@ -33,12 +37,16 @@ class RecipesService {
     required String recipeId,
     required String name,
     required List<RecipeIngredient> ingredients,
+    List<String> instructions = const [],
     String? notes,
+    String? sourceUrl,
   }) async {
     await _db.doc('households/$householdId/recipes/$recipeId').update({
       'name': name,
       'ingredients': ingredients.map((i) => i.toMap()).toList(),
+      'instructions': instructions,
       'notes': notes,
+      'sourceUrl': sourceUrl,
       'updatedAt': FieldValue.serverTimestamp(),
     });
   }

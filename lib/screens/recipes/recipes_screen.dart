@@ -33,9 +33,23 @@ class RecipesScreen extends ConsumerWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.go('/recipes/new'),
-        child: const Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.small(
+            heroTag: 'import',
+            onPressed: () => context.go('/recipes/new?import=true'),
+            tooltip: 'Import from URL',
+            child: const Icon(Icons.link),
+          ),
+          const SizedBox(height: 8),
+          FloatingActionButton(
+            heroTag: 'add',
+            onPressed: () => context.go('/recipes/new'),
+            tooltip: 'New recipe',
+            child: const Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }

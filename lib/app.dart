@@ -39,7 +39,9 @@ final _router = GoRouter(
           routes: [
             GoRoute(
               path: 'new',
-              builder: (_, __) => const AddRecipeScreen(),
+              builder: (_, state) => AddRecipeScreen(
+                autoImport: state.uri.queryParameters['import'] == 'true',
+              ),
             ),
             GoRoute(
               path: ':recipeId',

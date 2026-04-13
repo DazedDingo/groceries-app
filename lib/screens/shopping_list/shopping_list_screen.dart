@@ -14,6 +14,9 @@ import 'widgets/filter_bar.dart';
 import 'widgets/voice_fab.dart';
 import 'widgets/add_item_dialog.dart';
 import '../../services/unit_converter.dart';
+import '../../services/category_guesser.dart';
+import '../shared/bulk_add_dialog.dart';
+import '../../services/text_item_parser.dart';
 
 class ShoppingListScreen extends ConsumerStatefulWidget {
   const ShoppingListScreen({super.key});
@@ -99,6 +102,49 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to add item: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _showBulkAddDialog(String householdId) async {
+    final items = await showDialog<List<ParsedTextItem>>(
+      context: context,
+      builder: (_) => const BulkAddDialog(title: 'Bulk add to list'),
+    );
+    if (items == null || items.isEmpty || !mounted) return;
+
+    final user = ref.read(authStateProvider).valueOrNull;
+    final categories = ref.read(categoriesProvider).value ?? [];
+    final addedBy = AddedBy(
+      uid: user?.uid,
+      displayName: user?.displayName ?? 'Unknown',
+      source: ItemSource.app,
+    );
+
+    try {
+      for (final item in items) {
+        final cat = guessCategory(item.name, categories);
+        await ref.read(itemsServiceProvider).addItem(
+          householdId: householdId,
+          name: item.name,
+          categoryId: cat?.id ?? 'uncategorised',
+          preferredStores: [],
+          pantryItemId: null,
+          quantity: item.quantity,
+          unit: item.unit,
+          addedBy: addedBy,
+        );
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Added ${items.length} items')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add items: $e')),
         );
       }
     }
@@ -292,6 +338,11 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
               icon: const Icon(Icons.add),
               onPressed: () => _showManualAddDialog(householdId),
               tooltip: 'Add item',
+            ),
+            IconButton(
+              icon: const Icon(Icons.playlist_add),
+              onPressed: () => _showBulkAddDialog(householdId),
+              tooltip: 'Bulk add',
             ),
             IconButton(
               icon: const Icon(Icons.history),

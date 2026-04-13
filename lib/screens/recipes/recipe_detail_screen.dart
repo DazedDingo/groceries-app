@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../providers/recipes_provider.dart';
 import '../../providers/items_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -72,6 +73,29 @@ class RecipeDetailScreen extends ConsumerWidget {
             Text(recipe.notes!, style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 16),
           ],
+          if (recipe.sourceUrl != null && recipe.sourceUrl!.isNotEmpty) ...[
+            InkWell(
+              onTap: () => launchUrl(Uri.parse(recipe.sourceUrl!)),
+              child: Row(
+                children: [
+                  Icon(Icons.link, size: 16, color: Theme.of(context).colorScheme.primary),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      recipe.sourceUrl!,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        decoration: TextDecoration.underline,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
           Text('Ingredients', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           ...recipe.ingredients.map((ing) => ListTile(
@@ -80,6 +104,38 @@ class RecipeDetailScreen extends ConsumerWidget {
             title: Text(ing.name),
             trailing: Text(formatQuantityUnit(ing.quantity, ing.unit, unitSystem)),
           )),
+          if (recipe.instructions.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            Text('Instructions', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            ...recipe.instructions.asMap().entries.map((entry) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 28,
+                    height: 28,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      '${entry.key + 1}',
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(entry.value, style: Theme.of(context).textTheme.bodyMedium),
+                  ),
+                ],
+              ),
+            )),
+          ],
           const SizedBox(height: 24),
           FilledButton.icon(
             onPressed: () async {

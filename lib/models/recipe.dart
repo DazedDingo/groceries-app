@@ -24,16 +24,21 @@ class Recipe {
   final String id;
   final String name;
   final List<RecipeIngredient> ingredients;
+  final List<String> instructions;
   final String? notes;
+  final String? sourceUrl;
 
   const Recipe({
-    required this.id, required this.name, required this.ingredients, this.notes,
+    required this.id, required this.name, required this.ingredients,
+    this.instructions = const [], this.notes, this.sourceUrl,
   });
 
   Map<String, dynamic> toMap() => {
     'name': name,
     'ingredients': ingredients.map((i) => i.toMap()).toList(),
+    'instructions': instructions,
     'notes': notes,
+    'sourceUrl': sourceUrl,
     'updatedAt': FieldValue.serverTimestamp(),
   };
 
@@ -45,7 +50,11 @@ class Recipe {
       ingredients: (d['ingredients'] as List<dynamic>?)
           ?.map((i) => RecipeIngredient.fromMap(i as Map<String, dynamic>))
           .toList() ?? [],
+      instructions: (d['instructions'] as List<dynamic>?)
+          ?.map((s) => s.toString())
+          .toList() ?? [],
       notes: d['notes'],
+      sourceUrl: d['sourceUrl'],
     );
   }
 }
