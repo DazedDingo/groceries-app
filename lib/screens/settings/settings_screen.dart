@@ -54,7 +54,11 @@ class SettingsScreen extends ConsumerWidget {
                   if (!inviteDoc.exists) {
                     await inviteRef.set({'householdId': householdId});
                   }
-                  await Share.share('Join my grocery household! Use this invite code: $token');
+                  await Share.share(
+                    'Join my grocery household!\n\n'
+                    'Tap this link: groceries://join?token=$token\n\n'
+                    'Or enter this code manually: $token',
+                  );
                 }
               } catch (e) {
                 if (context.mounted) {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../models/item.dart';
 import '../../../services/unit_converter.dart';
 
-class ItemTile extends StatelessWidget {
+class ItemTile extends StatefulWidget {
   final ShoppingItem item;
   final VoidCallback onCheckOff;
   final VoidCallback onDelete;
@@ -24,6 +24,15 @@ class ItemTile extends StatelessWidget {
     this.unitSystem = UnitSystem.metric,
   });
 
+  @override
+  State<ItemTile> createState() => _ItemTileState();
+}
+
+class _ItemTileState extends State<ItemTile> {
+  bool _pendingAction = false;
+
+  ShoppingItem get item => widget.item;
+
   IconData _sourceIcon() => switch (item.addedBy.source) {
     ItemSource.googleHome => Icons.home,
     ItemSource.voiceInApp => Icons.mic,
@@ -33,14 +42,14 @@ class ItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final qtyLabel = formatQuantityUnit(item.quantity, item.unit, unitSystem);
+    final qtyLabel = formatQuantityUnit(item.quantity, item.unit, widget.unitSystem);
 
     final tile = ListTile(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      selected: isSelected,
-      leading: isSelecting
-          ? Checkbox(value: isSelected, onChanged: (_) => onTap())
+      onTap: widget.onTap,
+      onLongPress: widget.onLongPress,
+      selected: widget.isSelected,
+      leading: widget.isSelecting
+          ? Checkbox(value: widget.isSelected, onChanged: (_) => widget.onTap())
           : null,
       title: Text(item.name),
       subtitle: Column(
@@ -50,6 +59,13 @@ class ItemTile extends StatelessWidget {
           Text(qtyLabel.isEmpty
               ? item.addedBy.displayName
               : '${item.addedBy.displayName} · $qtyLabel'),
+          if (item.note != null && item.note!.isNotEmpty)
+            Text(
+              item.note!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
           if (item.recipeSource != null)
             Text(
               'from ${item.recipeSource}',
@@ -76,7 +92,7 @@ class ItemTile extends StatelessWidget {
       ),
     );
 
-    if (isSelecting) return tile;
+    if (widget.isSelecting) return tile;
 
     return Dismissible(
       key: Key(item.id),
@@ -90,7 +106,33 @@ class ItemTile extends StatelessWidget {
         padding: const EdgeInsets.only(right: 16),
         child: const Icon(Icons.delete, color: Colors.white),
       ),
-      onDismissed: (dir) => dir == DismissDirection.startToEnd ? onCheckOff() : onDelete(),
+      confirmDismiss: (dir) async {
+        if (_pendingAction) return false;
+        setState(() => _pendingAction = true);
+        final action = dir == DismissDirection.startToEnd ? 'Marked as bought' : 'Deleted';
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.hideCurrentSnackBar();
+        var undone = false;
+        final snackBar = SnackBar(
+          content: Text('$action "${item.name}"'),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () => undone = true,
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        messenger.showSnackBar(snackBar).closed.then((_) {
+          if (!undone && mounted) {
+            if (dir == DismissDirection.startToEnd) {
+              widget.onCheckOff();
+            } else {
+              widget.onDelete();
+            }
+          }
+          if (mounted) setState(() => _pendingAction = false);
+        });
+        return false;
+      },
       child: tile,
     );
   }

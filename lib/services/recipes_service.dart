@@ -20,6 +20,7 @@ class RecipesService {
     List<String> instructions = const [],
     String? notes,
     String? sourceUrl,
+    List<String> tags = const [],
   }) async {
     final ref = await _db.collection('households/$householdId/recipes').add({
       'name': name,
@@ -27,6 +28,7 @@ class RecipesService {
       'instructions': instructions,
       'notes': notes,
       'sourceUrl': sourceUrl,
+      'tags': tags,
       'updatedAt': FieldValue.serverTimestamp(),
     });
     return ref.id;
@@ -40,6 +42,7 @@ class RecipesService {
     List<String> instructions = const [],
     String? notes,
     String? sourceUrl,
+    List<String> tags = const [],
   }) async {
     await _db.doc('households/$householdId/recipes/$recipeId').update({
       'name': name,
@@ -47,6 +50,7 @@ class RecipesService {
       'instructions': instructions,
       'notes': notes,
       'sourceUrl': sourceUrl,
+      'tags': tags,
       'updatedAt': FieldValue.serverTimestamp(),
     });
   }

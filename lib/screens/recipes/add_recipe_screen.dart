@@ -22,10 +22,13 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
   final _nameCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
   final _sourceUrlCtrl = TextEditingController();
+  final _tagCtrl = TextEditingController();
   final List<_IngredientEntry> _ingredients = [];
   final List<TextEditingController> _instructions = [];
+  final List<String> _tags = [];
   bool _initialized = false;
   bool _importing = false;
+  bool _saving = false;
   bool _autoImportTriggered = false;
 
   @override
@@ -47,6 +50,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
     _nameCtrl.dispose();
     _notesCtrl.dispose();
     _sourceUrlCtrl.dispose();
+    _tagCtrl.dispose();
     for (final e in _ingredients) { e.nameCtrl.dispose(); e.qtyCtrl.dispose(); }
     for (final c in _instructions) { c.dispose(); }
     super.dispose();
@@ -69,6 +73,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
     for (final step in recipe.instructions) {
       _instructions.add(TextEditingController(text: step));
     }
+    _tags.addAll(recipe.tags);
   }
 
   void _addIngredient() {
@@ -246,47 +251,60 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
 
   Future<void> _save() async {
     final name = _nameCtrl.text.trim();
-    if (name.isEmpty || _ingredients.isEmpty) return;
+    if (name.isEmpty || _ingredients.isEmpty || _saving) return;
 
-    final householdId = ref.read(householdIdProvider).value ?? '';
-    final service = ref.read(recipesServiceProvider);
-    final ingredients = _ingredients.map((e) => RecipeIngredient(
-      name: e.nameCtrl.text.trim(),
-      quantity: e.quantity,
-      unit: e.unit,
-      categoryId: e.categoryId,
-    )).where((i) => i.name.isNotEmpty).toList();
+    setState(() => _saving = true);
+    try {
+      final householdId = ref.read(householdIdProvider).value ?? '';
+      final service = ref.read(recipesServiceProvider);
+      final ingredients = _ingredients.map((e) => RecipeIngredient(
+        name: e.nameCtrl.text.trim(),
+        quantity: e.quantity,
+        unit: e.unit,
+        categoryId: e.categoryId,
+      )).where((i) => i.name.isNotEmpty).toList();
 
-    final instructions = _instructions
-        .map((c) => c.text.trim())
-        .where((s) => s.isNotEmpty)
-        .toList();
+      final instructions = _instructions
+          .map((c) => c.text.trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
 
-    final notes = _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim();
-    final sourceUrl = _sourceUrlCtrl.text.trim().isEmpty ? null : _sourceUrlCtrl.text.trim();
+      final notes = _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim();
+      final sourceUrl = _sourceUrlCtrl.text.trim().isEmpty ? null : _sourceUrlCtrl.text.trim();
 
-    if (widget.recipeId != null) {
-      await service.updateRecipe(
-        householdId: householdId,
-        recipeId: widget.recipeId!,
-        name: name,
-        ingredients: ingredients,
-        instructions: instructions,
-        notes: notes,
-        sourceUrl: sourceUrl,
-      );
-    } else {
-      await service.addRecipe(
-        householdId: householdId,
-        name: name,
-        ingredients: ingredients,
-        instructions: instructions,
-        notes: notes,
-        sourceUrl: sourceUrl,
-      );
+      if (widget.recipeId != null) {
+        await service.updateRecipe(
+          householdId: householdId,
+          recipeId: widget.recipeId!,
+          name: name,
+          ingredients: ingredients,
+          instructions: instructions,
+          notes: notes,
+          sourceUrl: sourceUrl,
+          tags: _tags,
+        );
+      } else {
+        await service.addRecipe(
+          householdId: householdId,
+          name: name,
+          ingredients: ingredients,
+          instructions: instructions,
+          notes: notes,
+          sourceUrl: sourceUrl,
+          tags: _tags,
+        );
+      }
+
+      if (mounted) context.go('/recipes');
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save recipe: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
-
-    if (mounted) context.go('/recipes');
   }
 
   @override
@@ -309,7 +327,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
               onPressed: _importing ? null : _importFromUrl,
               tooltip: 'Import from URL',
             ),
-          TextButton(onPressed: _save, child: const Text('Save')),
+          TextButton(onPressed: _saving ? null : _save, child: const Text('Save')),
         ],
       ),
       body: _importing
@@ -333,6 +351,37 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
                   controller: _notesCtrl,
                   decoration: const InputDecoration(labelText: 'Description (optional)'),
                   maxLines: 2,
+                ),
+                const SizedBox(height: 12),
+
+                // Tags section
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: [
+                    ..._tags.map((tag) => InputChip(
+                      label: Text(tag),
+                      onDeleted: () => setState(() => _tags.remove(tag)),
+                    )),
+                    SizedBox(
+                      width: 120,
+                      child: TextField(
+                        controller: _tagCtrl,
+                        decoration: const InputDecoration(
+                          hintText: 'Add tag...',
+                          isDense: true,
+                          border: InputBorder.none,
+                        ),
+                        onSubmitted: (val) {
+                          final tag = val.trim().toLowerCase();
+                          if (tag.isNotEmpty && !_tags.contains(tag)) {
+                            setState(() => _tags.add(tag));
+                          }
+                          _tagCtrl.clear();
+                        },
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
 

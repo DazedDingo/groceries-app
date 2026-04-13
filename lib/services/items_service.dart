@@ -33,12 +33,13 @@ class ItemsService {
     required AddedBy addedBy,
     int quantity = 1,
     String? unit,
+    String? note,
     String? recipeSource,
   }) async {
     final batch = _db.batch();
     final itemRef = _db.collection('households/$householdId/items').doc();
     batch.set(itemRef, {
-      'name': name, 'quantity': quantity, 'unit': unit,
+      'name': name, 'quantity': quantity, 'unit': unit, 'note': note,
       'categoryId': categoryId,
       'preferredStores': preferredStores, 'pantryItemId': pantryItemId,
       'recipeSource': recipeSource,
@@ -59,10 +60,11 @@ class ItemsService {
     required String name,
     required int quantity,
     required String? unit,
+    String? note,
     required String categoryId,
   }) async {
     await _db.doc('households/$householdId/items/$itemId').update({
-      'name': name, 'quantity': quantity, 'unit': unit,
+      'name': name, 'quantity': quantity, 'unit': unit, 'note': note,
       'categoryId': categoryId,
     });
   }
@@ -90,12 +92,18 @@ class ItemsService {
     final batch = _db.batch();
     batch.delete(_db.doc('households/$householdId/items/${item.id}'));
     if (pantryItem != null && item.pantryItemId != null) {
+      final updates = <String, dynamic>{
+        'currentQuantity': FieldValue.increment(item.quantity),
+        'lastPurchasedAt': FieldValue.serverTimestamp(),
+      };
+      if (pantryItem.shelfLifeDays != null) {
+        updates['expiresAt'] = Timestamp.fromDate(
+          DateTime.now().add(Duration(days: pantryItem.shelfLifeDays!)),
+        );
+      }
       batch.update(
         _db.doc('households/$householdId/pantry/${item.pantryItemId}'),
-        {
-          'currentQuantity': pantryItem.currentQuantity + item.quantity,
-          'lastPurchasedAt': FieldValue.serverTimestamp(),
-        },
+        updates,
       );
     }
     final histRef = _db.collection('households/$householdId/history').doc();
@@ -118,12 +126,18 @@ class ItemsService {
       batch.delete(_db.doc('households/$householdId/items/${item.id}'));
       if (item.pantryItemId != null && pantryItems.containsKey(item.pantryItemId)) {
         final pi = pantryItems[item.pantryItemId]!;
+        final updates = <String, dynamic>{
+          'currentQuantity': FieldValue.increment(item.quantity),
+          'lastPurchasedAt': FieldValue.serverTimestamp(),
+        };
+        if (pi.shelfLifeDays != null) {
+          updates['expiresAt'] = Timestamp.fromDate(
+            DateTime.now().add(Duration(days: pi.shelfLifeDays!)),
+          );
+        }
         batch.update(
           _db.doc('households/$householdId/pantry/${item.pantryItemId}'),
-          {
-            'currentQuantity': pi.optimalQuantity,
-            'lastPurchasedAt': FieldValue.serverTimestamp(),
-          },
+          updates,
         );
       }
       final histRef = _db.collection('households/$householdId/history').doc();

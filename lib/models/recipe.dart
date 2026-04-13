@@ -27,10 +27,12 @@ class Recipe {
   final List<String> instructions;
   final String? notes;
   final String? sourceUrl;
+  final List<String> tags;
 
   const Recipe({
     required this.id, required this.name, required this.ingredients,
     this.instructions = const [], this.notes, this.sourceUrl,
+    this.tags = const [],
   });
 
   Map<String, dynamic> toMap() => {
@@ -39,6 +41,7 @@ class Recipe {
     'instructions': instructions,
     'notes': notes,
     'sourceUrl': sourceUrl,
+    'tags': tags,
     'updatedAt': FieldValue.serverTimestamp(),
   };
 
@@ -55,6 +58,7 @@ class Recipe {
           .toList() ?? [],
       notes: d['notes'],
       sourceUrl: d['sourceUrl'],
+      tags: List<String>.from(d['tags'] ?? []),
     );
   }
 }

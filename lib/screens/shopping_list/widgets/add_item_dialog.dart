@@ -7,19 +7,22 @@ class AddItemResult {
   final GroceryCategory? category;
   final int quantity;
   final String? unit;
-  AddItemResult({required this.name, required this.category, required this.quantity, this.unit});
+  final String? note;
+  AddItemResult({required this.name, required this.category, required this.quantity, this.unit, this.note});
 }
 
 class AddItemDialog extends StatefulWidget {
   final String initialName;
   final List<GroceryCategory> categories;
   final GroceryCategory? initialCategory;
+  final List<String> historySuggestions;
 
   const AddItemDialog({
     super.key,
     this.initialName = '',
     required this.categories,
     this.initialCategory,
+    this.historySuggestions = const [],
   });
 
   @override
@@ -27,24 +30,29 @@ class AddItemDialog extends StatefulWidget {
 }
 
 class _AddItemDialogState extends State<AddItemDialog> {
-  late final TextEditingController _nameCtrl;
+  // Autocomplete manages its own controller; we only keep a reference to read from it.
+  TextEditingController? _autocompleteCtrl;
   late final TextEditingController _qtyCtrl;
+  late final TextEditingController _noteCtrl;
   GroceryCategory? _category;
   int _quantity = 1;
   String? _unit;
 
+  String get _nameText => _autocompleteCtrl?.text ?? '';
+
   @override
   void initState() {
     super.initState();
-    _nameCtrl = TextEditingController(text: widget.initialName);
     _qtyCtrl = TextEditingController(text: '1');
+    _noteCtrl = TextEditingController();
     _category = widget.initialCategory;
   }
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
+    // Do NOT dispose _autocompleteCtrl — Autocomplete owns it.
     _qtyCtrl.dispose();
+    _noteCtrl.dispose();
     super.dispose();
   }
 
@@ -66,11 +74,28 @@ class _AddItemDialogState extends State<AddItemDialog> {
     return AlertDialog(
       title: const Text('Add item'),
       content: Column(mainAxisSize: MainAxisSize.min, children: [
-        TextField(
-          controller: _nameCtrl,
-          decoration: const InputDecoration(labelText: 'Item name'),
-          autofocus: widget.initialName.isEmpty,
-          onChanged: _onNameChanged,
+        Autocomplete<String>(
+          initialValue: TextEditingValue(text: widget.initialName),
+          optionsBuilder: (textEditingValue) {
+            if (textEditingValue.text.isEmpty) return const Iterable.empty();
+            final query = textEditingValue.text.toLowerCase();
+            return widget.historySuggestions
+                .where((s) => s.toLowerCase().contains(query));
+          },
+          onSelected: (selection) {
+            _onNameChanged(selection);
+            setState(() {});
+          },
+          fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+            _autocompleteCtrl = controller;
+            return TextField(
+              controller: controller,
+              focusNode: focusNode,
+              decoration: const InputDecoration(labelText: 'Item name'),
+              autofocus: widget.initialName.isEmpty,
+              onChanged: _onNameChanged,
+            );
+          },
         ),
         const SizedBox(height: 8),
         InputDecorator(
@@ -143,6 +168,16 @@ class _AddItemDialogState extends State<AddItemDialog> {
           ],
           onChanged: (v) => setState(() => _unit = v),
         ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _noteCtrl,
+          decoration: const InputDecoration(
+            labelText: 'Note (optional)',
+            hintText: 'e.g. brand, size, type',
+            isDense: true,
+          ),
+          maxLines: 1,
+        ),
       ]),
       actions: [
         TextButton(
@@ -150,15 +185,16 @@ class _AddItemDialogState extends State<AddItemDialog> {
           child: const Text('Cancel'),
         ),
         FilledButton(
-          onPressed: _nameCtrl.text.trim().isEmpty
+          onPressed: _nameText.trim().isEmpty
               ? null
               : () => Navigator.pop(
                     context,
                     AddItemResult(
-                      name: _nameCtrl.text.trim(),
+                      name: _nameText.trim(),
                       category: _category,
                       quantity: _quantity,
                       unit: _unit,
+                      note: _noteCtrl.text.trim().isEmpty ? null : _noteCtrl.text.trim(),
                     ),
                   ),
           child: const Text('Add'),

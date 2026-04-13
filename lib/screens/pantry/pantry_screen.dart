@@ -27,8 +27,10 @@ class PantryScreen extends ConsumerWidget {
     final itemsService = ref.watch(itemsServiceProvider);
     final user = ref.watch(authStateProvider).value;
 
-    final needsRestock = pantry.where((p) => p.isBelowOptimal).toList();
-    final stocked = pantry.where((p) => !p.isBelowOptimal).toList();
+    final expired = pantry.where((p) => p.isExpired).toList();
+    final expiringSoon = pantry.where((p) => p.isExpiringSoon).toList();
+    final needsRestock = pantry.where((p) => p.isBelowOptimal && !p.isExpired && !p.isExpiringSoon).toList();
+    final stocked = pantry.where((p) => !p.isBelowOptimal && !p.isExpired && !p.isExpiringSoon).toList();
 
     String catSortKey(PantryItem p) {
       try {
@@ -37,6 +39,8 @@ class PantryScreen extends ConsumerWidget {
         return 'zzz';
       }
     }
+    expired.sort((a, b) => catSortKey(a).compareTo(catSortKey(b)));
+    expiringSoon.sort((a, b) => catSortKey(a).compareTo(catSortKey(b)));
     needsRestock.sort((a, b) => catSortKey(a).compareTo(catSortKey(b)));
     stocked.sort((a, b) => catSortKey(a).compareTo(catSortKey(b)));
 
@@ -108,6 +112,56 @@ class PantryScreen extends ConsumerWidget {
                 ? const Center(child: Text('No pantry items yet. Tap + to add one.'))
                 : ListView(
                     children: [
+                      if (expired.isNotEmpty) ...[
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.errorContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.warning_amber, color: Theme.of(context).colorScheme.onErrorContainer),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  '${expired.length} expired item${expired.length == 1 ? '' : 's'} — consider removing',
+                                  style: TextStyle(color: Theme.of(context).colorScheme.onErrorContainer),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => pantryService.clearExpired(
+                                  householdId,
+                                  expired.map((e) => e.id).toList(),
+                                ),
+                                child: Text('Clear all',
+                                  style: TextStyle(color: Theme.of(context).colorScheme.onErrorContainer)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                          child: Text('Expired',
+                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    color: Theme.of(context).colorScheme.error,
+                                  )),
+                        ),
+                        ...expired.map(buildTile),
+                        const Divider(),
+                      ],
+                      if (expiringSoon.isNotEmpty) ...[
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                          child: Text('Expiring soon',
+                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    color: Colors.orange,
+                                  )),
+                        ),
+                        ...expiringSoon.map(buildTile),
+                        const Divider(),
+                      ],
                       if (needsRestock.isNotEmpty) ...[
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
@@ -224,9 +278,11 @@ class PantryScreen extends ConsumerWidget {
             TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
             FilledButton(
               onPressed: () {
+                final name = nameCtrl.text.trim();
+                if (name.isEmpty) return;
                 ref.read(pantryServiceProvider).addItem(
                   householdId: householdId,
-                  name: nameCtrl.text.trim(),
+                  name: name,
                   categoryId: selectedCategory?.id ?? 'uncategorised',
                   preferredStores: [],
                   optimalQuantity: int.tryParse(optCtrl.text) ?? 1,

@@ -17,6 +17,9 @@ import '../../services/unit_converter.dart';
 import '../../services/category_guesser.dart';
 import '../shared/bulk_add_dialog.dart';
 import '../../services/text_item_parser.dart';
+import '../../providers/history_provider.dart';
+import '../../models/history_entry.dart';
+import '../../services/restock_checker.dart';
 
 class ShoppingListScreen extends ConsumerStatefulWidget {
   const ShoppingListScreen({super.key});
@@ -28,6 +31,7 @@ class ShoppingListScreen extends ConsumerStatefulWidget {
 class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   final Set<String> _selectedIds = {};
   bool _selecting = false;
+  bool _restockChecked = false;
 
   void _enterSelecting(String id) {
     setState(() {
@@ -56,30 +60,53 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
 
   Future<void> _showManualAddDialog(String householdId) async {
     final categories = ref.read(categoriesProvider).value ?? [];
+    final history = ref.read(historyProvider(householdId)).value ?? [];
+    final suggestions = history
+        .where((h) => h.action == HistoryAction.bought)
+        .map((h) => h.itemName)
+        .toSet()
+        .toList();
     final result = await showDialog<AddItemResult>(
       context: context,
-      builder: (ctx) => AddItemDialog(categories: categories),
+      builder: (ctx) => AddItemDialog(
+        categories: categories,
+        historySuggestions: suggestions,
+      ),
     );
     if (result == null || !mounted) return;
 
-    // Check for duplicate
+    // Check for duplicate — offer to merge by bumping quantity
     final allItems = ref.read(itemsProvider).value ?? [];
-    final duplicate = allItems.any(
+    final existing = allItems.where(
       (item) => item.name.toLowerCase() == result.name.toLowerCase(),
-    );
-    if (duplicate && mounted) {
-      final confirm = await showDialog<bool>(
+    ).toList();
+    if (existing.isNotEmpty && mounted) {
+      final choice = await showDialog<String>(
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Item already on list'),
-          content: Text('"${result.name}" is already on your shopping list. Add it again?'),
+          content: Text('"${result.name}" is already on your shopping list.'),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Add anyway')),
+            TextButton(onPressed: () => Navigator.pop(ctx, 'cancel'), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(ctx, 'add'), child: const Text('Add separately')),
+            FilledButton(onPressed: () => Navigator.pop(ctx, 'merge'), child: const Text('Add to quantity')),
           ],
         ),
       );
-      if (confirm != true || !mounted) return;
+      if (choice == 'merge') {
+        final target = existing.first;
+        await ref.read(itemsServiceProvider).updateItem(
+          householdId: householdId,
+          itemId: target.id,
+          name: target.name,
+          quantity: target.quantity + result.quantity,
+          unit: result.unit ?? target.unit,
+          note: result.note ?? target.note,
+          categoryId: target.categoryId,
+        );
+        return;
+      }
+      if (choice != 'add' || !mounted) return;
     }
 
     try {
@@ -92,6 +119,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
         pantryItemId: null,
         quantity: result.quantity,
         unit: result.unit,
+        note: result.note,
         addedBy: AddedBy(
           uid: user?.uid,
           displayName: user?.displayName ?? 'Unknown',
@@ -212,10 +240,172 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
     }
   }
 
+  Future<void> _showRestockNudge(String householdId, List<PantryItem> overdue) async {
+    final selected = Set<String>.from(overdue.map((p) => p.id));
+
+    final result = await showDialog<Set<String>>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setD) => AlertDialog(
+          title: const Text('Restock reminder'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'These items are due for restocking:',
+                  style: Theme.of(ctx).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 8),
+                ...overdue.map((item) => CheckboxListTile(
+                  title: Text(item.name),
+                  subtitle: Text('${item.currentQuantity}/${item.optimalQuantity} in stock'),
+                  value: selected.contains(item.id),
+                  onChanged: (v) => setD(() {
+                    if (v == true) {
+                      selected.add(item.id);
+                    } else {
+                      selected.remove(item.id);
+                    }
+                  }),
+                )),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Dismiss')),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, selected),
+              child: Text('Add ${selected.length} to list'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (result == null || result.isEmpty || !mounted) return;
+
+    final user = ref.read(authStateProvider).valueOrNull;
+    final addedBy = AddedBy(
+      uid: user?.uid,
+      displayName: user?.displayName ?? 'Unknown',
+      source: ItemSource.app,
+    );
+
+    for (final item in overdue.where((p) => result.contains(p.id))) {
+      final qty = (item.optimalQuantity - item.currentQuantity).clamp(1, 999);
+      await ref.read(itemsServiceProvider).addItem(
+        householdId: householdId,
+        name: item.name,
+        categoryId: item.categoryId,
+        preferredStores: item.preferredStores,
+        pantryItemId: item.id,
+        quantity: qty,
+        addedBy: addedBy,
+      );
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Added ${result.length} restock items')),
+      );
+    }
+  }
+
+  Future<void> _showReorderLastTrip(String householdId) async {
+    final history = ref.read(historyProvider(householdId)).value ?? [];
+    final bought = history.where((h) => h.action == HistoryAction.bought).toList();
+    if (bought.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No purchase history yet')),
+        );
+      }
+      return;
+    }
+
+    // Group by "trip" — items bought within 2 hours of the most recent
+    final latest = bought.first.at;
+    final tripItems = bought
+        .where((h) => latest.difference(h.at).inHours.abs() < 2)
+        .map((h) => h.itemName)
+        .toSet()
+        .toList();
+
+    final selected = Set<String>.from(tripItems);
+
+    final result = await showDialog<Set<String>>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setD) => AlertDialog(
+          title: const Text('Reorder last trip'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView(
+              shrinkWrap: true,
+              children: tripItems.map((name) => CheckboxListTile(
+                title: Text(name),
+                value: selected.contains(name),
+                onChanged: (v) => setD(() {
+                  if (v == true) {
+                    selected.add(name);
+                  } else {
+                    selected.remove(name);
+                  }
+                }),
+              )).toList(),
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, selected),
+              child: Text('Add ${selected.length} items'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (result == null || result.isEmpty || !mounted) return;
+
+    final user = ref.read(authStateProvider).valueOrNull;
+    final categories = ref.read(categoriesProvider).value ?? [];
+    final addedBy = AddedBy(
+      uid: user?.uid,
+      displayName: user?.displayName ?? 'Unknown',
+      source: ItemSource.app,
+    );
+
+    for (final name in result) {
+      // Find the history entry to get the category and quantity
+      final entry = bought.firstWhere((h) => h.itemName == name);
+      final cat = guessCategory(name, categories);
+      await ref.read(itemsServiceProvider).addItem(
+        householdId: householdId,
+        name: name,
+        categoryId: cat?.id ?? entry.categoryId,
+        preferredStores: [],
+        pantryItemId: null,
+        quantity: entry.quantity,
+        addedBy: addedBy,
+      );
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Added ${result.length} items from last trip')),
+      );
+    }
+  }
+
   Future<void> _showEditDialog(ShoppingItem item, String householdId,
       List<GroceryCategory> categories) async {
     final nameCtrl = TextEditingController(text: item.name);
     final qtyCtrl = TextEditingController(text: item.quantity.toString());
+    final noteCtrl = TextEditingController(text: item.note ?? '');
     String categoryId = item.categoryId;
     String? unit = item.unit;
 
@@ -259,6 +449,16 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
               onChanged: (v) => setD(() => unit = v),
             ),
             const SizedBox(height: 8),
+            TextField(
+              controller: noteCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Note (optional)',
+                hintText: 'e.g. brand, size, type',
+                isDense: true,
+              ),
+              maxLines: 1,
+            ),
+            const SizedBox(height: 8),
             InputDecorator(
               decoration: const InputDecoration(labelText: 'Category'),
               child: DropdownButtonHideUnderline(
@@ -276,16 +476,26 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
             FilledButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(ctx);
-                ref.read(itemsServiceProvider).updateItem(
-                  householdId: householdId,
-                  itemId: item.id,
-                  name: nameCtrl.text.trim(),
-                  quantity: int.tryParse(qtyCtrl.text) ?? item.quantity,
-                  unit: unit,
-                  categoryId: categoryId,
-                );
+                final noteText = noteCtrl.text.trim();
+                try {
+                  await ref.read(itemsServiceProvider).updateItem(
+                    householdId: householdId,
+                    itemId: item.id,
+                    name: nameCtrl.text.trim(),
+                    quantity: int.tryParse(qtyCtrl.text) ?? item.quantity,
+                    unit: unit,
+                    note: noteText.isEmpty ? null : noteText,
+                    categoryId: categoryId,
+                  );
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to update: $e')),
+                    );
+                  }
+                }
               },
               child: const Text('Save'),
             ),
@@ -302,6 +512,20 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
     final categories = ref.watch(categoriesProvider).value ?? [];
     final householdId = ref.watch(householdIdProvider).value ?? '';
     final unitSystem = ref.watch(unitSystemProvider);
+
+    // Check for overdue restocks once pantry data loads
+    ref.listen(pantryProvider, (prev, next) {
+      if (_restockChecked) return;
+      final pantryItems = next.value;
+      if (pantryItems == null) return; // still loading
+      _restockChecked = true;
+      final overdue = findOverdueRestocks(pantryItems);
+      if (overdue.isNotEmpty && householdId.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _showRestockNudge(householdId, overdue);
+        });
+      }
+    });
 
     final grouped = <String, List<ShoppingItem>>{};
     for (final item in items) {
@@ -344,10 +568,18 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
               onPressed: () => _showBulkAddDialog(householdId),
               tooltip: 'Bulk add',
             ),
-            IconButton(
-              icon: const Icon(Icons.history),
-              onPressed: () => context.go('/list/history'),
-              tooltip: 'History',
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              onSelected: (val) {
+                if (val == 'history') context.go('/list/history');
+                if (val == 'templates') context.go('/list/templates');
+                if (val == 'reorder') _showReorderLastTrip(householdId);
+              },
+              itemBuilder: (_) => const [
+                PopupMenuItem(value: 'reorder', child: Text('Reorder last trip')),
+                PopupMenuItem(value: 'templates', child: Text('Templates')),
+                PopupMenuItem(value: 'history', child: Text('History')),
+              ],
             ),
             TextButton(
               onPressed: () => ref.read(unitSystemProvider.notifier).toggle(),

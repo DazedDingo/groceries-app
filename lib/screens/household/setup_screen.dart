@@ -5,15 +5,27 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../providers/household_provider.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
-  const SetupScreen({super.key});
+  final String? inviteToken;
+  const SetupScreen({super.key, this.inviteToken});
   @override
   ConsumerState<SetupScreen> createState() => _SetupScreenState();
 }
 
 class _SetupScreenState extends ConsumerState<SetupScreen> {
   final _nameController = TextEditingController();
-  final _tokenController = TextEditingController();
+  late final TextEditingController _tokenController;
   bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tokenController = TextEditingController(text: widget.inviteToken ?? '');
+    // Auto-join if opened via deep link with a valid token
+    final token = widget.inviteToken;
+    if (token != null && RegExp(r'^[a-zA-Z0-9]{20,64}$').hasMatch(token)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _join());
+    }
+  }
 
   Future<void> _create() async {
     setState(() => _loading = true);

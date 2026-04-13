@@ -39,6 +39,7 @@ class ShoppingItem {
   final String name;
   final int quantity;
   final String? unit;
+  final String? note;
   final String categoryId;
   final List<String> preferredStores;
   final String? pantryItemId;
@@ -48,14 +49,14 @@ class ShoppingItem {
 
   const ShoppingItem({
     required this.id, required this.name, required this.quantity,
-    this.unit,
+    this.unit, this.note,
     required this.categoryId, required this.preferredStores,
     required this.pantryItemId, this.recipeSource, required this.addedBy,
     required this.addedAt,
   });
 
   Map<String, dynamic> toMap() => {
-    'name': name, 'quantity': quantity, 'unit': unit,
+    'name': name, 'quantity': quantity, 'unit': unit, 'note': note,
     'categoryId': categoryId,
     'preferredStores': preferredStores, 'pantryItemId': pantryItemId,
     'recipeSource': recipeSource,
@@ -66,8 +67,9 @@ class ShoppingItem {
   factory ShoppingItem.fromFirestore(DocumentSnapshot doc) {
     final d = doc.data() as Map<String, dynamic>;
     return ShoppingItem(
-      id: doc.id, name: d['name'], quantity: d['quantity'] ?? 1,
+      id: doc.id, name: d['name'] ?? '', quantity: d['quantity'] ?? 1,
       unit: d['unit'],
+      note: d['note'],
       categoryId: d['categoryId'] ?? 'uncategorised',
       preferredStores: List<String>.from(d['preferredStores'] ?? []),
       pantryItemId: d['pantryItemId'],
