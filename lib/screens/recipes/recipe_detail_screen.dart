@@ -183,15 +183,24 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final recipes = ref.watch(recipesProvider).value ?? [];
-    final recipe = recipes.where((r) => r.id == widget.recipeId).firstOrNull;
-    final householdId = ref.watch(householdIdProvider).value ?? '';
+    final recipesAsync = ref.watch(recipesProvider);
+    final householdAsync = ref.watch(householdIdProvider);
     final unitSystem = ref.watch(unitSystemProvider);
+    final recipes = recipesAsync.value ?? const [];
+    final recipe = recipes.where((r) => r.id == widget.recipeId).firstOrNull;
+    final householdId = householdAsync.value ?? '';
 
+    // Show a spinner instead of "not found" while either provider is still
+    // loading (common during auth-token refresh while the screen is open).
     if (recipe == null) {
+      final stillLoading = recipesAsync.isLoading || householdAsync.isLoading;
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Recipe not found')),
+        body: Center(
+          child: stillLoading
+              ? const CircularProgressIndicator()
+              : const Text('Recipe not found'),
+        ),
       );
     }
 

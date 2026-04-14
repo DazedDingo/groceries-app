@@ -331,13 +331,13 @@ class _AboutTileState extends State<_AboutTile> {
     return ListTile(
       leading: const Icon(Icons.info_outline),
       title: const Text('About'),
-      subtitle: Text('Groceries — $_versionLine'),
+      subtitle: Text('Groceries — $_versionLine · by DazedDingo'),
       onTap: () => showAboutDialog(
         context: context,
         applicationName: 'Groceries',
         applicationVersion: _versionLine,
         applicationLegalese:
-            'A household grocery + pantry + recipe companion.',
+            'A household grocery + pantry + recipe companion.\n\nAuthored by DazedDingo.',
       ),
     );
   }
