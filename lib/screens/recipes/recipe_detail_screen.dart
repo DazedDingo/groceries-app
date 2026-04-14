@@ -191,14 +191,18 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
     final recipe = recipes.where((r) => r.id == widget.recipeId).firstOrNull;
     final householdId = householdAsync.value ?? '';
 
-    // Show a spinner instead of "not found" while either provider is still
-    // loading (common during auth-token refresh while the screen is open).
+    // Only treat a missing recipe as "not found" once we're sure the list has
+    // actually been fetched and populated. An empty list can appear transiently
+    // during auth-token refresh and must not collapse to the white-screen
+    // "not found" fallback.
     if (recipe == null) {
-      final stillLoading = recipesAsync.isLoading || householdAsync.isLoading;
+      final stillResolving = recipesAsync.isLoading ||
+          householdAsync.isLoading ||
+          recipes.isEmpty;
       return Scaffold(
         appBar: AppBar(),
         body: Center(
-          child: stillLoading
+          child: stillResolving
               ? const CircularProgressIndicator()
               : const Text('Recipe not found'),
         ),
