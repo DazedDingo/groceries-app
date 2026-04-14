@@ -44,6 +44,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
             onPressed: () => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
           ),
           duration: const Duration(seconds: 6),
+          persist: false,
         ),
       );
       context.go('/settings');

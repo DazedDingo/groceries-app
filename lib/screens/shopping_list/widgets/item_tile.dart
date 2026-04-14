@@ -127,6 +127,9 @@ class _ItemTileState extends State<ItemTile> {
         messenger.showSnackBar(SnackBar(
           content: Text('$action "${item.name}"'),
           duration: const Duration(milliseconds: 1500),
+          // Material 3 keeps action-bearing snackbars open indefinitely
+          // by default — we want auto-dismiss here.
+          persist: false,
           action: SnackBarAction(
             label: 'Undo',
             onPressed: () => widget.onUndo(receipt),
