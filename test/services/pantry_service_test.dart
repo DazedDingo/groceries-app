@@ -12,15 +12,77 @@ void main() {
       service = PantryService(db: fakeDb);
     });
 
+    Future<void> seedItem({
+      String id = 'p1',
+      int currentQuantity = 3,
+      int optimalQuantity = 6,
+      bool isHighPriority = false,
+    }) => fakeDb.doc('households/hh1/pantry/$id').set({
+      'name': 'Milk', 'categoryId': 'dairy', 'preferredStores': [],
+      'optimalQuantity': optimalQuantity, 'currentQuantity': currentQuantity,
+      'restockAfterDays': null, 'lastNudgedAt': null, 'lastPurchasedAt': null,
+      'isHighPriority': isHighPriority,
+    });
+
     test('decrementQuantity reduces currentQuantity by 1', () async {
-      await fakeDb.doc('households/hh1/pantry/p1').set({
-        'name': 'Eggs', 'categoryId': 'dairy', 'preferredStores': [],
-        'optimalQuantity': 6, 'currentQuantity': 3,
-        'restockAfterDays': null, 'lastNudgedAt': null, 'lastPurchasedAt': null,
-      });
+      await seedItem(currentQuantity: 3);
       await service.decrementQuantity(householdId: 'hh1', itemId: 'p1', current: 3);
       final doc = await fakeDb.doc('households/hh1/pantry/p1').get();
       expect(doc['currentQuantity'], 2);
+    });
+
+    test('decrementQuantity does nothing when current is 0', () async {
+      await seedItem(currentQuantity: 0);
+      await service.decrementQuantity(householdId: 'hh1', itemId: 'p1', current: 0);
+      final doc = await fakeDb.doc('households/hh1/pantry/p1').get();
+      expect(doc['currentQuantity'], 0);
+    });
+
+    test('incrementQuantity increases currentQuantity by 1', () async {
+      await seedItem(currentQuantity: 3);
+      await service.incrementQuantity(householdId: 'hh1', itemId: 'p1', current: 3);
+      final doc = await fakeDb.doc('households/hh1/pantry/p1').get();
+      expect(doc['currentQuantity'], 4);
+    });
+
+    test('updateItem persists isHighPriority true', () async {
+      await seedItem();
+      await service.updateItem('hh1', 'p1', {'isHighPriority': true});
+      final doc = await fakeDb.doc('households/hh1/pantry/p1').get();
+      expect(doc['isHighPriority'], isTrue);
+    });
+
+    test('updateItem persists isHighPriority false', () async {
+      await seedItem(isHighPriority: true);
+      await service.updateItem('hh1', 'p1', {'isHighPriority': false});
+      final doc = await fakeDb.doc('households/hh1/pantry/p1').get();
+      expect(doc['isHighPriority'], isFalse);
+    });
+
+    test('updateItem persists optimalQuantity', () async {
+      await seedItem();
+      await service.updateItem('hh1', 'p1', {'optimalQuantity': 12});
+      final doc = await fakeDb.doc('households/hh1/pantry/p1').get();
+      expect(doc['optimalQuantity'], 12);
+    });
+
+    test('pantryStream emits items with isHighPriority from Firestore', () async {
+      await seedItem(isHighPriority: true);
+      final items = await service.pantryStream('hh1').first;
+      expect(items.first.isHighPriority, isTrue);
+    });
+
+    test('pantryStream defaults isHighPriority to false for legacy items', () async {
+      // Legacy items written before the field existed have no isHighPriority key
+      await fakeDb.doc('households/hh1/pantry/legacy').set({
+        'name': 'Eggs', 'categoryId': 'dairy', 'preferredStores': [],
+        'optimalQuantity': 6, 'currentQuantity': 2,
+        'restockAfterDays': null, 'lastNudgedAt': null, 'lastPurchasedAt': null,
+        // no isHighPriority key — simulates data written before this feature
+      });
+      final items = await service.pantryStream('hh1').first;
+      final legacy = items.firstWhere((i) => i.id == 'legacy');
+      expect(legacy.isHighPriority, isFalse);
     });
   });
 }
