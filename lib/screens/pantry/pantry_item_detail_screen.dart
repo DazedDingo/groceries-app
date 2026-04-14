@@ -289,24 +289,56 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Location', style: theme.textTheme.titleSmall),
-                  const SizedBox(height: 8),
-                  DropdownButton<PantryLocation?>(
-                    value: item.location,
-                    isExpanded: true,
-                    items: [
-                      const DropdownMenuItem<PantryLocation?>(
-                          value: null, child: Text('Not set')),
-                      ...PantryLocation.values.map((loc) => DropdownMenuItem(
-                            value: loc,
-                            child: Text(loc.label),
-                          )),
+                  Row(
+                    children: [
+                      Text('Location', style: theme.textTheme.titleSmall),
+                      const Spacer(),
+                      TextButton.icon(
+                        onPressed: () => context.push('/settings/locations'),
+                        icon: const Icon(Icons.edit, size: 14),
+                        label: const Text('Manage'),
+                        style: TextButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                        ),
+                      ),
                     ],
-                    onChanged: (val) {
-                      ref.read(pantryServiceProvider).updateItem(
-                          householdId, widget.itemId, {'location': val?.id});
-                    },
                   ),
+                  const SizedBox(height: 8),
+                  Builder(builder: (ctx) {
+                    final customLocations =
+                        ref.watch(customLocationsProvider).value ?? [];
+                    return DropdownButton<String?>(
+                      value: item.location,
+                      isExpanded: true,
+                      items: [
+                        const DropdownMenuItem<String?>(
+                            value: null, child: Text('Not set')),
+                        ...PantryLocation.values.map((loc) =>
+                            DropdownMenuItem<String?>(
+                              value: loc.id,
+                              child: Text(loc.label),
+                            )),
+                        if (customLocations.isNotEmpty) ...[
+                          const DropdownMenuItem<String?>(
+                            enabled: false,
+                            value: '__divider__',
+                            child: Divider(height: 1),
+                          ),
+                          ...customLocations.map((label) =>
+                              DropdownMenuItem<String?>(
+                                value: label,
+                                child: Text(label),
+                              )),
+                        ],
+                      ],
+                      onChanged: (val) {
+                        if (val == '__divider__') return;
+                        ref.read(pantryServiceProvider).updateItem(
+                            householdId, widget.itemId, {'location': val});
+                      },
+                    );
+                  }),
                 ],
               ),
             ),

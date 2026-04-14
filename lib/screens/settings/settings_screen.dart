@@ -82,6 +82,12 @@ class SettingsScreen extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.go('/settings/categories'),
           ),
+          ListTile(
+            title: const Text('Manage Locations'),
+            subtitle: const Text('Add custom storage locations for pantry items'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/settings/locations'),
+          ),
           const Divider(),
 
           // --- Household ---

@@ -377,7 +377,7 @@ class PantryScreen extends ConsumerWidget {
                   preferredStores: [],
                   optimalQuantity: int.tryParse(optCtrl.text) ?? 1,
                   currentQuantity: 0,
-                  location: selectedLocation,
+                  location: selectedLocation?.id,
                 );
                 Navigator.pop(ctx);
               },

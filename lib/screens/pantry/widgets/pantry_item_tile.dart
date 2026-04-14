@@ -48,10 +48,10 @@ class PantryItemTile extends StatelessWidget {
               Text('${item.currentQuantity} / ${item.optimalQuantity} optimal'),
               if (item.location != null) ...[
                 const SizedBox(width: 8),
-                Icon(_iconForLocation(item.location!),
+                Icon(_iconForLocation(item.location),
                     size: 12, color: scheme.onSurfaceVariant),
                 const SizedBox(width: 2),
-                Text(item.location!.label,
+                Text(_labelForLocation(item.location),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: scheme.onSurfaceVariant,
                         )),
@@ -89,8 +89,8 @@ class PantryItemTile extends StatelessWidget {
     );
   }
 
-  IconData _iconForLocation(PantryLocation loc) {
-    switch (loc) {
+  IconData _iconForLocation(String? location) {
+    switch (PantryLocation.fromId(location)) {
       case PantryLocation.fridge:
         return Icons.kitchen;
       case PantryLocation.freezer:
@@ -100,7 +100,13 @@ class PantryItemTile extends StatelessWidget {
       case PantryLocation.counter:
         return Icons.countertops;
       case PantryLocation.other:
+      case null:
         return Icons.place_outlined;
     }
+  }
+
+  String _labelForLocation(String? location) {
+    if (location == null) return '';
+    return PantryLocation.fromId(location)?.label ?? location;
   }
 }

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/pantry_item.dart';
+import '../models/pantry_item.dart'; // PantryItem only — PantryLocation kept for callers
 
 class PantryService {
   final FirebaseFirestore _db;
@@ -23,7 +23,7 @@ class PantryService {
     int? restockAfterDays,
     int? shelfLifeDays,
     String? unit,
-    PantryLocation? location,
+    String? location,
   }) async {
     final ref = await _db.collection('households/$householdId/pantry').add({
       'name': name, 'categoryId': categoryId, 'preferredStores': preferredStores,
@@ -33,7 +33,7 @@ class PantryService {
       'unit': unit,
       'expiresAt': null,
       'lastNudgedAt': null, 'lastPurchasedAt': null,
-      'location': location?.id,
+      'location': location,
     });
     return ref.id;
   }

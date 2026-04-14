@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/pantry_service.dart';
+import '../services/location_service.dart';
 import '../models/pantry_item.dart';
 import 'household_provider.dart';
 
@@ -9,6 +10,14 @@ final pantryProvider = StreamProvider<List<PantryItem>>((ref) {
   final householdId = ref.watch(householdIdProvider).value;
   if (householdId == null) return const Stream.empty();
   return ref.watch(pantryServiceProvider).pantryStream(householdId);
+});
+
+final locationServiceProvider = Provider<LocationService>((ref) => LocationService());
+
+final customLocationsProvider = StreamProvider<List<String>>((ref) {
+  final householdId = ref.watch(householdIdProvider).value;
+  if (householdId == null) return const Stream.empty();
+  return ref.watch(locationServiceProvider).customLocationsStream(householdId);
 });
 
 final pantrySelectedCategoryProvider = StateProvider<String?>((ref) => null);

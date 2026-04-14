@@ -36,7 +36,9 @@ class PantryItem {
   final DateTime? expiresAt;
   final DateTime? lastNudgedAt;
   final DateTime? lastPurchasedAt;
-  final PantryLocation? location;
+  /// Storage key for the item's location. Matches [PantryLocation.id] for
+  /// built-in locations, or is the raw label string for custom locations.
+  final String? location;
   final bool isHighPriority;
 
   const PantryItem({
@@ -78,7 +80,7 @@ class PantryItem {
     'expiresAt': expiresAt != null ? Timestamp.fromDate(expiresAt!) : null,
     'lastNudgedAt': lastNudgedAt != null ? Timestamp.fromDate(lastNudgedAt!) : null,
     'lastPurchasedAt': lastPurchasedAt != null ? Timestamp.fromDate(lastPurchasedAt!) : null,
-    'location': location?.id,
+    'location': location,
     'isHighPriority': isHighPriority,
   };
 
@@ -96,7 +98,7 @@ class PantryItem {
       expiresAt: (d['expiresAt'] as Timestamp?)?.toDate(),
       lastNudgedAt: (d['lastNudgedAt'] as Timestamp?)?.toDate(),
       lastPurchasedAt: (d['lastPurchasedAt'] as Timestamp?)?.toDate(),
-      location: PantryLocation.fromId(d['location'] as String?),
+      location: d['location'] as String?,
       isHighPriority: d['isHighPriority'] ?? false,
     );
   }
@@ -113,7 +115,7 @@ class PantryItem {
     DateTime? expiresAt,
     DateTime? lastNudgedAt,
     DateTime? lastPurchasedAt,
-    PantryLocation? location,
+    String? location,
     bool? isHighPriority,
   }) => PantryItem(
     id: id,
