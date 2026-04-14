@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../providers/recipes_provider.dart';
 import '../../providers/household_provider.dart';
 import '../../providers/categories_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../models/recipe.dart';
 import '../../services/category_guesser.dart';
 import '../../services/text_item_parser.dart';
@@ -284,6 +285,7 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
           tags: _tags,
         );
       } else {
+        final user = ref.read(authStateProvider).valueOrNull;
         await service.addRecipe(
           householdId: householdId,
           name: name,
@@ -292,6 +294,8 @@ class _AddRecipeScreenState extends ConsumerState<AddRecipeScreen> {
           notes: notes,
           sourceUrl: sourceUrl,
           tags: _tags,
+          addedByUid: user?.uid,
+          addedByDisplayName: user?.displayName,
         );
       }
 

@@ -21,6 +21,8 @@ class RecipesService {
     String? notes,
     String? sourceUrl,
     List<String> tags = const [],
+    String? addedByUid,
+    String? addedByDisplayName,
   }) async {
     final ref = await _db.collection('households/$householdId/recipes').add({
       'name': name,
@@ -29,6 +31,9 @@ class RecipesService {
       'notes': notes,
       'sourceUrl': sourceUrl,
       'tags': tags,
+      'addedByUid': addedByUid,
+      'addedByDisplayName': addedByDisplayName,
+      'addedAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
     return ref.id;

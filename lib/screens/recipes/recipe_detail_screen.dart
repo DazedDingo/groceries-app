@@ -8,9 +8,12 @@ import '../../providers/items_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/household_provider.dart';
 import '../../providers/pantry_provider.dart';
+import '../../providers/recipe_rating_provider.dart';
 import '../../models/item.dart';
 import '../../models/recipe.dart';
+import '../../services/recipe_rating_service.dart';
 import '../../services/unit_converter.dart';
+import 'widgets/star_rating.dart';
 
 void _showCookThisDialog(
   BuildContext context,
@@ -229,6 +232,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          _RecipeHeader(recipe: recipe, householdId: householdId),
           if (recipe.notes != null && recipe.notes!.isNotEmpty) ...[
             Text(recipe.notes!, style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 16),
@@ -350,6 +354,98 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(48),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _relativeAdded(DateTime when) {
+  final diff = DateTime.now().difference(when);
+  if (diff.inDays >= 365) return '${(diff.inDays / 365).floor()}y ago';
+  if (diff.inDays >= 30) return '${(diff.inDays / 30).floor()}mo ago';
+  if (diff.inDays >= 1) return '${diff.inDays}d ago';
+  if (diff.inHours >= 1) return '${diff.inHours}h ago';
+  if (diff.inMinutes >= 1) return '${diff.inMinutes}m ago';
+  return 'just now';
+}
+
+class _RecipeHeader extends ConsumerWidget {
+  final Recipe recipe;
+  final String householdId;
+  const _RecipeHeader({required this.recipe, required this.householdId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final user = ref.watch(authStateProvider).valueOrNull;
+    final ratingsAsync = ref.watch(recipeRatingsProvider(recipe.id));
+    final ratings = ratingsAsync.value ?? const <String, int>{};
+    final summary = RecipeRatingSummary.from(ratings);
+    final myRating = user == null ? 0 : (ratings[user.uid] ?? 0);
+
+    final byline = <String>[
+      if (recipe.addedByDisplayName != null && recipe.addedByDisplayName!.isNotEmpty)
+        'Added by ${recipe.addedByDisplayName}',
+      if (recipe.addedAt != null) _relativeAdded(recipe.addedAt!),
+    ].join(' · ');
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (byline.isNotEmpty)
+            Text(byline,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                )),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              StarRating(
+                value: myRating.toDouble(),
+                onChanged: user == null
+                    ? null
+                    : (r) {
+                        ref.read(recipeRatingServiceProvider).setRating(
+                              householdId: householdId,
+                              recipeId: recipe.id,
+                              uid: user.uid,
+                              rating: r,
+                            );
+                      },
+              ),
+              const SizedBox(width: 12),
+              if (summary.count > 0)
+                Text(
+                  '${summary.average.toStringAsFixed(1)} (${summary.count})',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                )
+              else
+                Text(
+                  'Tap a star to rate',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              if (myRating > 0) ...[
+                const Spacer(),
+                TextButton(
+                  onPressed: user == null
+                      ? null
+                      : () => ref.read(recipeRatingServiceProvider).clearRating(
+                            householdId: householdId,
+                            recipeId: recipe.id,
+                            uid: user.uid,
+                          ),
+                  child: const Text('Clear'),
+                ),
+              ],
+            ],
           ),
         ],
       ),

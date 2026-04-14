@@ -62,4 +62,46 @@ void main() {
     final recipes = await service.recipesStream(hid).first;
     expect(recipes, isEmpty);
   });
+
+  test('addRecipe persists addedBy fields and addedAt timestamp', () async {
+    final id = await service.addRecipe(
+      householdId: hid,
+      name: 'Easy Pancakes',
+      ingredients: const [RecipeIngredient(name: 'flour', quantity: 1)],
+      addedByUid: 'user-alice',
+      addedByDisplayName: 'Alice',
+    );
+    final snap = await fakeDb.doc('households/$hid/recipes/$id').get();
+    expect(snap['addedByUid'], 'user-alice');
+    expect(snap['addedByDisplayName'], 'Alice');
+    expect(snap['addedAt'], isNotNull);
+  });
+
+  test('Recipe.fromFirestore round-trips addedBy + addedAt', () async {
+    await service.addRecipe(
+      householdId: hid,
+      name: 'Round-Trip',
+      ingredients: const [RecipeIngredient(name: 'x', quantity: 1)],
+      addedByUid: 'user-bob',
+      addedByDisplayName: 'Bob',
+    );
+    final recipes = await service.recipesStream(hid).first;
+    expect(recipes.first.addedByUid, 'user-bob');
+    expect(recipes.first.addedByDisplayName, 'Bob');
+    expect(recipes.first.addedAt, isNotNull);
+  });
+
+  test('legacy recipes without addedBy fields load with nulls', () async {
+    await fakeDb.collection('households/$hid/recipes').add({
+      'name': 'Legacy Recipe',
+      'ingredients': [const RecipeIngredient(name: 'salt', quantity: 1).toMap()],
+      'instructions': <String>[],
+      'tags': <String>[],
+    });
+    final recipes = await service.recipesStream(hid).first;
+    expect(recipes.first.name, 'Legacy Recipe');
+    expect(recipes.first.addedByUid, isNull);
+    expect(recipes.first.addedByDisplayName, isNull);
+    expect(recipes.first.addedAt, isNull);
+  });
 }

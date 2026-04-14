@@ -28,11 +28,15 @@ class Recipe {
   final String? notes;
   final String? sourceUrl;
   final List<String> tags;
+  final String? addedByUid;
+  final String? addedByDisplayName;
+  final DateTime? addedAt;
 
   const Recipe({
     required this.id, required this.name, required this.ingredients,
     this.instructions = const [], this.notes, this.sourceUrl,
     this.tags = const [],
+    this.addedByUid, this.addedByDisplayName, this.addedAt,
   });
 
   Map<String, dynamic> toMap() => {
@@ -59,6 +63,9 @@ class Recipe {
       notes: d['notes'],
       sourceUrl: d['sourceUrl'],
       tags: List<String>.from(d['tags'] ?? []),
+      addedByUid: d['addedByUid'] as String?,
+      addedByDisplayName: d['addedByDisplayName'] as String?,
+      addedAt: (d['addedAt'] as Timestamp?)?.toDate(),
     );
   }
 }
