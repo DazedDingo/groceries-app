@@ -9,6 +9,7 @@ import '../../providers/pantry_provider.dart';
 import '../../models/category.dart';
 import '../../models/item.dart';
 import '../../models/pantry_item.dart';
+import 'cart_action.dart';
 import 'widgets/item_tile.dart';
 import 'widgets/filter_bar.dart';
 import 'widgets/voice_fab.dart';
@@ -22,40 +23,6 @@ import '../../services/text_item_parser.dart';
 import '../../providers/history_provider.dart';
 import '../../models/history_entry.dart';
 import '../../services/restock_checker.dart';
-
-Future<void> _cartItemDetached(
-  ProviderContainer container,
-  String householdId,
-  ShoppingItem item,
-) async {
-  try {
-    final pantryList = container.read(pantryProvider).value ?? [];
-    PantryItem? pantryItem;
-
-    if (item.pantryItemId != null) {
-      try {
-        pantryItem = pantryList.firstWhere((p) => p.id == item.pantryItemId);
-      } catch (_) {}
-    } else {
-      await container.read(pantryServiceProvider).addItem(
-        householdId: householdId,
-        name: item.name,
-        categoryId: item.categoryId,
-        preferredStores: item.preferredStores,
-        optimalQuantity: item.quantity,
-        currentQuantity: item.quantity,
-      );
-    }
-
-    await container.read(itemsServiceProvider).checkOff(
-      householdId: householdId,
-      item: item,
-      pantryItem: pantryItem,
-    );
-  } catch (_) {
-    // Caller may already be disposed; nothing to surface.
-  }
-}
 
 class ShoppingListScreen extends ConsumerStatefulWidget {
   const ShoppingListScreen({super.key});
@@ -716,7 +683,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                         _showEditDialog(item, householdId, categories);
                       }
                     },
-                    onCheckOff: () => _cartItemDetached(
+                    onCheckOff: () => cartItemDetached(
                       ProviderScope.containerOf(context, listen: false),
                       householdId,
                       item,
