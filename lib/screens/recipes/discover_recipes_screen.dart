@@ -21,6 +21,8 @@ class _DiscoverRecipesScreenState extends ConsumerState<DiscoverRecipesScreen> {
   RecipeSource _source = RecipeSource.mealdb;
   bool _loading = false;
   String? _error;
+  String? _loadingPreviewId;
+  bool _saving = false;
   List<RecipeSearchResult> _results = const [];
 
   @override
@@ -54,11 +56,8 @@ class _DiscoverRecipesScreenState extends ConsumerState<DiscoverRecipesScreen> {
   }
 
   Future<void> _openPreview(RecipeSearchResult r) async {
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
-    );
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _loadingPreviewId = r.id);
     try {
       final service = ref.read(recipeSearchServiceProvider);
       final imported = r.source == RecipeSource.mealdb
@@ -66,14 +65,14 @@ class _DiscoverRecipesScreenState extends ConsumerState<DiscoverRecipesScreen> {
           : await service.fetchSpoonacular(
               r.id, ref.read(spoonacularKeyProvider));
       if (!mounted) return;
-      Navigator.of(context).pop(); // close spinner
       _showPreviewSheet(imported, r);
     } catch (e) {
       if (!mounted) return;
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      messenger.showSnackBar(SnackBar(
         content: Text('Could not load recipe: ${e.toString().replaceFirst('Exception: ', '')}'),
       ));
+    } finally {
+      if (mounted) setState(() => _loadingPreviewId = null);
     }
   }
 
@@ -138,28 +137,40 @@ class _DiscoverRecipesScreenState extends ConsumerState<DiscoverRecipesScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(sheetCtx),
-                      child: const Text('Cancel'),
+              StatefulBuilder(builder: (ctx, setSheet) {
+                return Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: _saving ? null : () => Navigator.pop(sheetCtx),
+                        child: const Text('Cancel'),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: FilledButton.icon(
-                      icon: const Icon(Icons.bookmark_add),
-                      label: const Text('Save to my recipes'),
-                      onPressed: () async {
-                        Navigator.pop(sheetCtx);
-                        await _saveRecipe(imported);
-                      },
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: FilledButton.icon(
+                        icon: _saving
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Colors.white),
+                              )
+                            : const Icon(Icons.bookmark_add),
+                        label: Text(_saving ? 'Saving…' : 'Save to my recipes'),
+                        onPressed: _saving
+                            ? null
+                            : () async {
+                                setSheet(() {});
+                                await _saveRecipe(imported);
+                                if (sheetCtx.mounted) Navigator.pop(sheetCtx);
+                              },
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                );
+              }),
             ],
           ),
         ),
@@ -169,26 +180,31 @@ class _DiscoverRecipesScreenState extends ConsumerState<DiscoverRecipesScreen> {
 
   Future<void> _saveRecipe(ImportedRecipe imported) async {
     final messenger = ScaffoldMessenger.of(context);
-    // Wait for auth to emit first so householdIdProvider doesn't cache a
-    // null result from a cold read before auth has resolved.
-    final user = await ref.read(authStateProvider.future);
+
+    // Read auth synchronously from FirebaseAuth.currentUser — reliable once
+    // the app has booted, unlike the async auth provider which may not have
+    // emitted by the time the user taps Save.
+    final user = ref.read(authServiceProvider).currentUser;
     if (user == null) {
       messenger.showSnackBar(
           const SnackBar(content: Text('Please sign in to save recipes')));
       return;
     }
-    var householdId = await ref.read(householdIdProvider.future);
-    if (householdId == null || householdId.isEmpty) {
-      // Provider may have cached a null from before auth resolved — retry once.
-      ref.invalidate(householdIdProvider);
-      householdId = await ref.read(householdIdProvider.future);
-    }
-    if (householdId == null || householdId.isEmpty) {
-      messenger.showSnackBar(const SnackBar(
-          content: Text('No household set up — check Settings')));
-      return;
-    }
+
+    setState(() => _saving = true);
     try {
+      // Go direct to the service rather than trusting a cached provider.
+      final householdId = await ref
+          .read(householdServiceProvider)
+          .getHouseholdIdForUser(user.uid);
+
+      if (householdId == null || householdId.isEmpty) {
+        if (!mounted) return;
+        messenger.showSnackBar(const SnackBar(
+            content: Text('No household set up — check Settings')));
+        return;
+      }
+
       await ref.read(recipesServiceProvider).addRecipe(
             householdId: householdId,
             name: imported.name,
@@ -202,6 +218,7 @@ class _DiscoverRecipesScreenState extends ConsumerState<DiscoverRecipesScreen> {
       if (!mounted) return;
       messenger.showSnackBar(SnackBar(
         content: Text('Saved "${imported.name}" to your recipes'),
+        duration: const Duration(seconds: 2),
       ));
       if (context.mounted) context.go('/recipes');
     } catch (e) {
@@ -209,6 +226,8 @@ class _DiscoverRecipesScreenState extends ConsumerState<DiscoverRecipesScreen> {
       messenger.showSnackBar(SnackBar(
         content: Text('Could not save: $e'),
       ));
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
   }
 
@@ -334,8 +353,16 @@ class _DiscoverRecipesScreenState extends ConsumerState<DiscoverRecipesScreen> {
                             subtitle: Text(r.source == RecipeSource.mealdb
                                 ? 'TheMealDB'
                                 : 'Spoonacular'),
-                            trailing: const Icon(Icons.chevron_right),
-                            onTap: () => _openPreview(r),
+                            trailing: _loadingPreviewId == r.id
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : const Icon(Icons.chevron_right),
+                            onTap: _loadingPreviewId == null
+                                ? () => _openPreview(r)
+                                : null,
                           );
                         },
                       ),

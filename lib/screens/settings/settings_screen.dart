@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:android_intent_plus/android_intent.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/household_provider.dart';
 import '../../providers/recipe_search_provider.dart';
@@ -195,6 +196,8 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () => context.go('/settings/report-issue'),
           ),
           const Divider(),
+          const _AboutTile(),
+          const Divider(),
           ListTile(
             title: const Text('Sign out'),
             onTap: () async {
@@ -298,6 +301,44 @@ class _SpoonacularKeyTileState extends ConsumerState<_SpoonacularKeyTile> {
         _ctrl.text = key;
         setState(() => _editing = true);
       },
+    );
+  }
+}
+
+class _AboutTile extends StatefulWidget {
+  const _AboutTile();
+
+  @override
+  State<_AboutTile> createState() => _AboutTileState();
+}
+
+class _AboutTileState extends State<_AboutTile> {
+  String _versionLine = 'Loading…';
+
+  @override
+  void initState() {
+    super.initState();
+    PackageInfo.fromPlatform().then((info) {
+      if (!mounted) return;
+      setState(() {
+        _versionLine = 'v${info.version} (build ${info.buildNumber})';
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.info_outline),
+      title: const Text('About'),
+      subtitle: Text('Groceries — $_versionLine'),
+      onTap: () => showAboutDialog(
+        context: context,
+        applicationName: 'Groceries',
+        applicationVersion: _versionLine,
+        applicationLegalese:
+            'A household grocery + pantry + recipe companion.',
+      ),
     );
   }
 }

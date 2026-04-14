@@ -12,6 +12,7 @@ import 'package:groceries_app/providers/recipe_search_provider.dart';
 import 'package:groceries_app/providers/recipes_provider.dart';
 import 'package:groceries_app/screens/recipes/discover_recipes_screen.dart';
 import 'package:groceries_app/services/auth_service.dart';
+import 'package:groceries_app/services/household_service.dart';
 import 'package:groceries_app/services/recipe_search_service.dart';
 import 'package:groceries_app/services/recipes_service.dart';
 import 'package:http/http.dart' as http;
@@ -49,10 +50,14 @@ Widget _wrap({
     ],
   );
 
+  // Seed the user-doc householdId so HouseholdService can resolve it.
+  db.doc('users/${mockUser.uid}').set({'householdId': 'hh1'});
+
   return ProviderScope(
     overrides: [
       recipeSearchServiceProvider.overrideWithValue(searchService),
       householdIdProvider.overrideWith((ref) async => 'hh1'),
+      householdServiceProvider.overrideWithValue(HouseholdService(db: db)),
       authStateProvider.overrideWith((ref) => Stream.value(mockUser)),
       authServiceProvider.overrideWithValue(AuthService(auth: auth)),
       recipesServiceProvider.overrideWithValue(RecipesService(db: db)),
