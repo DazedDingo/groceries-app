@@ -241,12 +241,41 @@ class _SpoonacularKeyTileState extends ConsumerState<_SpoonacularKeyTile> {
                 style: TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 4),
             Text(
-              'Free at spoonacular.com/food-api — 150 requests/day.',
+              'Powers recipe search on the Discover tab. Free tier allows 150 requests/day — plenty for a household.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
             ),
             const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('How to get a key',
+                      style: Theme.of(context).textTheme.labelLarge),
+                  const SizedBox(height: 6),
+                  const Text('1. Go to spoonacular.com/food-api and click "Start Now".'),
+                  const Text('2. Sign up for a free account (email + password).'),
+                  const Text('3. After signing in, open the Profile menu → "Show/Hide API Key".'),
+                  const Text('4. Copy the key and paste it below.'),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: () => launchUrl(
+                      Uri.parse('https://spoonacular.com/food-api'),
+                      mode: LaunchMode.externalApplication,
+                    ),
+                    icon: const Icon(Icons.open_in_new, size: 16),
+                    label: const Text('Open spoonacular.com/food-api'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
             TextField(
               controller: _ctrl,
               autofocus: true,

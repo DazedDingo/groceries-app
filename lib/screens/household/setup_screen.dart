@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../providers/household_provider.dart';
+import '../shared/pantry_background.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
   final String? inviteToken;
@@ -62,24 +63,80 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Set up household')),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TextField(controller: _nameController, decoration: const InputDecoration(labelText: 'Household name')),
-                  const SizedBox(height: 16),
+      appBar: AppBar(
+        title: const Text('Set up household'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      extendBodyBehindAppBar: true,
+      body: PantryBackground(
+        child: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Card(
+                    elevation: 2,
+                    color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.94),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                  Text(
+                    'A household is a shared space for your grocery list, pantry, and recipes. Pick one option:',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 24),
+                  Text('Create a new household',
+                      style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Start fresh — you'll be the first member. Other people can join later using an invite link you share from Settings.",
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Household name',
+                      hintText: 'e.g. The Smiths',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                   FilledButton(onPressed: _create, child: const Text('Create household')),
                   const Divider(height: 48),
-                  TextField(controller: _tokenController, decoration: const InputDecoration(labelText: 'Invite token')),
-                  const SizedBox(height: 16),
+                  Text('Join an existing household',
+                      style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Someone already in the household can send you an invite link. Opening it here fills in the token automatically — or paste one manually below.',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _tokenController,
+                    decoration: const InputDecoration(
+                      labelText: 'Invite token',
+                      hintText: 'Paste from invite link',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                   OutlinedButton(onPressed: _join, child: const Text('Join household')),
-                ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ),
-            ),
+      ),
     );
   }
 }

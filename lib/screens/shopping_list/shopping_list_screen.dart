@@ -601,11 +601,6 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
             )
           else ...[
             IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () => _showManualAddDialog(householdId),
-              tooltip: 'Add item',
-            ),
-            IconButton(
               icon: const Icon(Icons.playlist_add),
               onPressed: () => _showBulkAddDialog(householdId),
               tooltip: 'Bulk add',
@@ -721,7 +716,22 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
             ),
         ],
       ),
-      floatingActionButton: _selecting ? null : VoiceFab(householdId: householdId),
+      floatingActionButton: _selecting
+          ? null
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                FloatingActionButton.small(
+                  heroTag: 'add-manual',
+                  onPressed: () => _showManualAddDialog(householdId),
+                  tooltip: 'Add item',
+                  child: const Icon(Icons.add),
+                ),
+                const SizedBox(height: 8),
+                VoiceFab(householdId: householdId),
+              ],
+            ),
     );
   }
 }

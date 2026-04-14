@@ -11,6 +11,7 @@ import '../../providers/pantry_provider.dart';
 import '../../providers/recipe_rating_provider.dart';
 import '../../models/item.dart';
 import '../../models/recipe.dart';
+import '../../services/pantry_match.dart';
 import '../../services/recipe_rating_service.dart';
 import '../../services/unit_converter.dart';
 import 'widgets/star_rating.dart';
@@ -307,12 +308,34 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          ...recipe.ingredients.map((ing) => ListTile(
-            dense: true,
-            contentPadding: EdgeInsets.zero,
-            title: Text(ing.name),
-            trailing: Text(formatQuantityUnit(ing.quantity * _multiplier, ing.unit, unitSystem)),
-          )),
+          ...recipe.ingredients.map((ing) {
+            final pantryList = ref.watch(pantryProvider).value ?? const [];
+            final match = findLenientPantryMatch(ing.name, pantryList);
+            final inStock = match != null;
+            final color = inStock
+                ? Colors.green
+                : Theme.of(context).colorScheme.error;
+            return ListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(
+                inStock
+                    ? Icons.check_circle_outline
+                    : Icons.radio_button_unchecked,
+                color: color,
+                size: 20,
+              ),
+              title: Text(ing.name, style: TextStyle(color: color)),
+              subtitle: inStock
+                  ? Text('In pantry: ${match.currentQuantity}',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ))
+                  : null,
+              trailing: Text(
+                  formatQuantityUnit(ing.quantity * _multiplier, ing.unit, unitSystem)),
+            );
+          }),
           if (recipe.tags.isNotEmpty) ...[
             const SizedBox(height: 16),
             Wrap(

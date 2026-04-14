@@ -8,6 +8,11 @@ import type { WriteItemParams } from './types.js';
 export interface SyncResult {
   synced: number;
   errors: number;
+  listFound: boolean;
+  tasksSeen: number;
+  skippedAlreadyProcessed: number;
+  listName: string;
+  availableLists?: string[];
 }
 
 export interface SyncDeps {
@@ -31,13 +36,14 @@ function buildTasksClient(): tasks_v1.Tasks {
 async function findTaskList(
   client: tasks_v1.Tasks,
   listName: string,
-): Promise<string | null> {
+): Promise<{ id: string | null; available: string[] }> {
   const res = await client.tasklists.list({ maxResults: 100 });
   const lists = res.data.items ?? [];
+  const available = lists.map((l) => l.title ?? '').filter(Boolean);
   const match = lists.find(
     (l) => l.title?.toLowerCase() === listName.toLowerCase(),
   );
-  return match?.id ?? null;
+  return { id: match?.id ?? null, available };
 }
 
 export async function syncGoogleTasks(
@@ -50,9 +56,17 @@ export async function syncGoogleTasks(
     deps?.listName ?? process.env.GOOGLE_TASKS_LIST_NAME ?? 'My Tasks';
 
   // 1. Find the task list
-  const listId = await findTaskList(client, listName);
+  const { id: listId, available } = await findTaskList(client, listName);
   if (!listId) {
-    return { synced: 0, errors: 0 };
+    return {
+      synced: 0,
+      errors: 0,
+      listFound: false,
+      tasksSeen: 0,
+      skippedAlreadyProcessed: 0,
+      listName,
+      availableLists: available,
+    };
   }
 
   // 2. Get incomplete tasks
@@ -64,18 +78,33 @@ export async function syncGoogleTasks(
   const tasks = tasksRes.data.items ?? [];
 
   if (tasks.length === 0) {
-    return { synced: 0, errors: 0 };
+    return {
+      synced: 0,
+      errors: 0,
+      listFound: true,
+      tasksSeen: 0,
+      skippedAlreadyProcessed: 0,
+      listName,
+    };
   }
 
   // 3. Look up household
   const userDoc = await db.doc(`users/${uid}`).get();
   const householdId = userDoc.data()?.householdId as string | undefined;
   if (!householdId) {
-    return { synced: 0, errors: tasks.length };
+    return {
+      synced: 0,
+      errors: tasks.length,
+      listFound: true,
+      tasksSeen: tasks.length,
+      skippedAlreadyProcessed: 0,
+      listName,
+    };
   }
 
   let synced = 0;
   let errors = 0;
+  let skippedAlreadyProcessed = 0;
 
   for (const task of tasks) {
     const taskId = task.id;
@@ -86,7 +115,10 @@ export async function syncGoogleTasks(
       // 4. Check if already processed
       const processedRef = db.doc(`sync/googleTasks/processed/${taskId}`);
       const processedDoc = await processedRef.get();
-      if (processedDoc.exists) continue;
+      if (processedDoc.exists) {
+        skippedAlreadyProcessed++;
+        continue;
+      }
 
       // 5. Parse and categorize
       const { quantity, name, unit } = parseItemString(title);
@@ -133,5 +165,12 @@ export async function syncGoogleTasks(
     }
   }
 
-  return { synced, errors };
+  return {
+    synced,
+    errors,
+    listFound: true,
+    tasksSeen: tasks.length,
+    skippedAlreadyProcessed,
+    listName,
+  };
 }

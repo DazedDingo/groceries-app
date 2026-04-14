@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../providers/pantry_provider.dart';
 import '../../providers/recipes_provider.dart';
+import '../../services/pantry_match.dart';
 import '../shared/empty_state.dart';
 import '../shared/list_skeleton.dart';
 
 final _selectedTagProvider = StateProvider<String?>((ref) => null);
+final _canMakeNowProvider = StateProvider<bool>((ref) => false);
 
 class RecipesScreen extends ConsumerWidget {
   const RecipesScreen({super.key});
@@ -14,6 +17,8 @@ class RecipesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final recipes = ref.watch(recipesProvider);
     final selectedTag = ref.watch(_selectedTagProvider);
+    final canMakeNow = ref.watch(_canMakeNowProvider);
+    final pantry = ref.watch(pantryProvider).value ?? const [];
 
     return Scaffold(
       appBar: AppBar(title: const Text('Recipes')),
@@ -40,16 +45,37 @@ class RecipesScreen extends ConsumerWidget {
 
           // Collect all unique tags
           final allTags = list.expand((r) => r.tags).toSet().toList()..sort();
-          final filtered = selectedTag == null
+          var filtered = selectedTag == null
               ? list
               : list.where((r) => r.tags.contains(selectedTag)).toList();
+          if (canMakeNow) {
+            filtered = filtered.where((r) => canMakeFromPantry(r, pantry)).toList();
+          }
 
           return Column(
             children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    FilterChip(
+                      avatar: Icon(
+                        canMakeNow ? Icons.check_circle : Icons.kitchen,
+                        size: 18,
+                        color: canMakeNow ? Colors.green : null,
+                      ),
+                      label: const Text('Can make now'),
+                      selected: canMakeNow,
+                      onSelected: (v) =>
+                          ref.read(_canMakeNowProvider.notifier).state = v,
+                    ),
+                  ],
+                ),
+              ),
               if (allTags.isNotEmpty)
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   child: Row(
                     children: allTags.map((tag) => Padding(
                       padding: const EdgeInsets.only(right: 8),
@@ -63,7 +89,21 @@ class RecipesScreen extends ConsumerWidget {
                   ),
                 ),
               Expanded(
-                child: ListView.builder(
+                child: filtered.isEmpty
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Text(
+                            canMakeNow
+                                ? "Nothing you can make right now — pantry's a bit light."
+                                : 'No matching recipes.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant),
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
                   itemCount: filtered.length,
                   itemBuilder: (_, i) {
                     final r = filtered[i];

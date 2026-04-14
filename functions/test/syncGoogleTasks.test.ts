@@ -80,7 +80,12 @@ describe('syncGoogleTasks', () => {
 
   it('returns synced:0 for empty task list', async () => {
     const result = await syncGoogleTasks(makeDeps({ tasks: [] }));
-    expect(result).toEqual({ synced: 0, errors: 0 });
+    expect(result).toMatchObject({
+      synced: 0,
+      errors: 0,
+      listFound: true,
+      tasksSeen: 0,
+    });
     expect(mockWriteItem).not.toHaveBeenCalled();
   });
 
@@ -174,12 +179,17 @@ describe('syncGoogleTasks', () => {
     expect(result.synced).toBe(0);
   });
 
-  it('returns synced:0 when task list not found', async () => {
+  it('returns synced:0 and listFound:false when task list not found', async () => {
     const client = makeTasksClient([], [{ id: 'list-x', title: 'Other List' }]);
     const deps = makeDeps({ getTasksClient: () => client, listName: 'My Tasks' });
     const result = await syncGoogleTasks(deps);
 
-    expect(result).toEqual({ synced: 0, errors: 0 });
+    expect(result).toMatchObject({
+      synced: 0,
+      errors: 0,
+      listFound: false,
+      availableLists: ['Other List'],
+    });
   });
 
   it('returns errors when user has no household', async () => {

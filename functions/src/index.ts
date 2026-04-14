@@ -15,8 +15,25 @@ export const fulfillment = functionsV1.https.onRequest(handleIftttWebhook as any
 // v2 scheduled function — polls Google Tasks every 3 minutes
 export const syncTasksV2 = onSchedule('every 3 minutes', async () => {
   const result = await syncGoogleTasks();
-  if (result.synced > 0 || result.errors > 0) {
+
+  // Always log abnormal outcomes so the flow is diagnosable.
+  if (!result.listFound) {
+    logger.warn('Google Tasks list not found', {
+      looking_for: result.listName,
+      available: result.availableLists,
+    });
+  } else if (result.synced > 0 || result.errors > 0) {
     logger.info('Google Tasks sync', result);
+  } else {
+    // List found but nothing new — log once per hour on the xx:00 tick.
+    const now = new Date();
+    if (now.getUTCMinutes() < 3) {
+      logger.info('Google Tasks idle', {
+        listName: result.listName,
+        tasksSeen: result.tasksSeen,
+        skippedAlreadyProcessed: result.skippedAlreadyProcessed,
+      });
+    }
   }
 });
 
