@@ -23,6 +23,40 @@ import '../../providers/history_provider.dart';
 import '../../models/history_entry.dart';
 import '../../services/restock_checker.dart';
 
+Future<void> _cartItemDetached(
+  ProviderContainer container,
+  String householdId,
+  ShoppingItem item,
+) async {
+  try {
+    final pantryList = container.read(pantryProvider).value ?? [];
+    PantryItem? pantryItem;
+
+    if (item.pantryItemId != null) {
+      try {
+        pantryItem = pantryList.firstWhere((p) => p.id == item.pantryItemId);
+      } catch (_) {}
+    } else {
+      await container.read(pantryServiceProvider).addItem(
+        householdId: householdId,
+        name: item.name,
+        categoryId: item.categoryId,
+        preferredStores: item.preferredStores,
+        optimalQuantity: item.quantity,
+        currentQuantity: item.quantity,
+      );
+    }
+
+    await container.read(itemsServiceProvider).checkOff(
+      householdId: householdId,
+      item: item,
+      pantryItem: pantryItem,
+    );
+  } catch (_) {
+    // Caller may already be disposed; nothing to surface.
+  }
+}
+
 class ShoppingListScreen extends ConsumerStatefulWidget {
   const ShoppingListScreen({super.key});
 
@@ -234,41 +268,6 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to add items: $e')),
-        );
-      }
-    }
-  }
-
-  Future<void> _cartItem(String householdId, ShoppingItem item) async {
-    try {
-      final pantryList = ref.read(pantryProvider).value ?? [];
-      PantryItem? pantryItem;
-
-      if (item.pantryItemId != null) {
-        try {
-          pantryItem = pantryList.firstWhere((p) => p.id == item.pantryItemId);
-        } catch (_) {}
-      } else {
-        // No pantry link — create a new pantry entry
-        await ref.read(pantryServiceProvider).addItem(
-          householdId: householdId,
-          name: item.name,
-          categoryId: item.categoryId,
-          preferredStores: item.preferredStores,
-          optimalQuantity: item.quantity,
-          currentQuantity: item.quantity,
-        );
-      }
-
-      await ref.read(itemsServiceProvider).checkOff(
-        householdId: householdId,
-        item: item,
-        pantryItem: pantryItem,
-      );
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to cart item: $e')),
         );
       }
     }
@@ -717,9 +716,14 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                         _showEditDialog(item, householdId, categories);
                       }
                     },
-                    onCheckOff: () => _cartItem(householdId, item),
-                    onDelete: () => ref.read(itemsServiceProvider).deleteItem(
-                      householdId: householdId, item: item),
+                    onCheckOff: () => _cartItemDetached(
+                      ProviderScope.containerOf(context, listen: false),
+                      householdId,
+                      item,
+                    ),
+                    onDelete: () => ProviderScope.containerOf(context, listen: false)
+                        .read(itemsServiceProvider)
+                        .deleteItem(householdId: householdId, item: item),
                   )),
                 ];
               }).toList(),
