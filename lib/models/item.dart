@@ -44,6 +44,7 @@ class ShoppingItem {
   final List<String> preferredStores;
   final String? pantryItemId;
   final String? recipeSource;
+  final bool isRecurring;
   final AddedBy addedBy;
   final DateTime addedAt;
 
@@ -51,8 +52,8 @@ class ShoppingItem {
     required this.id, required this.name, required this.quantity,
     this.unit, this.note,
     required this.categoryId, required this.preferredStores,
-    required this.pantryItemId, this.recipeSource, required this.addedBy,
-    required this.addedAt,
+    required this.pantryItemId, this.recipeSource, this.isRecurring = false,
+    required this.addedBy, required this.addedAt,
   });
 
   Map<String, dynamic> toMap() => {
@@ -60,6 +61,7 @@ class ShoppingItem {
     'categoryId': categoryId,
     'preferredStores': preferredStores, 'pantryItemId': pantryItemId,
     'recipeSource': recipeSource,
+    'isRecurring': isRecurring,
     'addedBy': addedBy.toMap(),
     'addedAt': Timestamp.fromDate(addedAt),
   };
@@ -74,6 +76,7 @@ class ShoppingItem {
       preferredStores: List<String>.from(d['preferredStores'] ?? []),
       pantryItemId: d['pantryItemId'],
       recipeSource: d['recipeSource'],
+      isRecurring: d['isRecurring'] ?? false,
       addedBy: AddedBy.fromMap(d['addedBy'] ?? {}),
       addedAt: (d['addedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );

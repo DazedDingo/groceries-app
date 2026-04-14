@@ -35,6 +35,7 @@ class ItemsService {
     String? unit,
     String? note,
     String? recipeSource,
+    bool isRecurring = false,
   }) async {
     final batch = _db.batch();
     final itemRef = _db.collection('households/$householdId/items').doc();
@@ -43,6 +44,7 @@ class ItemsService {
       'categoryId': categoryId,
       'preferredStores': preferredStores, 'pantryItemId': pantryItemId,
       'recipeSource': recipeSource,
+      'isRecurring': isRecurring,
       'addedBy': addedBy.toMap(), 'addedAt': FieldValue.serverTimestamp(),
     });
     final histRef = _db.collection('households/$householdId/history').doc();

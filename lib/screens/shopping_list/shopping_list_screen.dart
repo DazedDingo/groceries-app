@@ -134,6 +134,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
         quantity: result.quantity,
         unit: result.unit,
         note: result.note,
+        isRecurring: result.isRecurring,
         addedBy: AddedBy(
           uid: user?.uid,
           displayName: user?.displayName ?? 'Unknown',
@@ -189,6 +190,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       quantity: result.quantity,
       unit: result.unit,
       note: result.note,
+      isRecurring: result.isRecurring,
       addedBy: AddedBy(
         uid: user?.uid,
         displayName: user?.displayName ?? 'Unknown',
@@ -256,7 +258,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
             name: item.name,
             categoryId: item.categoryId,
             preferredStores: item.preferredStores,
-            optimalQuantity: item.quantity,
+            optimalQuantity: item.isRecurring ? item.quantity : 0,
             currentQuantity: item.quantity,
           );
         }

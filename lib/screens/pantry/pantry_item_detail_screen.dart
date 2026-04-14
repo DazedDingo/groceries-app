@@ -16,6 +16,7 @@ class PantryItemDetailScreen extends ConsumerStatefulWidget {
 class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen> {
   int? _selectedDays;
   int? _selectedShelfLife;
+  int _optimalQuantity = 0;
   bool _initialized = false;
 
   @override
@@ -28,6 +29,7 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
       _initialized = true;
       _selectedDays = item.restockAfterDays;
       _selectedShelfLife = item.shelfLifeDays;
+      _optimalQuantity = item.optimalQuantity;
       // Auto-guess shelf life if not set, and persist it
       if (_selectedShelfLife == null) {
         final categories = ref.read(categoriesProvider).value ?? [];
@@ -89,8 +91,41 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
                   Row(
                     children: [
                       Text('Current: ${item.currentQuantity}', style: theme.textTheme.bodyLarge),
-                      const SizedBox(width: 16),
-                      Text('Optimal: ${item.optimalQuantity}', style: theme.textTheme.bodyLarge),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Text('Optimal:', style: theme.textTheme.bodyLarge),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.remove),
+                        visualDensity: VisualDensity.compact,
+                        onPressed: _optimalQuantity > 0
+                            ? () {
+                                setState(() => _optimalQuantity--);
+                                ref.read(pantryServiceProvider).updateItem(
+                                    householdId, widget.itemId, {'optimalQuantity': _optimalQuantity});
+                              }
+                            : null,
+                      ),
+                      SizedBox(
+                        width: 40,
+                        child: Text(
+                          '$_optimalQuantity',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.titleMedium,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add),
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () {
+                          setState(() => _optimalQuantity++);
+                          ref.read(pantryServiceProvider).updateItem(
+                              householdId, widget.itemId, {'optimalQuantity': _optimalQuantity});
+                        },
+                      ),
                     ],
                   ),
                   if (item.isBelowOptimal)

@@ -10,7 +10,8 @@ class AddItemResult {
   final String? unit;
   final String? note;
   final bool categoryOverridden;
-  AddItemResult({required this.name, required this.category, required this.quantity, this.unit, this.note, this.categoryOverridden = false});
+  final bool isRecurring;
+  AddItemResult({required this.name, required this.category, required this.quantity, this.unit, this.note, this.categoryOverridden = false, this.isRecurring = false});
 }
 
 class AddItemDialog extends StatefulWidget {
@@ -42,6 +43,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
   bool _categoryManuallyChanged = false;
   int _quantity = 1;
   String? _unit;
+  bool _isRecurring = false;
 
   String get _nameText => _autocompleteCtrl?.text ?? '';
 
@@ -97,7 +99,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
             return TextField(
               controller: controller,
               focusNode: focusNode,
-              decoration: const InputDecoration(labelText: 'Item name'),
+              decoration: const InputDecoration(labelText: 'Item name', isDense: true),
               autofocus: widget.initialName.isEmpty,
               onChanged: _onNameChanged,
             );
@@ -187,6 +189,15 @@ class _AddItemDialogState extends State<AddItemDialog> {
           ),
           maxLines: 1,
         ),
+        const SizedBox(height: 4),
+        SwitchListTile(
+          value: _isRecurring,
+          onChanged: (v) => setState(() => _isRecurring = v),
+          title: const Text('Is recurring?'),
+          subtitle: const Text('Sets optimal quantity for restock alerts'),
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+        ),
       ]),
       actions: [
         TextButton(
@@ -205,6 +216,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
                       unit: _unit,
                       note: _noteCtrl.text.trim().isEmpty ? null : _noteCtrl.text.trim(),
                       categoryOverridden: _categoryManuallyChanged,
+                      isRecurring: _isRecurring,
                     ),
                   ),
           child: const Text('Add'),
