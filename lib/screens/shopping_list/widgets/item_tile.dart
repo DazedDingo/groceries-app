@@ -124,7 +124,7 @@ class _ItemTileState extends State<ItemTile> {
           duration: const Duration(seconds: 3),
         );
         messenger.showSnackBar(snackBar).closed.then((_) {
-          if (!undone && mounted) {
+          if (!undone) {
             if (dir == DismissDirection.startToEnd) {
               widget.onCheckOff();
             } else {

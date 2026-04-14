@@ -704,6 +704,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                     ),
                   ),
                   ...entry.value.map((item) => ItemTile(
+                    key: ValueKey(item.id),
                     item: item,
                     unitSystem: unitSystem,
                     isSelecting: _selecting,
