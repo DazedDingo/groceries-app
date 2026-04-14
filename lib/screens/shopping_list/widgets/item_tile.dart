@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../models/item.dart';
 import '../../../services/unit_converter.dart';
+import '../cart_action.dart';
 
 class ItemTile extends StatefulWidget {
   final ShoppingItem item;
-  final VoidCallback onCheckOff;
-  final VoidCallback onDelete;
+  final Future<CartReceipt> Function() onCheckOff;
+  final Future<CartReceipt> Function() onDelete;
+  final Future<void> Function(CartReceipt receipt) onUndo;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
   final bool isSelecting;
@@ -18,6 +20,7 @@ class ItemTile extends StatefulWidget {
     required this.item,
     required this.onCheckOff,
     required this.onDelete,
+    required this.onUndo,
     required this.onTap,
     required this.onLongPress,
     this.isSelecting = false,
@@ -111,29 +114,26 @@ class _ItemTileState extends State<ItemTile> {
         if (_pendingAction) return false;
         HapticFeedback.mediumImpact();
         setState(() => _pendingAction = true);
-        final action = dir == DismissDirection.startToEnd ? 'Marked as bought' : 'Deleted';
+
         final messenger = ScaffoldMessenger.of(context);
         messenger.hideCurrentSnackBar();
-        var undone = false;
-        final snackBar = SnackBar(
+
+        final isCart = dir == DismissDirection.startToEnd;
+        final receipt = isCart ? await widget.onCheckOff() : await widget.onDelete();
+
+        if (mounted) setState(() => _pendingAction = false);
+
+        final action = isCart ? 'Marked as bought' : 'Deleted';
+        messenger.showSnackBar(SnackBar(
           content: Text('$action "${item.name}"'),
+          duration: const Duration(milliseconds: 1500),
           action: SnackBarAction(
             label: 'Undo',
-            onPressed: () => undone = true,
+            onPressed: () => widget.onUndo(receipt),
           ),
-          duration: const Duration(seconds: 3),
-        );
-        messenger.showSnackBar(snackBar).closed.then((_) {
-          if (!undone) {
-            if (dir == DismissDirection.startToEnd) {
-              widget.onCheckOff();
-            } else {
-              widget.onDelete();
-            }
-          }
-          if (mounted) setState(() => _pendingAction = false);
-        });
-        return false;
+        ));
+
+        return true;
       },
       child: tile,
     );

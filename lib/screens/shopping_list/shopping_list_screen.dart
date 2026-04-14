@@ -688,9 +688,16 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                       householdId,
                       item,
                     ),
-                    onDelete: () => ProviderScope.containerOf(context, listen: false)
-                        .read(itemsServiceProvider)
-                        .deleteItem(householdId: householdId, item: item),
+                    onDelete: () => deleteItemDetached(
+                      ProviderScope.containerOf(context, listen: false),
+                      householdId,
+                      item,
+                    ),
+                    onUndo: (receipt) => undoDetached(
+                      ProviderScope.containerOf(context, listen: false),
+                      householdId,
+                      receipt,
+                    ),
                   )),
                 ];
               }).toList(),

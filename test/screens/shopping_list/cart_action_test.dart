@@ -44,7 +44,7 @@ void main() {
     test('removes item from list and creates pantry entry when not linked', () async {
       final item = await seedShoppingItem();
 
-      await cartItemDetached(container, 'hh1', item);
+      final receipt = await cartItemDetached(container, 'hh1', item);
 
       final listSnap = await fakeDb.collection('households/hh1/items').get();
       expect(listSnap.docs, isEmpty,
@@ -54,6 +54,8 @@ void main() {
       expect(pantrySnap.docs.length, 1,
           reason: 'a pantry entry should be created for the unlinked item');
       expect(pantrySnap.docs.first['name'], 'Milk');
+      expect(receipt.createdPantryItemId, pantrySnap.docs.first.id,
+          reason: 'receipt should record the new pantry id for undo');
     });
 
     test('removes item from list without creating pantry entry when already linked',
@@ -70,7 +72,7 @@ void main() {
       });
       final item = await seedShoppingItem(pantryItemId: 'p1');
 
-      await cartItemDetached(container, 'hh1', item);
+      final receipt = await cartItemDetached(container, 'hh1', item);
 
       final listSnap = await fakeDb.collection('households/hh1/items').get();
       expect(listSnap.docs, isEmpty);
@@ -78,17 +80,17 @@ void main() {
       final pantrySnap = await fakeDb.collection('households/hh1/pantry').get();
       expect(pantrySnap.docs.length, 1,
           reason: 'no duplicate pantry entry should be created');
+      expect(receipt.createdPantryItemId, isNull,
+          reason: 'no new pantry id when the item was already linked');
     });
 
     test('runs successfully even after the originating container is gone',
         () async {
-      // This is the regression scenario: the user navigates away (the
-      // shopping-list screen state is disposed) before the snackbar's 3s
-      // timer fires. The function captures a root container, so the work
-      // must still complete.
+      // Regression: user navigates away (screen state disposed) before the
+      // snackbar's timer fires. The work captures a root container, so the
+      // checkOff must still complete.
       final item = await seedShoppingItem();
 
-      // Simulate "deferred work after navigation" by awaiting a delay.
       await Future<void>.delayed(const Duration(milliseconds: 50));
       await cartItemDetached(container, 'hh1', item);
 
@@ -96,6 +98,82 @@ void main() {
       expect(listSnap.docs, isEmpty);
       final pantrySnap = await fakeDb.collection('households/hh1/pantry').get();
       expect(pantrySnap.docs.length, 1);
+    });
+  });
+
+  group('undoDetached', () {
+    late FakeFirebaseFirestore fakeDb;
+    late ProviderContainer container;
+
+    setUp(() {
+      fakeDb = FakeFirebaseFirestore();
+      container = ProviderContainer(
+        overrides: [
+          itemsServiceProvider.overrideWithValue(ItemsService(db: fakeDb)),
+          pantryServiceProvider.overrideWithValue(PantryService(db: fakeDb)),
+        ],
+      );
+      addTearDown(container.dispose);
+    });
+
+    Future<ShoppingItem> seedShoppingItem({String? pantryItemId}) async {
+      final ref = fakeDb.collection('households/hh1/items').doc('item1');
+      await ref.set({
+        'name': 'Milk',
+        'quantity': 2,
+        'unit': 'L',
+        'note': 'organic',
+        'categoryId': 'dairy',
+        'preferredStores': <String>[],
+        'pantryItemId': pantryItemId,
+        'addedBy': {'uid': 'u1', 'displayName': 'Alice', 'source': 'app'},
+        'addedAt': DateTime.now(),
+      });
+      final snap = await ref.get();
+      return ShoppingItem.fromFirestore(snap);
+    }
+
+    test('after cart of unlinked item: removes new pantry entry and re-adds the item',
+        () async {
+      final item = await seedShoppingItem();
+      final receipt = await cartItemDetached(container, 'hh1', item);
+      // Sanity: pantry got the new entry.
+      expect((await fakeDb.collection('households/hh1/pantry').get()).docs.length, 1);
+
+      await undoDetached(container, 'hh1', receipt);
+
+      final pantrySnap = await fakeDb.collection('households/hh1/pantry').get();
+      expect(pantrySnap.docs, isEmpty,
+          reason: 'undo must drop the pantry entry that cart created');
+      final listSnap = await fakeDb.collection('households/hh1/items').get();
+      expect(listSnap.docs.length, 1,
+          reason: 'shopping item must be re-added on undo');
+      expect(listSnap.docs.first['name'], 'Milk');
+      expect(listSnap.docs.first['quantity'], 2);
+      expect(listSnap.docs.first['unit'], 'L');
+      expect(listSnap.docs.first['note'], 'organic');
+    });
+
+    test('after delete: re-adds the item without touching pantry', () async {
+      // Existing unrelated pantry entry — undo of a delete must leave it alone.
+      await fakeDb.collection('households/hh1/pantry').doc('p1').set({
+        'name': 'Eggs', 'categoryId': 'dairy',
+        'preferredStores': <String>[], 'optimalQuantity': 1,
+        'currentQuantity': 1, 'shelfLifeDays': null,
+      });
+      final item = await seedShoppingItem();
+
+      final receipt = await deleteItemDetached(container, 'hh1', item);
+      expect(receipt.createdPantryItemId, isNull);
+
+      await undoDetached(container, 'hh1', receipt);
+
+      final listSnap = await fakeDb.collection('households/hh1/items').get();
+      expect(listSnap.docs.length, 1);
+      final pantrySnap = await fakeDb.collection('households/hh1/pantry').get();
+      expect(pantrySnap.docs.length, 1,
+          reason: 'unrelated pantry entry must not be touched');
+      expect(pantrySnap.docs.first.id, 'p1');
     });
   });
 }

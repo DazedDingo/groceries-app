@@ -4,24 +4,36 @@ import '../../models/pantry_item.dart';
 import '../../providers/items_provider.dart';
 import '../../providers/pantry_provider.dart';
 
+/// Snapshot of what changed when a shopping item was carted or deleted, so the
+/// action can be undone.
+class CartReceipt {
+  final ShoppingItem originalItem;
+
+  /// If we created a new pantry entry as part of carting (item was unlinked),
+  /// this is its id so undo can remove it.
+  final String? createdPantryItemId;
+
+  const CartReceipt({required this.originalItem, this.createdPantryItemId});
+}
+
 /// Cart a shopping item using a [ProviderContainer] rather than a widget [Ref],
-/// so the work survives screen disposal (e.g. user navigates away during the
-/// snackbar undo window).
-Future<void> cartItemDetached(
+/// so the work survives screen disposal. Applies immediately and returns a
+/// receipt the caller can pass to [undoCartDetached].
+Future<CartReceipt> cartItemDetached(
   ProviderContainer container,
   String householdId,
   ShoppingItem item,
 ) async {
+  String? createdPantryId;
+  PantryItem? pantryItem;
   try {
     final pantryList = container.read(pantryProvider).value ?? [];
-    PantryItem? pantryItem;
-
     if (item.pantryItemId != null) {
       try {
         pantryItem = pantryList.firstWhere((p) => p.id == item.pantryItemId);
       } catch (_) {}
     } else {
-      await container.read(pantryServiceProvider).addItem(
+      createdPantryId = await container.read(pantryServiceProvider).addItem(
         householdId: householdId,
         name: item.name,
         categoryId: item.categoryId,
@@ -39,4 +51,50 @@ Future<void> cartItemDetached(
   } catch (_) {
     // Caller may already be disposed; nothing to surface.
   }
+  return CartReceipt(originalItem: item, createdPantryItemId: createdPantryId);
+}
+
+/// Delete a shopping item in the same disposal-safe way; receipt lets the
+/// caller undo by re-adding it.
+Future<CartReceipt> deleteItemDetached(
+  ProviderContainer container,
+  String householdId,
+  ShoppingItem item,
+) async {
+  try {
+    await container.read(itemsServiceProvider).deleteItem(
+      householdId: householdId,
+      item: item,
+    );
+  } catch (_) {}
+  return CartReceipt(originalItem: item);
+}
+
+/// Reverse a cart or delete: drop any pantry entry we created, re-add the
+/// original shopping item.
+Future<void> undoDetached(
+  ProviderContainer container,
+  String householdId,
+  CartReceipt receipt,
+) async {
+  try {
+    if (receipt.createdPantryItemId != null) {
+      await container.read(pantryServiceProvider).deleteItem(
+        householdId,
+        receipt.createdPantryItemId!,
+      );
+    }
+    final item = receipt.originalItem;
+    await container.read(itemsServiceProvider).addItem(
+      householdId: householdId,
+      name: item.name,
+      categoryId: item.categoryId,
+      preferredStores: item.preferredStores,
+      pantryItemId: item.pantryItemId,
+      quantity: item.quantity,
+      unit: item.unit,
+      note: item.note,
+      addedBy: item.addedBy,
+    );
+  } catch (_) {}
 }

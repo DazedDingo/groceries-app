@@ -13,6 +13,8 @@ import '../shared/empty_state.dart';
 import '../shared/list_skeleton.dart';
 
 final _dayFormat = DateFormat('EEE d');
+final _weekdayFormat = DateFormat('E'); // Mon, Tue
+final _dayNumFormat = DateFormat('d');
 
 class MealPlanScreen extends ConsumerWidget {
   const MealPlanScreen({super.key});
@@ -68,6 +70,21 @@ class MealPlanScreen extends ConsumerWidget {
               ],
             ),
           ),
+          // Week calendar strip — one cell per day, tap to add a meal,
+          // dot count shows how many meals are planned for that day.
+          mealPlanAsync.maybeWhen(
+            data: (entries) => _WeekStrip(
+              days: days,
+              entries: entries,
+              onTapDay: (day) => _showAddMealDialog(context, ref, householdId, day),
+            ),
+            orElse: () => _WeekStrip(
+              days: days,
+              entries: const [],
+              onTapDay: (day) => _showAddMealDialog(context, ref, householdId, day),
+            ),
+          ),
+          const Divider(height: 1),
           Expanded(
             child: mealPlanAsync.when(
               loading: () => const ListSkeleton(),
@@ -76,13 +93,7 @@ class MealPlanScreen extends ConsumerWidget {
                 title: 'Could not load meal plan',
                 subtitle: '$e',
               ),
-              data: (entries) => entries.isEmpty
-                ? const EmptyState(
-                    icon: Icons.calendar_month,
-                    title: 'No meals planned',
-                    subtitle: 'Tap + on a day to assign a recipe',
-                  )
-                : ListView(
+              data: (entries) => ListView(
                     children: days.map((day) {
                       final dayEntries = entries.where((e) =>
                           e.date.year == day.year &&
@@ -292,5 +303,90 @@ class MealPlanScreen extends ConsumerWidget {
         SnackBar(content: Text('Added $count ingredients to shopping list')),
       );
     }
+  }
+}
+
+class _WeekStrip extends StatelessWidget {
+  final List<DateTime> days;
+  final List<MealPlanEntry> entries;
+  final void Function(DateTime day) onTapDay;
+
+  const _WeekStrip({
+    required this.days,
+    required this.entries,
+    required this.onTapDay,
+  });
+
+  bool _sameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final today = DateTime.now();
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+      child: Row(
+        children: days.map((day) {
+          final count = entries.where((e) => _sameDay(e.date, day)).length;
+          final isToday = _sameDay(day, today);
+          return Expanded(
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () => onTapDay(day),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+                child: Column(
+                  children: [
+                    Text(
+                      _weekdayFormat.format(day),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      width: 32, height: 32,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isToday ? theme.colorScheme.primary : Colors.transparent,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        _dayNumFormat.format(day),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: isToday ? theme.colorScheme.onPrimary : null,
+                          fontWeight: isToday ? FontWeight.bold : null,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    SizedBox(
+                      height: 6,
+                      child: count == 0
+                          ? null
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(
+                                count.clamp(1, 3),
+                                (_) => Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 1),
+                                  width: 4, height: 4,
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ),
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
   }
 }
