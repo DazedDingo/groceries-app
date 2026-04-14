@@ -11,77 +11,116 @@ class ManageLocationsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final householdId = ref.watch(householdIdProvider).value ?? '';
     final customAsync = ref.watch(customLocationsProvider);
-    final customLocations = customAsync.value ?? [];
     final locationService = ref.watch(locationServiceProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Manage Locations')),
-      body: ListView(
-        children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
-            child: Text('Built-in locations',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-          ...PantryLocation.values.map((loc) => ListTile(
-                leading: Icon(_icon(loc)),
-                title: Text(loc.label),
-                dense: true,
-              )),
-          const Divider(),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-            child: Row(
+      body: customAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, _) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Custom locations',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                const Spacer(),
-                TextButton.icon(
-                  onPressed: () => _showAddDialog(context, householdId, locationService),
-                  icon: const Icon(Icons.add, size: 16),
-                  label: const Text('Add'),
+                Icon(Icons.error_outline, color: theme.colorScheme.error, size: 48),
+                const SizedBox(height: 12),
+                Text(
+                  'Could not load locations',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.colorScheme.error,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  err.toString(),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
           ),
-          if (customLocations.isEmpty)
+        ),
+        data: (customLocations) => ListView(
+          children: [
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text('No custom locations yet.',
-                  style: TextStyle(color: Colors.grey)),
-            )
-          else
-            ...customLocations.map((label) => ListTile(
-                  leading: const Icon(Icons.place_outlined),
-                  title: Text(label),
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+              child: Text('Built-in locations',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            ...PantryLocation.values.map((loc) => ListTile(
+                  leading: Icon(_icon(loc)),
+                  title: Text(loc.label),
                   dense: true,
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    tooltip: 'Remove',
-                    onPressed: () async {
-                      final confirm = await showDialog<bool>(
-                        context: context,
-                        builder: (ctx) => AlertDialog(
-                          title: const Text('Remove location?'),
-                          content: Text(
-                              '"$label" will be removed. Items using it will still show the label until you change them.'),
-                          actions: [
-                            TextButton(
-                                onPressed: () => Navigator.pop(ctx, false),
-                                child: const Text('Cancel')),
-                            FilledButton(
-                                onPressed: () => Navigator.pop(ctx, true),
-                                child: const Text('Remove')),
-                          ],
-                        ),
-                      );
-                      if (confirm == true) {
-                        locationService.removeLocation(householdId, label);
-                      }
-                    },
-                  ),
                 )),
-        ],
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: Row(
+                children: [
+                  const Text('Custom locations',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Spacer(),
+                  TextButton.icon(
+                    onPressed: () => _showAddDialog(context, householdId, locationService),
+                    icon: const Icon(Icons.add, size: 16),
+                    label: const Text('Add'),
+                  ),
+                ],
+              ),
+            ),
+            if (customLocations.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  'No custom locations yet.',
+                  style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+                ),
+              )
+            else
+              ...customLocations.map((label) => ListTile(
+                    leading: const Icon(Icons.place_outlined),
+                    title: Text(label),
+                    dense: true,
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      tooltip: 'Remove',
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text('Remove location?'),
+                            content: Text(
+                                '"$label" will be removed. Items using it will still show the label until you change them.'),
+                            actions: [
+                              TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: const Text('Cancel')),
+                              FilledButton(
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  child: const Text('Remove')),
+                            ],
+                          ),
+                        );
+                        if (confirm == true && context.mounted) {
+                          try {
+                            await locationService.removeLocation(householdId, label);
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Error removing location: $e')),
+                              );
+                            }
+                          }
+                        }
+                      },
+                    ),
+                  )),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDialog(context, householdId, locationService),
@@ -116,8 +155,16 @@ class ManageLocationsScreen extends ConsumerWidget {
         ],
       ),
     );
-    if (result != null && result.isNotEmpty) {
-      locationService.addLocation(householdId, result);
+    if (result != null && result.isNotEmpty && context.mounted) {
+      try {
+        await locationService.addLocation(householdId, result);
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error adding location: $e')),
+          );
+        }
+      }
     }
   }
 

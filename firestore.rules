@@ -62,6 +62,10 @@ service cloud.firestore {
       match /categoryOverrides/{overrideId} {
         allow read, write: if isMember(householdId);
       }
+
+      match /config/{docId} {
+        allow read, write: if isMember(householdId);
+      }
     }
 
     match /users/{uid} {
