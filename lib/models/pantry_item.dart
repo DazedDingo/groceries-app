@@ -36,6 +36,7 @@ class PantryItem {
   final DateTime? lastNudgedAt;
   final DateTime? lastPurchasedAt;
   final PantryLocation? location;
+  final bool isHighPriority;
 
   const PantryItem({
     required this.id, required this.name, required this.categoryId,
@@ -44,6 +45,7 @@ class PantryItem {
     this.shelfLifeDays, this.expiresAt,
     required this.lastNudgedAt, required this.lastPurchasedAt,
     this.location,
+    this.isHighPriority = false,
   });
 
   bool get isBelowOptimal => currentQuantity < optimalQuantity;
@@ -75,6 +77,7 @@ class PantryItem {
     'lastNudgedAt': lastNudgedAt != null ? Timestamp.fromDate(lastNudgedAt!) : null,
     'lastPurchasedAt': lastPurchasedAt != null ? Timestamp.fromDate(lastPurchasedAt!) : null,
     'location': location?.id,
+    'isHighPriority': isHighPriority,
   };
 
   factory PantryItem.fromFirestore(DocumentSnapshot doc) {
@@ -91,6 +94,7 @@ class PantryItem {
       lastNudgedAt: (d['lastNudgedAt'] as Timestamp?)?.toDate(),
       lastPurchasedAt: (d['lastPurchasedAt'] as Timestamp?)?.toDate(),
       location: PantryLocation.fromId(d['location'] as String?),
+      isHighPriority: d['isHighPriority'] ?? false,
     );
   }
 
@@ -106,6 +110,7 @@ class PantryItem {
     DateTime? lastNudgedAt,
     DateTime? lastPurchasedAt,
     PantryLocation? location,
+    bool? isHighPriority,
   }) => PantryItem(
     id: id,
     name: name ?? this.name,
@@ -119,5 +124,6 @@ class PantryItem {
     lastNudgedAt: lastNudgedAt ?? this.lastNudgedAt,
     lastPurchasedAt: lastPurchasedAt ?? this.lastPurchasedAt,
     location: location ?? this.location,
+    isHighPriority: isHighPriority ?? this.isHighPriority,
   );
 }

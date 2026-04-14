@@ -30,6 +30,10 @@ class PantryItemTile extends StatelessWidget {
             padding: EdgeInsets.zero,
             visualDensity: VisualDensity.compact,
           ),
+          if (item.isHighPriority) ...[
+            const SizedBox(width: 6),
+            const Icon(Icons.star, size: 16, color: Colors.amber),
+          ],
           if (item.isBelowOptimal) ...[
             const SizedBox(width: 6),
             Icon(Icons.warning_amber, size: 16, color: scheme.error),

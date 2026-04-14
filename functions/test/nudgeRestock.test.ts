@@ -9,7 +9,7 @@ const mockBatch = { set: mockBatchSet, update: mockBatchUpdate, commit: mockBatc
 
 const mockPantryRefUpdate = jest.fn().mockResolvedValue(undefined);
 
-// Tracks what collections return
+// Tracks what collections return — keyed by field name for pantry where() queries
 const mockCollectionGet: Record<string, jest.Mock> = {};
 const mockCollectionWhere: Record<string, jest.Mock> = {};
 
@@ -23,7 +23,12 @@ jest.mock('firebase-admin', () => ({
         }
         if (path.includes('/pantry')) {
           return {
-            where: () => ({ get: mockCollectionGet['pantry'] ?? jest.fn().mockResolvedValue({ docs: [] }) }),
+            // Differentiate queries by field: 'restockAfterDays' vs 'isHighPriority'
+            where: (field: string) => ({
+              get: field === 'isHighPriority'
+                ? (mockCollectionGet['pantryPriority'] ?? jest.fn().mockResolvedValue({ docs: [] }))
+                : (mockCollectionGet['pantry'] ?? jest.fn().mockResolvedValue({ docs: [] })),
+            }),
           };
         }
         if (path.includes('/items')) {
@@ -57,6 +62,7 @@ function makePantryDoc(overrides: Partial<{
   lastNudgedAt: { toDate: () => Date } | null;
   lastPurchasedAt: { toDate: () => Date } | null;
   categoryId: string;
+  isHighPriority: boolean;
 }> = {}) {
   const data = {
     name: 'milk',
@@ -66,6 +72,7 @@ function makePantryDoc(overrides: Partial<{
     lastNudgedAt: null,
     lastPurchasedAt: null,
     categoryId: 'dairy',
+    isHighPriority: false,
     ...overrides,
   };
   return {
@@ -178,5 +185,27 @@ describe('nudgeRestock', () => {
     await nudgeRestock();
     const [, itemData] = mockBatchSet.mock.calls[0];
     expect(itemData.pantryItemId).toBe('pantry-abc');
+  });
+
+  it('nudges high-priority item immediately even when delay has not passed', async () => {
+    const recentDate = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000); // 2 days ago
+    mockCollectionGet['households'] = jest.fn().mockResolvedValue(makeHouseholdDocs(['hh-1']));
+    // Not in scheduled query (no restockAfterDays), but in priority query
+    mockCollectionGet['pantry'] = jest.fn().mockResolvedValue({ docs: [] });
+    mockCollectionGet['pantryPriority'] = jest.fn().mockResolvedValue({
+      docs: [makePantryDoc({ isHighPriority: true, restockAfterDays: 7, lastNudgedAt: { toDate: () => recentDate } })],
+    });
+    const result = await nudgeRestock();
+    expect(result.nudged).toBe(1);
+  });
+
+  it('does not nudge high-priority item that is at or above optimal', async () => {
+    mockCollectionGet['households'] = jest.fn().mockResolvedValue(makeHouseholdDocs(['hh-1']));
+    mockCollectionGet['pantry'] = jest.fn().mockResolvedValue({ docs: [] });
+    mockCollectionGet['pantryPriority'] = jest.fn().mockResolvedValue({
+      docs: [makePantryDoc({ isHighPriority: true, currentQuantity: 3, optimalQuantity: 2 })],
+    });
+    const result = await nudgeRestock();
+    expect(result.nudged).toBe(0);
   });
 });

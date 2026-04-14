@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/pantry_item.dart';
 import '../../providers/pantry_provider.dart';
@@ -17,7 +18,21 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
   int? _selectedDays;
   int? _selectedShelfLife;
   int _optimalQuantity = 0;
+  bool _isHighPriority = false;
   bool _initialized = false;
+  late final TextEditingController _optimalController;
+
+  @override
+  void initState() {
+    super.initState();
+    _optimalController = TextEditingController(text: '0');
+  }
+
+  @override
+  void dispose() {
+    _optimalController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +45,8 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
       _selectedDays = item.restockAfterDays;
       _selectedShelfLife = item.shelfLifeDays;
       _optimalQuantity = item.optimalQuantity;
+      _isHighPriority = item.isHighPriority;
+      _optimalController.text = '$_optimalQuantity';
       // Auto-guess shelf life if not set, and persist it
       if (_selectedShelfLife == null) {
         final categories = ref.read(categoriesProvider).value ?? [];
@@ -103,30 +120,73 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
                         visualDensity: VisualDensity.compact,
                         onPressed: _optimalQuantity > 0
                             ? () {
-                                setState(() => _optimalQuantity--);
+                                setState(() {
+                                  _optimalQuantity--;
+                                  _optimalController.text = '$_optimalQuantity';
+                                });
                                 ref.read(pantryServiceProvider).updateItem(
                                     householdId, widget.itemId, {'optimalQuantity': _optimalQuantity});
                               }
                             : null,
                       ),
                       SizedBox(
-                        width: 40,
-                        child: Text(
-                          '$_optimalQuantity',
+                        width: 56,
+                        child: TextField(
+                          controller: _optimalController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           textAlign: TextAlign.center,
                           style: theme.textTheme.titleMedium,
+                          decoration: const InputDecoration(
+                            isDense: true,
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                          ),
+                          onSubmitted: (val) {
+                            final n = int.tryParse(val) ?? 0;
+                            setState(() => _optimalQuantity = n);
+                            ref.read(pantryServiceProvider).updateItem(
+                                householdId, widget.itemId, {'optimalQuantity': n});
+                          },
+                          onEditingComplete: () {
+                            final n = int.tryParse(_optimalController.text) ?? 0;
+                            setState(() => _optimalQuantity = n);
+                            ref.read(pantryServiceProvider).updateItem(
+                                householdId, widget.itemId, {'optimalQuantity': n});
+                            FocusScope.of(context).unfocus();
+                          },
                         ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.add),
                         visualDensity: VisualDensity.compact,
                         onPressed: () {
-                          setState(() => _optimalQuantity++);
+                          setState(() {
+                            _optimalQuantity++;
+                            _optimalController.text = '$_optimalQuantity';
+                          });
                           ref.read(pantryServiceProvider).updateItem(
                               householdId, widget.itemId, {'optimalQuantity': _optimalQuantity});
                         },
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 4),
+                  SwitchListTile(
+                    value: _isHighPriority,
+                    onChanged: (v) {
+                      setState(() => _isHighPriority = v);
+                      ref.read(pantryServiceProvider).updateItem(
+                          householdId, widget.itemId, {'isHighPriority': v});
+                    },
+                    title: const Text('High priority'),
+                    subtitle: const Text('Floats to top of list when low, nudge fires immediately'),
+                    secondary: Icon(
+                      Icons.star,
+                      color: _isHighPriority ? Colors.amber : theme.colorScheme.outlineVariant,
+                    ),
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
                   ),
                   if (item.isBelowOptimal)
                     Padding(

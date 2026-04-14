@@ -557,13 +557,15 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
     final householdId = ref.watch(householdIdProvider).value ?? '';
     final unitSystem = ref.watch(unitSystemProvider);
 
+    final pantryItems = ref.watch(pantryProvider).value ?? [];
+
     // Check for overdue restocks once pantry data loads
     ref.listen(pantryProvider, (prev, next) {
       if (_restockChecked) return;
-      final pantryItems = next.value;
-      if (pantryItems == null) return; // still loading
+      final pantryList = next.value;
+      if (pantryList == null) return; // still loading
       _restockChecked = true;
-      final overdue = findOverdueRestocks(pantryItems);
+      final overdue = findOverdueRestocks(pantryList);
       if (overdue.isNotEmpty && householdId.isNotEmpty) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) _showRestockNudge(householdId, overdue);
@@ -571,8 +573,18 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       }
     });
 
+    // High-priority items: linked to a high-priority pantry item that is below optimal
+    bool isHighPriorityItem(ShoppingItem item) {
+      if (item.pantryItemId == null) return false;
+      final pantry = pantryItems.where((p) => p.id == item.pantryItemId).firstOrNull;
+      return pantry != null && pantry.isHighPriority && pantry.isBelowOptimal;
+    }
+
+    final priorityItems = items.where(isHighPriorityItem).toList();
+    final regularItems = items.where((i) => !isHighPriorityItem(i)).toList();
+
     final grouped = <String, List<ShoppingItem>>{};
-    for (final item in items) {
+    for (final item in regularItems) {
       grouped.putIfAbsent(item.categoryId, () => []).add(item);
     }
 
@@ -636,7 +648,57 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                   subtitle: 'Tap the microphone button or long-press to add items',
                 )
               : ListView(
-              children: sortedGroups.expand((entry) {
+              children: [
+                if (priorityItems.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.star, size: 16, color: Colors.amber),
+                        const SizedBox(width: 8),
+                        Text('Priority', style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: Colors.amber.shade700,
+                        )),
+                        const SizedBox(width: 8),
+                        Text('(${priorityItems.length})', style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Colors.amber.shade400,
+                        )),
+                      ],
+                    ),
+                  ),
+                  ...priorityItems.map((item) => ItemTile(
+                    key: ValueKey(item.id),
+                    item: item,
+                    unitSystem: unitSystem,
+                    isSelecting: _selecting,
+                    isSelected: _selectedIds.contains(item.id),
+                    onLongPress: () => _enterSelecting(item.id),
+                    onTap: () {
+                      if (_selecting) {
+                        _toggleSelection(item.id);
+                      } else {
+                        _showEditDialog(item, householdId, categories);
+                      }
+                    },
+                    onCheckOff: () => cartItemDetached(
+                      ProviderScope.containerOf(context, listen: false),
+                      householdId,
+                      item,
+                    ),
+                    onDelete: () => deleteItemDetached(
+                      ProviderScope.containerOf(context, listen: false),
+                      householdId,
+                      item,
+                    ),
+                    onUndo: (receipt) => undoDetached(
+                      ProviderScope.containerOf(context, listen: false),
+                      householdId,
+                      receipt,
+                    ),
+                  )),
+                  const Divider(),
+                ],
+                ...sortedGroups.expand((entry) {
                 final cat = categories.firstWhere(
                   (c) => c.id == entry.key,
                   orElse: () => const GroceryCategory(id: '', name: 'Uncategorised',
@@ -697,7 +759,8 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                     ),
                   )),
                 ];
-              }).toList(),
+              }),
+              ],
             ),
           ),
           if (_selecting)
