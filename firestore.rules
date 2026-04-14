@@ -44,6 +44,11 @@ service cloud.firestore {
 
       match /recipes/{recipeId} {
         allow read, write: if isMember(householdId);
+
+        match /ratings/{uid} {
+          allow read: if isMember(householdId);
+          allow write: if isMember(householdId) && request.auth.uid == uid;
+        }
       }
 
       match /templates/{templateId} {
