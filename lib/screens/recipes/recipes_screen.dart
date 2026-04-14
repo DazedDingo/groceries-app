@@ -6,6 +6,7 @@ import '../../providers/recipes_provider.dart';
 import '../../services/pantry_match.dart';
 import '../shared/empty_state.dart';
 import '../shared/list_skeleton.dart';
+import '../shared/help_button.dart';
 
 final _selectedTagProvider = StateProvider<String?>((ref) => null);
 final _canMakeNowProvider = StateProvider<bool>((ref) => false);
@@ -21,7 +22,26 @@ class RecipesScreen extends ConsumerWidget {
     final pantry = ref.watch(pantryProvider).value ?? const [];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Recipes')),
+      appBar: AppBar(
+        title: const Text('Recipes'),
+        actions: const [
+          HelpButton(
+            screenTitle: 'Recipes',
+            sections: [
+              HelpSection(icon: Icons.add, title: 'Adding recipes',
+                  body: 'Tap + to add a recipe manually. Use Discover (top-right) to search TheMealDB or Spoonacular and import recipes automatically.'),
+              HelpSection(icon: Icons.touch_app, title: 'Viewing a recipe',
+                  body: 'Tap a recipe card to see ingredients and instructions.'),
+              HelpSection(icon: Icons.add_shopping_cart, title: 'Cook This',
+                  body: 'On a recipe detail screen, tap "Cook This" to add scaled ingredients directly to your shopping list.'),
+              HelpSection(icon: Icons.calendar_month, title: 'Meal plan',
+                  body: 'Tap the calendar icon on a recipe to add it to a day in your meal plan.'),
+              HelpSection(icon: Icons.filter_list, title: 'Filtering',
+                  body: 'Use the tag chips to filter by cuisine or type. Toggle "Can make now" to show only recipes you have all the ingredients for.'),
+            ],
+          ),
+        ],
+      ),
       body: recipes.when(
         loading: () => const ListSkeleton(),
         error: (e, _) => const EmptyState(

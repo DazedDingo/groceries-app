@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../shared/help_button.dart';
 import '../../providers/pantry_provider.dart';
 import '../../providers/household_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -92,6 +93,23 @@ class PantryScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Pantry'),
         actions: [
+          const HelpButton(
+            screenTitle: 'Pantry',
+            sections: [
+              HelpSection(icon: Icons.touch_app, title: 'Opening an item',
+                  body: 'Tap any item to open its detail screen, where you can set optimal quantity, shelf life, location, and high-priority toggle.'),
+              HelpSection(icon: Icons.exposure, title: 'Adjusting stock',
+                  body: 'Use the + and - buttons on each tile to change the current quantity without opening the detail screen.'),
+              HelpSection(icon: Icons.add_shopping_cart, title: 'Adding to list',
+                  body: 'When an item is below optimal, tap "Add to list" on the tile to request a restock on your shopping list.'),
+              HelpSection(icon: Icons.star, title: 'High priority',
+                  body: 'Mark an item high priority in its detail screen. It will float to the top of your shopping list and trigger restock nudges immediately when low.'),
+              HelpSection(icon: Icons.warning_amber, title: 'Stock indicators',
+                  body: 'Warning icon = below optimal quantity. Expiry banners appear at the top when items are expired or expiring soon.'),
+              HelpSection(icon: Icons.place, title: 'Locations',
+                  body: 'Set Fridge, Freezer, Pantry, Counter, or Other on each item so you know exactly where to look at home.'),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.playlist_add),
             onPressed: () => _showBulkAddDialog(context, ref, householdId, categories),

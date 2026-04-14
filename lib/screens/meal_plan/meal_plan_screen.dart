@@ -11,6 +11,7 @@ import '../../providers/items_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../shared/empty_state.dart';
 import '../shared/list_skeleton.dart';
+import '../shared/help_button.dart';
 
 final _dayFormat = DateFormat('EEE d');
 final _weekdayFormat = DateFormat('E'); // Mon, Tue
@@ -31,6 +32,19 @@ class MealPlanScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Meal Plan'),
         actions: [
+          const HelpButton(
+            screenTitle: 'Meal Plan',
+            sections: [
+              HelpSection(icon: Icons.add, title: 'Adding meals',
+                  body: 'Tap any day to pick a recipe from your collection and add it to that day.'),
+              HelpSection(icon: Icons.chevron_left, title: 'Navigating weeks',
+                  body: 'Use the left/right arrows to move between weeks. Tap the date to jump back to the current week.'),
+              HelpSection(icon: Icons.add_shopping_cart, title: 'Add all to list',
+                  body: 'Tap the cart icon in the top-right to add ingredients for every planned meal this week to your shopping list at once.'),
+              HelpSection(icon: Icons.delete, title: 'Removing a meal',
+                  body: 'Tap a planned meal on any day to remove it from the plan.'),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.add_shopping_cart),
             tooltip: 'Add all ingredients to list',

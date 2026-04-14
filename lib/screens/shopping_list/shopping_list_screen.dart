@@ -24,6 +24,7 @@ import '../../providers/history_provider.dart';
 import '../../models/history_entry.dart';
 import '../../services/restock_checker.dart';
 import '../../services/fuzzy_match.dart';
+import '../shared/help_button.dart';
 
 class ShoppingListScreen extends ConsumerStatefulWidget {
   const ShoppingListScreen({super.key});
@@ -737,6 +738,21 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
               tooltip: 'Cancel selection',
             )
           else ...[
+            const HelpButton(
+              screenTitle: 'Shopping List',
+              sections: [
+                HelpSection(icon: Icons.add, title: 'Adding items',
+                    body: 'Tap + to add manually, tap the mic to add by voice, or use the bulk-add icon to paste a list.'),
+                HelpSection(icon: Icons.swipe, title: 'Buying & deleting',
+                    body: 'Swipe right to mark as bought (moves quantity to pantry), swipe left to delete.'),
+                HelpSection(icon: Icons.touch_app, title: 'Editing',
+                    body: 'Tap an item to edit its name, quantity, unit, or note.'),
+                HelpSection(icon: Icons.select_all, title: 'Bulk checkout',
+                    body: 'Long-press any item to enter selection mode, then tap "Confirm bought" to check off multiple items at once.'),
+                HelpSection(icon: Icons.star, title: 'Priority items',
+                    body: 'Items linked to a high-priority pantry item show a star. When they\'re also low on stock they float to the top of the list.'),
+              ],
+            ),
             IconButton(
               icon: const Icon(Icons.playlist_add),
               onPressed: () => _showBulkAddDialog(householdId),

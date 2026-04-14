@@ -7,6 +7,7 @@ import '../../providers/pantry_provider.dart';
 import '../../providers/household_provider.dart';
 import '../../services/shelf_life_guesser.dart';
 import '../../providers/categories_provider.dart';
+import '../shared/help_button.dart';
 
 class PantryItemDetailScreen extends ConsumerStatefulWidget {
   final String itemId;
@@ -74,6 +75,21 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
       appBar: AppBar(
         title: Text(item.name),
         actions: [
+          const HelpButton(
+            screenTitle: 'Pantry Item',
+            sections: [
+              HelpSection(icon: Icons.straighten, title: 'Optimal quantity',
+                  body: 'The target amount you want on hand. You\'ll get a restock nudge when current stock drops below this. Use +/- or type the number directly.'),
+              HelpSection(icon: Icons.star, title: 'High priority',
+                  body: 'When toggled on, this item floats to the top of your shopping list as soon as it goes below optimal, and restock nudges fire immediately.'),
+              HelpSection(icon: Icons.calendar_today, title: 'Shelf life',
+                  body: 'How long this item lasts after purchase. When you check it off the shopping list, an expiry date is calculated automatically.'),
+              HelpSection(icon: Icons.place, title: 'Location',
+                  body: 'Where this item lives at home (Fridge, Freezer, Pantry, Counter, Other). Shown on the tile as a small icon.'),
+              HelpSection(icon: Icons.notifications, title: 'Restock nudge',
+                  body: 'Set an interval (e.g. every 7 days) to get a nudge on the shopping list even if you haven\'t bought it recently.'),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.delete),
             onPressed: () async {
