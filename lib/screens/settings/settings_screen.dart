@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/household_provider.dart';
+import '../../providers/recipe_search_provider.dart';
 import '../../services/notification_service.dart';
 import '../../services/unit_converter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -119,8 +120,9 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () async {
               const intent = AndroidIntent(
                 action: 'android.intent.action.MAIN',
+                category: 'android.intent.category.LAUNCHER',
                 package: 'com.google.android.apps.walletnfcrel',
-                componentName: 'com.google.android.apps.walletnfcrel.MainActivity',
+                flags: <int>[0x10000000],
               );
               try {
                 await intent.launch();
@@ -138,6 +140,22 @@ class SettingsScreen extends ConsumerWidget {
                 }
               }
             },
+          ),
+          const Divider(),
+
+          // --- Recipe sources ---
+          ExpansionTile(
+            title: const Text('Recipe sources'),
+            subtitle: const Text('Discover recipes online'),
+            children: [
+              const ListTile(
+                leading: Icon(Icons.public),
+                title: Text('TheMealDB'),
+                subtitle: Text('Free, no setup needed'),
+                trailing: Icon(Icons.check, color: Colors.green),
+              ),
+              _SpoonacularKeyTile(),
+            ],
           ),
           const Divider(),
 
@@ -186,6 +204,100 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _SpoonacularKeyTile extends ConsumerStatefulWidget {
+  @override
+  ConsumerState<_SpoonacularKeyTile> createState() => _SpoonacularKeyTileState();
+}
+
+class _SpoonacularKeyTileState extends ConsumerState<_SpoonacularKeyTile> {
+  bool _editing = false;
+  final _ctrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final key = ref.watch(spoonacularKeyProvider);
+    final hasKey = key.isNotEmpty;
+
+    if (_editing) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Spoonacular API key',
+                style: TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 4),
+            Text(
+              'Free at spoonacular.com/food-api — 150 requests/day.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _ctrl,
+              autofocus: true,
+              decoration: const InputDecoration(
+                hintText: 'Paste API key',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => setState(() => _editing = false),
+                    child: const Text('Cancel'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () async {
+                      await ref
+                          .read(spoonacularKeyProvider.notifier)
+                          .set(_ctrl.text);
+                      if (!mounted) return;
+                      setState(() => _editing = false);
+                    },
+                    child: const Text('Save'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListTile(
+      leading: const Icon(Icons.restaurant),
+      title: const Text('Spoonacular'),
+      subtitle: Text(hasKey ? 'Key saved' : 'Tap to add your free API key'),
+      trailing: hasKey
+          ? IconButton(
+              icon: const Icon(Icons.delete_outline),
+              tooltip: 'Remove key',
+              onPressed: () =>
+                  ref.read(spoonacularKeyProvider.notifier).set(''),
+            )
+          : const Icon(Icons.chevron_right),
+      onTap: () {
+        _ctrl.text = key;
+        setState(() => _editing = true);
+      },
     );
   }
 }

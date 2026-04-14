@@ -19,6 +19,7 @@ import 'screens/shopping_list/templates_screen.dart';
 import 'screens/recipes/recipes_screen.dart';
 import 'screens/recipes/recipe_detail_screen.dart';
 import 'screens/recipes/add_recipe_screen.dart';
+import 'screens/recipes/discover_recipes_screen.dart';
 import 'screens/meal_plan/meal_plan_screen.dart';
 
 final _router = GoRouter(
@@ -56,6 +57,10 @@ final _router = GoRouter(
               builder: (_, state) => AddRecipeScreen(
                 autoImport: state.uri.queryParameters['import'] == 'true',
               ),
+            ),
+            GoRoute(
+              path: 'discover',
+              builder: (_, __) => const DiscoverRecipesScreen(),
             ),
             GoRoute(
               path: ':recipeId',

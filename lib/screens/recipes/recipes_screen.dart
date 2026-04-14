@@ -87,6 +87,13 @@ class RecipesScreen extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           FloatingActionButton.small(
+            heroTag: 'discover',
+            onPressed: () => context.go('/recipes/discover'),
+            tooltip: 'Discover recipes',
+            child: const Icon(Icons.search),
+          ),
+          const SizedBox(height: 8),
+          FloatingActionButton.small(
             heroTag: 'import',
             onPressed: () => context.go('/recipes/new?import=true'),
             tooltip: 'Import from URL',
