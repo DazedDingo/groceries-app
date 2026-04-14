@@ -29,18 +29,28 @@ Future<CartReceipt> cartItemDetached(
   try {
     final pantryList = container.read(pantryProvider).value ?? [];
     if (item.pantryItemId != null) {
-      try {
-        pantryItem = pantryList.firstWhere((p) => p.id == item.pantryItemId);
-      } catch (_) {}
+      // Explicitly linked — look up by ID. Don't create a new entry even if
+      // the pantry stream hasn't loaded yet (item.pantryItemId is the link).
+      pantryItem = pantryList.where((p) => p.id == item.pantryItemId).firstOrNull;
     } else {
-      createdPantryId = await container.read(pantryServiceProvider).addItem(
-        householdId: householdId,
-        name: item.name,
-        categoryId: item.categoryId,
-        preferredStores: item.preferredStores,
-        optimalQuantity: item.quantity,
-        currentQuantity: item.quantity,
-      );
+      // No ID link — try name match first to avoid duplicates when units differ
+      // (e.g. "cheese 1g" on the list vs "cheese 2x" already in pantry).
+      pantryItem = pantryList
+          .where((p) => p.name.toLowerCase() == item.name.toLowerCase())
+          .firstOrNull;
+
+      if (pantryItem == null) {
+        // Genuinely new item — create a pantry entry.
+        createdPantryId = await container.read(pantryServiceProvider).addItem(
+          householdId: householdId,
+          name: item.name,
+          categoryId: item.categoryId,
+          preferredStores: item.preferredStores,
+          optimalQuantity: item.quantity,
+          currentQuantity: item.quantity,
+          unit: item.unit,
+        );
+      }
     }
 
     await container.read(itemsServiceProvider).checkOff(

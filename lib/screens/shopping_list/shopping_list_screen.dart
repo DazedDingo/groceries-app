@@ -35,6 +35,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   final Set<String> _selectedIds = {};
   bool _selecting = false;
   bool _restockChecked = false;
+  Set<String> _knownItemIds = {};
 
   void _enterSelecting(String id) {
     setState(() {
@@ -260,6 +261,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
             preferredStores: item.preferredStores,
             optimalQuantity: item.isRecurring ? item.quantity : 0,
             currentQuantity: item.quantity,
+            unit: item.unit,
           );
         }
       }
@@ -559,6 +561,29 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
 
     final pantryItems = ref.watch(pantryProvider).value ?? [];
 
+    // Detect items removed externally (by a partner) and show a brief toast.
+    ref.listen(itemsProvider, (prev, next) {
+      final prevIds = prev?.value?.map((i) => i.id).toSet() ?? {};
+      final nextIds = next.value?.map((i) => i.id).toSet() ?? {};
+      final removed = prevIds.difference(nextIds);
+      // Only show toast for items we didn't remove ourselves (_knownItemIds
+      // is updated in onCheckOff/onDelete before the stream fires).
+      final externallyRemoved = removed.difference(_knownItemIds);
+      if (externallyRemoved.isNotEmpty && prevIds.isNotEmpty && mounted) {
+        final removedItems = prev!.value!
+            .where((i) => externallyRemoved.contains(i.id))
+            .toList();
+        final names = removedItems.map((i) => i.name).join(', ');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Partner checked off: $names'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+      _knownItemIds = _knownItemIds.intersection(nextIds);
+    });
+
     // Check for overdue restocks once pantry data loads
     ref.listen(pantryProvider, (prev, next) {
       if (_restockChecked) return;
@@ -573,10 +598,20 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       }
     });
 
-    // High-priority items: linked to a high-priority pantry item that is below optimal
+    // High-priority items: linked (by ID or name) to a high-priority pantry item
+    // that is below optimal. Name fallback handles manually-added list items.
+    PantryItem? pantryFor(ShoppingItem item) {
+      if (item.pantryItemId != null) {
+        final byId = pantryItems.where((p) => p.id == item.pantryItemId).firstOrNull;
+        if (byId != null) return byId;
+      }
+      return pantryItems
+          .where((p) => p.name.toLowerCase() == item.name.toLowerCase())
+          .firstOrNull;
+    }
+
     bool isHighPriorityItem(ShoppingItem item) {
-      if (item.pantryItemId == null) return false;
-      final pantry = pantryItems.where((p) => p.id == item.pantryItemId).firstOrNull;
+      final pantry = pantryFor(item);
       return pantry != null && pantry.isHighPriority && pantry.isBelowOptimal;
     }
 
@@ -669,6 +704,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                   ...priorityItems.map((item) => ItemTile(
                     key: ValueKey(item.id),
                     item: item,
+                    isHighPriority: true,
                     unitSystem: unitSystem,
                     isSelecting: _selecting,
                     isSelected: _selectedIds.contains(item.id),
@@ -680,16 +716,22 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                         _showEditDialog(item, householdId, categories);
                       }
                     },
-                    onCheckOff: () => cartItemDetached(
-                      ProviderScope.containerOf(context, listen: false),
-                      householdId,
-                      item,
-                    ),
-                    onDelete: () => deleteItemDetached(
-                      ProviderScope.containerOf(context, listen: false),
-                      householdId,
-                      item,
-                    ),
+                    onCheckOff: () {
+                      _knownItemIds.add(item.id);
+                      return cartItemDetached(
+                        ProviderScope.containerOf(context, listen: false),
+                        householdId,
+                        item,
+                      );
+                    },
+                    onDelete: () {
+                      _knownItemIds.add(item.id);
+                      return deleteItemDetached(
+                        ProviderScope.containerOf(context, listen: false),
+                        householdId,
+                        item,
+                      );
+                    },
                     onUndo: (receipt) => undoDetached(
                       ProviderScope.containerOf(context, listen: false),
                       householdId,
@@ -731,6 +773,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                   ...entry.value.map((item) => ItemTile(
                     key: ValueKey(item.id),
                     item: item,
+                    isHighPriority: isHighPriorityItem(item),
                     unitSystem: unitSystem,
                     isSelecting: _selecting,
                     isSelected: _selectedIds.contains(item.id),
@@ -742,16 +785,22 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                         _showEditDialog(item, householdId, categories);
                       }
                     },
-                    onCheckOff: () => cartItemDetached(
-                      ProviderScope.containerOf(context, listen: false),
-                      householdId,
-                      item,
-                    ),
-                    onDelete: () => deleteItemDetached(
-                      ProviderScope.containerOf(context, listen: false),
-                      householdId,
-                      item,
-                    ),
+                    onCheckOff: () {
+                      _knownItemIds.add(item.id);
+                      return cartItemDetached(
+                        ProviderScope.containerOf(context, listen: false),
+                        householdId,
+                        item,
+                      );
+                    },
+                    onDelete: () {
+                      _knownItemIds.add(item.id);
+                      return deleteItemDetached(
+                        ProviderScope.containerOf(context, listen: false),
+                        householdId,
+                        item,
+                      );
+                    },
                     onUndo: (receipt) => undoDetached(
                       ProviderScope.containerOf(context, listen: false),
                       householdId,

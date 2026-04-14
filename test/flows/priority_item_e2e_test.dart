@@ -1,10 +1,10 @@
-/// E2E: high-priority pantry item flow
-///
-/// Verifies the full path:
-///   pantry item marked isHighPriority=true + below optimal
-///   → shopping list receives a matching item from restock/manual add
-///   → isHighPriorityItem classification returns true for that item
-///   → classification returns false for normal items
+// E2E: high-priority pantry item flow
+//
+// Verifies the full path:
+//   pantry item marked isHighPriority=true + below optimal
+//   → shopping list receives a matching item from restock/manual add
+//   → isHighPriorityItem classification returns true for that item
+//   → classification returns false for normal items
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:groceries_app/models/item.dart';

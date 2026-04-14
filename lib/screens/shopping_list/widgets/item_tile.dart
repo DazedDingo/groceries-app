@@ -13,6 +13,7 @@ class ItemTile extends StatefulWidget {
   final VoidCallback onLongPress;
   final bool isSelecting;
   final bool isSelected;
+  final bool isHighPriority;
   final UnitSystem unitSystem;
 
   const ItemTile({
@@ -25,6 +26,7 @@ class ItemTile extends StatefulWidget {
     required this.onLongPress,
     this.isSelecting = false,
     this.isSelected = false,
+    this.isHighPriority = false,
     this.unitSystem = UnitSystem.metric,
   });
 
@@ -83,6 +85,11 @@ class _ItemTileState extends State<ItemTile> {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (widget.isHighPriority)
+            const Padding(
+              padding: EdgeInsets.only(right: 4),
+              child: Icon(Icons.star, size: 14, color: Colors.amber),
+            ),
           if (item.pantryItemId != null)
             const Padding(
               padding: EdgeInsets.only(right: 4),

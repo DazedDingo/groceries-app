@@ -32,6 +32,7 @@ class PantryItem {
   final int currentQuantity;
   final int? restockAfterDays;
   final int? shelfLifeDays;
+  final String? unit;
   final DateTime? expiresAt;
   final DateTime? lastNudgedAt;
   final DateTime? lastPurchasedAt;
@@ -42,7 +43,7 @@ class PantryItem {
     required this.id, required this.name, required this.categoryId,
     required this.preferredStores, required this.optimalQuantity,
     required this.currentQuantity, required this.restockAfterDays,
-    this.shelfLifeDays, this.expiresAt,
+    this.shelfLifeDays, this.unit, this.expiresAt,
     required this.lastNudgedAt, required this.lastPurchasedAt,
     this.location,
     this.isHighPriority = false,
@@ -73,6 +74,7 @@ class PantryItem {
     'optimalQuantity': optimalQuantity, 'currentQuantity': currentQuantity,
     'restockAfterDays': restockAfterDays,
     'shelfLifeDays': shelfLifeDays,
+    'unit': unit,
     'expiresAt': expiresAt != null ? Timestamp.fromDate(expiresAt!) : null,
     'lastNudgedAt': lastNudgedAt != null ? Timestamp.fromDate(lastNudgedAt!) : null,
     'lastPurchasedAt': lastPurchasedAt != null ? Timestamp.fromDate(lastPurchasedAt!) : null,
@@ -90,6 +92,7 @@ class PantryItem {
       currentQuantity: d['currentQuantity'] ?? 0,
       restockAfterDays: d['restockAfterDays'],
       shelfLifeDays: d['shelfLifeDays'],
+      unit: d['unit'] as String?,
       expiresAt: (d['expiresAt'] as Timestamp?)?.toDate(),
       lastNudgedAt: (d['lastNudgedAt'] as Timestamp?)?.toDate(),
       lastPurchasedAt: (d['lastPurchasedAt'] as Timestamp?)?.toDate(),
@@ -106,6 +109,7 @@ class PantryItem {
     int? currentQuantity,
     int? restockAfterDays,
     int? shelfLifeDays,
+    String? unit,
     DateTime? expiresAt,
     DateTime? lastNudgedAt,
     DateTime? lastPurchasedAt,
@@ -120,6 +124,7 @@ class PantryItem {
     currentQuantity: currentQuantity ?? this.currentQuantity,
     restockAfterDays: restockAfterDays ?? this.restockAfterDays,
     shelfLifeDays: shelfLifeDays ?? this.shelfLifeDays,
+    unit: unit ?? this.unit,
     expiresAt: expiresAt ?? this.expiresAt,
     lastNudgedAt: lastNudgedAt ?? this.lastNudgedAt,
     lastPurchasedAt: lastPurchasedAt ?? this.lastPurchasedAt,

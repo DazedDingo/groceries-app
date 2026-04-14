@@ -22,6 +22,7 @@ class PantryService {
     required int currentQuantity,
     int? restockAfterDays,
     int? shelfLifeDays,
+    String? unit,
     PantryLocation? location,
   }) async {
     final ref = await _db.collection('households/$householdId/pantry').add({
@@ -29,6 +30,7 @@ class PantryService {
       'optimalQuantity': optimalQuantity, 'currentQuantity': currentQuantity,
       'restockAfterDays': restockAfterDays,
       'shelfLifeDays': shelfLifeDays,
+      'unit': unit,
       'expiresAt': null,
       'lastNudgedAt': null, 'lastPurchasedAt': null,
       'location': location?.id,

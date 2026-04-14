@@ -88,8 +88,10 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
                 ),
               );
               if (confirm != true || !mounted) return;
-              await ref.read(pantryServiceProvider).deleteItem(householdId, widget.itemId);
+              // Pop before deleting — prevents the Firestore stream from removing
+              // the item and causing a blank rebuild before navigation completes.
               navigator.pop();
+              ref.read(pantryServiceProvider).deleteItem(householdId, widget.itemId);
             },
           ),
         ],

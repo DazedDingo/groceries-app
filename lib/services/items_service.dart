@@ -93,9 +93,15 @@ class ItemsService {
   }) async {
     final batch = _db.batch();
     batch.delete(_db.doc('households/$householdId/items/${item.id}'));
-    if (pantryItem != null && item.pantryItemId != null) {
+    if (pantryItem != null) {
+      // Use the explicit link if available, otherwise fall back to the matched item's id.
+      final pantryId = item.pantryItemId ?? pantryItem.id;
+      // Only increment quantity when units are compatible (both null, or both equal).
+      // A mismatch (e.g. list "2 pieces" vs pantry "200g") would corrupt the number,
+      // so we skip the increment but still update lastPurchasedAt.
+      final unitsCompatible = item.unit == pantryItem.unit;
       final updates = <String, dynamic>{
-        'currentQuantity': FieldValue.increment(item.quantity),
+        if (unitsCompatible) 'currentQuantity': FieldValue.increment(item.quantity),
         'lastPurchasedAt': FieldValue.serverTimestamp(),
       };
       if (pantryItem.shelfLifeDays != null) {
@@ -104,7 +110,7 @@ class ItemsService {
         );
       }
       batch.update(
-        _db.doc('households/$householdId/pantry/${item.pantryItemId}'),
+        _db.doc('households/$householdId/pantry/$pantryId'),
         updates,
       );
     }
@@ -128,8 +134,9 @@ class ItemsService {
       batch.delete(_db.doc('households/$householdId/items/${item.id}'));
       if (item.pantryItemId != null && pantryItems.containsKey(item.pantryItemId)) {
         final pi = pantryItems[item.pantryItemId]!;
+        final unitsCompatible = item.unit == pi.unit;
         final updates = <String, dynamic>{
-          'currentQuantity': FieldValue.increment(item.quantity),
+          if (unitsCompatible) 'currentQuantity': FieldValue.increment(item.quantity),
           'lastPurchasedAt': FieldValue.serverTimestamp(),
         };
         if (pi.shelfLifeDays != null) {
