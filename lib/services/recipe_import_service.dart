@@ -22,8 +22,11 @@ class ImportedRecipe {
 /// Fetches a URL and attempts to extract a recipe from JSON-LD (schema.org Recipe)
 /// or falls back to OpenGraph / title + manual ingredient entry.
 class RecipeImportService {
+  final http.Client _client;
+  RecipeImportService({http.Client? client}) : _client = client ?? http.Client();
+
   Future<ImportedRecipe> importFromUrl(String url) async {
-    final response = await http.get(
+    final response = await _client.get(
       Uri.parse(url),
       headers: {'User-Agent': 'GroceriesApp/1.0'},
     );
