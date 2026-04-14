@@ -1,5 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ReportIssueScreen extends StatefulWidget {
@@ -45,7 +46,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
           duration: const Duration(seconds: 6),
         ),
       );
-      Navigator.of(context).pop();
+      context.go('/settings');
     } on FirebaseFunctionsException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
