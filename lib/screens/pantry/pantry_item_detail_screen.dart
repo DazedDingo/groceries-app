@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../models/pantry_item.dart';
 import '../../providers/pantry_provider.dart';
 import '../../providers/household_provider.dart';
@@ -76,7 +77,7 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
           IconButton(
             icon: const Icon(Icons.delete),
             onPressed: () async {
-              final navigator = Navigator.of(context);
+              final router = GoRouter.of(context);
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
@@ -88,9 +89,11 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
                 ),
               );
               if (confirm != true || !mounted) return;
-              // Pop before deleting — prevents the Firestore stream from removing
-              // the item and causing a blank rebuild before navigation completes.
-              navigator.pop();
+              // Use go_router's pop so we return to /pantry via the same
+              // router that pushed us here (context.push in pantry_screen).
+              // Fire delete after popping so the stream update never rebuilds
+              // this screen.
+              router.pop();
               ref.read(pantryServiceProvider).deleteItem(householdId, widget.itemId);
             },
           ),

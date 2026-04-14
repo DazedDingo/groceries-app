@@ -610,13 +610,20 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
           .firstOrNull;
     }
 
-    bool isHighPriorityItem(ShoppingItem item) {
+    // Star badge: shows whenever the linked pantry item is high priority.
+    bool isHighPriority(ShoppingItem item) {
+      final pantry = pantryFor(item);
+      return pantry != null && pantry.isHighPriority;
+    }
+
+    // Priority section (floats to top): high priority AND currently low stock.
+    bool isUrgentPriority(ShoppingItem item) {
       final pantry = pantryFor(item);
       return pantry != null && pantry.isHighPriority && pantry.isBelowOptimal;
     }
 
-    final priorityItems = items.where(isHighPriorityItem).toList();
-    final regularItems = items.where((i) => !isHighPriorityItem(i)).toList();
+    final priorityItems = items.where(isUrgentPriority).toList();
+    final regularItems = items.where((i) => !isUrgentPriority(i)).toList();
 
     final grouped = <String, List<ShoppingItem>>{};
     for (final item in regularItems) {
@@ -704,7 +711,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                   ...priorityItems.map((item) => ItemTile(
                     key: ValueKey(item.id),
                     item: item,
-                    isHighPriority: true,
+                    isHighPriority: isHighPriority(item),
                     unitSystem: unitSystem,
                     isSelecting: _selecting,
                     isSelected: _selectedIds.contains(item.id),
@@ -773,7 +780,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                   ...entry.value.map((item) => ItemTile(
                     key: ValueKey(item.id),
                     item: item,
-                    isHighPriority: isHighPriorityItem(item),
+                    isHighPriority: isHighPriority(item),
                     unitSystem: unitSystem,
                     isSelecting: _selecting,
                     isSelected: _selectedIds.contains(item.id),

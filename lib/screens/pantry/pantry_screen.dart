@@ -85,7 +85,7 @@ class PantryScreen extends ConsumerWidget {
           source: ItemSource.app,
         ),
       ),
-      onTap: () => context.go('/pantry/${item.id}'),
+      onTap: () => context.push('/pantry/${item.id}'),
     );
 
     return Scaffold(
