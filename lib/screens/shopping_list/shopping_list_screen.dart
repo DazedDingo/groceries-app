@@ -23,6 +23,7 @@ import '../../services/text_item_parser.dart';
 import '../../providers/history_provider.dart';
 import '../../models/history_entry.dart';
 import '../../services/restock_checker.dart';
+import '../../services/fuzzy_match.dart';
 
 class ShoppingListScreen extends ConsumerStatefulWidget {
   const ShoppingListScreen({super.key});
@@ -66,22 +67,31 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
     final categories = ref.read(categoriesProvider).value ?? [];
     final overrides = ref.read(categoryOverridesProvider).value ?? {};
     final history = ref.read(historyProvider(householdId)).value ?? [];
-    final suggestions = history
+
+    // Suggestions: current list first (highest priority), then history, then pantry.
+    final currentListItems =
+        (ref.read(itemsProvider).value ?? []).map((i) => i.name).toList();
+    final historySuggestions = history
         .where((h) => h.action == HistoryAction.bought)
         .map((h) => h.itemName)
         .toSet()
         .toList();
+    final pantryItemNames =
+        (ref.read(pantryProvider).value ?? []).map((p) => p.name).toList();
+
     final result = await showDialog<AddItemResult>(
       context: context,
       builder: (ctx) => AddItemDialog(
         categories: categories,
-        historySuggestions: suggestions,
+        currentListItems: currentListItems,
+        historySuggestions: historySuggestions,
+        pantryItemNames: pantryItemNames,
         categoryOverrides: overrides,
       ),
     );
     if (result == null || !mounted) return;
 
-    // Save category override if user manually changed it
+    // Save category override if user manually changed it.
     if (result.categoryOverridden && result.category != null) {
       ref.read(categoryOverrideServiceProvider).saveOverride(
         householdId: householdId,
@@ -90,12 +100,14 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       );
     }
 
-    // Check for duplicate — offer to merge by bumping quantity
+    // Re-read items after the dialog so we see any concurrent additions.
     final allItems = ref.read(itemsProvider).value ?? [];
-    final existing = allItems.where(
-      (item) => item.name.toLowerCase() == result.name.toLowerCase(),
-    ).toList();
-    if (existing.isNotEmpty && mounted) {
+
+    // ── Exact-match duplicate check ────────────────────────────────────────
+    final exactMatches = allItems
+        .where((i) => i.name.toLowerCase() == result.name.toLowerCase())
+        .toList();
+    if (exactMatches.isNotEmpty && mounted) {
       final choice = await showDialog<String>(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -109,7 +121,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
         ),
       );
       if (choice == 'merge') {
-        final target = existing.first;
+        final target = exactMatches.first;
         await ref.read(itemsServiceProvider).updateItem(
           householdId: householdId,
           itemId: target.id,
@@ -124,6 +136,75 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       if (choice != 'add' || !mounted) return;
     }
 
+    // ── Fuzzy-match warning (only when no exact match found) ───────────────
+    if (exactMatches.isEmpty && mounted) {
+      final fuzzyHits = allItems
+          .where((i) =>
+              i.name.toLowerCase() != result.name.toLowerCase() &&
+              isFuzzyMatch(result.name, i.name))
+          .toList();
+      if (fuzzyHits.isNotEmpty && mounted) {
+        final match = fuzzyHits.first;
+        final fuzzyChoice = await showDialog<String>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Row(children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.amber.shade700),
+              const SizedBox(width: 8),
+              const Expanded(child: Text('Similar item on list')),
+            ]),
+            content: RichText(
+              text: TextSpan(
+                style: DefaultTextStyle.of(ctx).style,
+                children: [
+                  TextSpan(
+                    text: '"${match.name}"',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const TextSpan(text: ' is already on your list. Is '),
+                  TextSpan(
+                    text: '"${result.name}"',
+                    style: const TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                  const TextSpan(text: ' a different item, or did you mean to add to it?'),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, 'cancel'),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, 'add'),
+                child: const Text('Add separately'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(ctx, 'merge'),
+                child: Text('Add to "${match.name}"'),
+              ),
+            ],
+          ),
+        );
+        if (fuzzyChoice == 'cancel' || fuzzyChoice == null || !mounted) return;
+        if (fuzzyChoice == 'merge') {
+          await ref.read(itemsServiceProvider).updateItem(
+            householdId: householdId,
+            itemId: match.id,
+            name: match.name,
+            quantity: match.quantity + result.quantity,
+            unit: result.unit ?? match.unit,
+            note: result.note ?? match.note,
+            categoryId: match.categoryId,
+          );
+          return;
+        }
+        // fuzzyChoice == 'add': fall through to add as new item.
+        if (!mounted) return;
+      }
+    }
+
+    // ── Add new item ───────────────────────────────────────────────────────
     try {
       final user = ref.read(authStateProvider).valueOrNull;
       await ref.read(itemsServiceProvider).addItem(

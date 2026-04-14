@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../models/category.dart';
 import '../../../services/category_guesser.dart';
+import '../../../services/fuzzy_match.dart';
 
 class AddItemResult {
   final String name;
@@ -18,7 +19,12 @@ class AddItemDialog extends StatefulWidget {
   final String initialName;
   final List<GroceryCategory> categories;
   final GroceryCategory? initialCategory;
+  /// Items currently on the shopping list — shown first in suggestions.
+  final List<String> currentListItems;
+  /// Previously bought items from history — shown second.
   final List<String> historySuggestions;
+  /// Pantry item names — shown third.
+  final List<String> pantryItemNames;
   final Map<String, String> categoryOverrides;
 
   const AddItemDialog({
@@ -26,7 +32,9 @@ class AddItemDialog extends StatefulWidget {
     this.initialName = '',
     required this.categories,
     this.initialCategory,
+    this.currentListItems = const [],
     this.historySuggestions = const [],
+    this.pantryItemNames = const [],
     this.categoryOverrides = const {},
   });
 
@@ -85,10 +93,43 @@ class _AddItemDialogState extends State<AddItemDialog> {
         Autocomplete<String>(
           initialValue: TextEditingValue(text: widget.initialName),
           optionsBuilder: (textEditingValue) {
-            if (textEditingValue.text.isEmpty) return const Iterable.empty();
-            final query = textEditingValue.text.toLowerCase();
-            return widget.historySuggestions
-                .where((s) => s.toLowerCase().contains(query));
+            final raw = textEditingValue.text;
+            if (raw.isEmpty) return const Iterable.empty();
+            final query = raw.toLowerCase();
+
+            // Sources in priority order: on-list → history → pantry.
+            final sources = [
+              widget.currentListItems,
+              widget.historySuggestions,
+              widget.pantryItemNames,
+            ];
+
+            final seen = <String>{};
+            final results = <String>[];
+
+            // Pass 1: substring matches (high confidence).
+            for (final source in sources) {
+              for (final s in source) {
+                final lower = s.toLowerCase();
+                if (lower.contains(query) && seen.add(lower)) {
+                  results.add(s);
+                }
+              }
+            }
+
+            // Pass 2: fuzzy matches not already surfaced (catches typos /
+            // plurals that aren't substrings).
+            for (final source in sources) {
+              for (final s in source) {
+                final lower = s.toLowerCase();
+                if (!seen.contains(lower) && isFuzzyMatch(raw, lower)) {
+                  seen.add(lower);
+                  results.add(s);
+                }
+              }
+            }
+
+            return results.take(10);
           },
           onSelected: (selection) {
             _onNameChanged(selection);
