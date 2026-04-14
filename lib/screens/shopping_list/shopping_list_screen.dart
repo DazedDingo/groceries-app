@@ -240,26 +240,26 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   }
 
   Future<void> _cartItem(String householdId, ShoppingItem item) async {
-    final pantryList = ref.read(pantryProvider).value ?? [];
-    PantryItem? pantryItem;
-
-    if (item.pantryItemId != null) {
-      try {
-        pantryItem = pantryList.firstWhere((p) => p.id == item.pantryItemId);
-      } catch (_) {}
-    } else {
-      // No pantry link — create a new pantry entry with current quantity = item quantity
-      await ref.read(pantryServiceProvider).addItem(
-        householdId: householdId,
-        name: item.name,
-        categoryId: item.categoryId,
-        preferredStores: item.preferredStores,
-        optimalQuantity: item.quantity,
-        currentQuantity: item.quantity,
-      );
-    }
-
     try {
+      final pantryList = ref.read(pantryProvider).value ?? [];
+      PantryItem? pantryItem;
+
+      if (item.pantryItemId != null) {
+        try {
+          pantryItem = pantryList.firstWhere((p) => p.id == item.pantryItemId);
+        } catch (_) {}
+      } else {
+        // No pantry link — create a new pantry entry
+        await ref.read(pantryServiceProvider).addItem(
+          householdId: householdId,
+          name: item.name,
+          categoryId: item.categoryId,
+          preferredStores: item.preferredStores,
+          optimalQuantity: item.quantity,
+          currentQuantity: item.quantity,
+        );
+      }
+
       await ref.read(itemsServiceProvider).checkOff(
         householdId: householdId,
         item: item,
@@ -282,6 +282,20 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
     final pantryMap = {for (final p in pantryList) p.id: p};
 
     try {
+      // Create pantry items for shopping items not already linked to pantry
+      for (final item in selected) {
+        if (item.pantryItemId == null) {
+          await ref.read(pantryServiceProvider).addItem(
+            householdId: householdId,
+            name: item.name,
+            categoryId: item.categoryId,
+            preferredStores: item.preferredStores,
+            optimalQuantity: item.quantity,
+            currentQuantity: item.quantity,
+          );
+        }
+      }
+
       await ref.read(itemsServiceProvider).confirmBought(
         householdId: householdId,
         items: selected,

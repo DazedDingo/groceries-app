@@ -10,6 +10,7 @@ import '../../providers/household_provider.dart';
 import '../../providers/items_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../shared/empty_state.dart';
+import '../shared/list_skeleton.dart';
 
 final _dayFormat = DateFormat('EEE d');
 
@@ -19,7 +20,7 @@ class MealPlanScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final weekStart = ref.watch(selectedWeekStartProvider);
-    final entries = ref.watch(mealPlanProvider).value ?? [];
+    final mealPlanAsync = ref.watch(mealPlanProvider);
     final householdId = ref.watch(householdIdProvider).value ?? '';
 
     final days = List.generate(7, (i) => weekStart.add(Duration(days: i)));
@@ -31,7 +32,7 @@ class MealPlanScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.add_shopping_cart),
             tooltip: 'Add all ingredients to list',
-            onPressed: entries.isEmpty ? null : () => _addAllToList(context, ref, entries, householdId),
+            onPressed: (mealPlanAsync.value ?? []).isEmpty ? null : () => _addAllToList(context, ref, mealPlanAsync.value!, householdId),
           ),
         ],
       ),
@@ -68,7 +69,14 @@ class MealPlanScreen extends ConsumerWidget {
             ),
           ),
           Expanded(
-            child: entries.isEmpty
+            child: mealPlanAsync.when(
+              loading: () => const ListSkeleton(),
+              error: (e, _) => EmptyState(
+                icon: Icons.error_outline,
+                title: 'Could not load meal plan',
+                subtitle: '$e',
+              ),
+              data: (entries) => entries.isEmpty
                 ? const EmptyState(
                     icon: Icons.calendar_month,
                     title: 'No meals planned',
@@ -146,6 +154,7 @@ class MealPlanScreen extends ConsumerWidget {
                       );
                     }).toList(),
                   ),
+            ),
           ),
         ],
       ),
