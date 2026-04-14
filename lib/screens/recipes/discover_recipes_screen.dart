@@ -168,9 +168,26 @@ class _DiscoverRecipesScreenState extends ConsumerState<DiscoverRecipesScreen> {
   }
 
   Future<void> _saveRecipe(ImportedRecipe imported) async {
-    final householdId = await ref.read(householdIdProvider.future) ?? '';
-    if (householdId.isEmpty) return;
+    final messenger = ScaffoldMessenger.of(context);
+    // Wait for auth to emit first so householdIdProvider doesn't cache a
+    // null result from a cold read before auth has resolved.
     final user = await ref.read(authStateProvider.future);
+    if (user == null) {
+      messenger.showSnackBar(
+          const SnackBar(content: Text('Please sign in to save recipes')));
+      return;
+    }
+    var householdId = await ref.read(householdIdProvider.future);
+    if (householdId == null || householdId.isEmpty) {
+      // Provider may have cached a null from before auth resolved — retry once.
+      ref.invalidate(householdIdProvider);
+      householdId = await ref.read(householdIdProvider.future);
+    }
+    if (householdId == null || householdId.isEmpty) {
+      messenger.showSnackBar(const SnackBar(
+          content: Text('No household set up — check Settings')));
+      return;
+    }
     try {
       await ref.read(recipesServiceProvider).addRecipe(
             householdId: householdId,
@@ -179,17 +196,17 @@ class _DiscoverRecipesScreenState extends ConsumerState<DiscoverRecipesScreen> {
             instructions: imported.instructions,
             notes: imported.notes,
             sourceUrl: imported.sourceUrl,
-            addedByUid: user?.uid,
-            addedByDisplayName: user?.displayName ?? 'Unknown',
+            addedByUid: user.uid,
+            addedByDisplayName: user.displayName ?? 'Unknown',
           );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      messenger.showSnackBar(SnackBar(
         content: Text('Saved "${imported.name}" to your recipes'),
       ));
       if (context.mounted) context.go('/recipes');
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      messenger.showSnackBar(SnackBar(
         content: Text('Could not save: $e'),
       ));
     }
@@ -198,6 +215,9 @@ class _DiscoverRecipesScreenState extends ConsumerState<DiscoverRecipesScreen> {
   @override
   Widget build(BuildContext context) {
     final spoonKey = ref.watch(spoonacularKeyProvider);
+    // Warm auth + household so they're resolved by the time the user taps Save.
+    ref.watch(authStateProvider);
+    ref.watch(householdIdProvider);
     final needsKey = _source == RecipeSource.spoonacular && spoonKey.isEmpty;
 
     return Scaffold(
