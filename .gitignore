@@ -59,3 +59,8 @@ functions/lib/
 # Secrets
 *.env
 google-services.json
+
+# Keystore
+*.jks
+*.keystore
+android/key.properties
