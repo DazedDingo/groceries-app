@@ -39,7 +39,21 @@ class PantryItemTile extends StatelessWidget {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('${item.currentQuantity} / ${item.optimalQuantity} optimal'),
+          Row(
+            children: [
+              Text('${item.currentQuantity} / ${item.optimalQuantity} optimal'),
+              if (item.location != null) ...[
+                const SizedBox(width: 8),
+                Icon(_iconForLocation(item.location!),
+                    size: 12, color: scheme.onSurfaceVariant),
+                const SizedBox(width: 2),
+                Text(item.location!.label,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        )),
+              ],
+            ],
+          ),
           if (item.isBelowOptimal)
             TextButton.icon(
               onPressed: onAddToList,
@@ -69,5 +83,20 @@ class PantryItemTile extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  IconData _iconForLocation(PantryLocation loc) {
+    switch (loc) {
+      case PantryLocation.fridge:
+        return Icons.kitchen;
+      case PantryLocation.freezer:
+        return Icons.ac_unit;
+      case PantryLocation.pantry:
+        return Icons.shelves;
+      case PantryLocation.counter:
+        return Icons.countertops;
+      case PantryLocation.other:
+        return Icons.place_outlined;
+    }
   }
 }

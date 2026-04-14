@@ -30,8 +30,18 @@ class PantryScreen extends ConsumerWidget {
 
     final expired = pantry.where((p) => p.isExpired).toList();
     final expiringSoon = pantry.where((p) => p.isExpiringSoon).toList();
-    final needsRestock = pantry.where((p) => p.isBelowOptimal && !p.isExpired && !p.isExpiringSoon).toList();
-    final stocked = pantry.where((p) => !p.isBelowOptimal && !p.isExpired && !p.isExpiringSoon).toList();
+    final stale = pantry.where((p) => p.isStale && !p.isBelowOptimal).toList();
+    final needsRestock = pantry
+        .where((p) =>
+            p.isBelowOptimal && !p.isExpired && !p.isExpiringSoon && !p.isStale)
+        .toList();
+    final stocked = pantry
+        .where((p) =>
+            !p.isBelowOptimal &&
+            !p.isExpired &&
+            !p.isExpiringSoon &&
+            !p.isStale)
+        .toList();
 
     String catSortKey(PantryItem p) {
       try {
@@ -42,6 +52,7 @@ class PantryScreen extends ConsumerWidget {
     }
     expired.sort((a, b) => catSortKey(a).compareTo(catSortKey(b)));
     expiringSoon.sort((a, b) => catSortKey(a).compareTo(catSortKey(b)));
+    stale.sort((a, b) => catSortKey(a).compareTo(catSortKey(b)));
     needsRestock.sort((a, b) => catSortKey(a).compareTo(catSortKey(b)));
     stocked.sort((a, b) => catSortKey(a).compareTo(catSortKey(b)));
 
@@ -182,6 +193,26 @@ class PantryScreen extends ConsumerWidget {
                         ...expiringSoon.map(buildTile),
                         const Divider(),
                       ],
+                      if (stale.isNotEmpty) ...[
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                          child: Text('Sitting unused',
+                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    color: Colors.brown,
+                                  )),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                          child: Text(
+                            'In your pantry 60+ days — use it or bin it.',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                ),
+                          ),
+                        ),
+                        ...stale.map(buildTile),
+                        const Divider(),
+                      ],
                       if (needsRestock.isNotEmpty) ...[
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
@@ -255,6 +286,7 @@ class PantryScreen extends ConsumerWidget {
     final nameCtrl = TextEditingController();
     final optCtrl = TextEditingController(text: '1');
     GroceryCategory? selectedCategory;
+    PantryLocation? selectedLocation;
 
     showDialog(
       context: context,
@@ -288,6 +320,26 @@ class PantryScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 8),
+            InputDecorator(
+              decoration: const InputDecoration(labelText: 'Location'),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<PantryLocation?>(
+                  value: selectedLocation,
+                  isExpanded: true,
+                  hint: const Text('Not set'),
+                  items: [
+                    const DropdownMenuItem<PantryLocation?>(
+                        value: null, child: Text('Not set')),
+                    ...PantryLocation.values.map((loc) => DropdownMenuItem(
+                          value: loc,
+                          child: Text(loc.label),
+                        )),
+                  ],
+                  onChanged: (loc) => setState(() => selectedLocation = loc),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
             TextField(
               controller: optCtrl,
               decoration: const InputDecoration(labelText: 'Optimal quantity'),
@@ -307,6 +359,7 @@ class PantryScreen extends ConsumerWidget {
                   preferredStores: [],
                   optimalQuantity: int.tryParse(optCtrl.text) ?? 1,
                   currentQuantity: 0,
+                  location: selectedLocation,
                 );
                 Navigator.pop(ctx);
               },

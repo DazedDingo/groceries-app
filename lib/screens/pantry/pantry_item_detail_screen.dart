@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../models/pantry_item.dart';
 import '../../providers/pantry_provider.dart';
 import '../../providers/household_provider.dart';
 import '../../services/shelf_life_guesser.dart';
@@ -157,6 +158,37 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
                       setState(() => _selectedShelfLife = val);
                       ref.read(pantryServiceProvider).updateItem(
                           householdId, widget.itemId, {'shelfLifeDays': val});
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Location
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Location', style: theme.textTheme.titleSmall),
+                  const SizedBox(height: 8),
+                  DropdownButton<PantryLocation?>(
+                    value: item.location,
+                    isExpanded: true,
+                    items: [
+                      const DropdownMenuItem<PantryLocation?>(
+                          value: null, child: Text('Not set')),
+                      ...PantryLocation.values.map((loc) => DropdownMenuItem(
+                            value: loc,
+                            child: Text(loc.label),
+                          )),
+                    ],
+                    onChanged: (val) {
+                      ref.read(pantryServiceProvider).updateItem(
+                          householdId, widget.itemId, {'location': val?.id});
                     },
                   ),
                 ],

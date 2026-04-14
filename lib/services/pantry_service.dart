@@ -22,6 +22,7 @@ class PantryService {
     required int currentQuantity,
     int? restockAfterDays,
     int? shelfLifeDays,
+    PantryLocation? location,
   }) async {
     final ref = await _db.collection('households/$householdId/pantry').add({
       'name': name, 'categoryId': categoryId, 'preferredStores': preferredStores,
@@ -30,6 +31,7 @@ class PantryService {
       'shelfLifeDays': shelfLifeDays,
       'expiresAt': null,
       'lastNudgedAt': null, 'lastPurchasedAt': null,
+      'location': location?.id,
     });
     return ref.id;
   }

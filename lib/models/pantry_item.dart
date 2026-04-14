@@ -1,5 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Where in the kitchen this item lives. String values are persisted in
+/// Firestore so they are stable across clients — do not rename without a
+/// migration. Null = unknown.
+enum PantryLocation {
+  fridge('fridge', 'Fridge'),
+  freezer('freezer', 'Freezer'),
+  pantry('pantry', 'Pantry'),
+  counter('counter', 'Counter'),
+  other('other', 'Other');
+
+  final String id;
+  final String label;
+  const PantryLocation(this.id, this.label);
+
+  static PantryLocation? fromId(String? id) {
+    if (id == null) return null;
+    for (final loc in PantryLocation.values) {
+      if (loc.id == id) return loc;
+    }
+    return null;
+  }
+}
+
 class PantryItem {
   final String id;
   final String name;
@@ -12,6 +35,7 @@ class PantryItem {
   final DateTime? expiresAt;
   final DateTime? lastNudgedAt;
   final DateTime? lastPurchasedAt;
+  final PantryLocation? location;
 
   const PantryItem({
     required this.id, required this.name, required this.categoryId,
@@ -19,6 +43,7 @@ class PantryItem {
     required this.currentQuantity, required this.restockAfterDays,
     this.shelfLifeDays, this.expiresAt,
     required this.lastNudgedAt, required this.lastPurchasedAt,
+    this.location,
   });
 
   bool get isBelowOptimal => currentQuantity < optimalQuantity;
@@ -27,6 +52,18 @@ class PantryItem {
       expiresAt != null &&
       !isExpired &&
       expiresAt!.difference(DateTime.now()).inDays <= 2;
+
+  /// Item has been sitting untouched for a while — a soft "still there?" nudge,
+  /// independent of hard expiry. Fires when we have stock on hand but haven't
+  /// repurchased in ~60 days and the item isn't already flagged as expired or
+  /// expiring soon.
+  bool get isStale {
+    if (currentQuantity <= 0) return false;
+    if (isExpired || isExpiringSoon) return false;
+    final purchased = lastPurchasedAt;
+    if (purchased == null) return false;
+    return DateTime.now().difference(purchased).inDays >= 60;
+  }
 
   Map<String, dynamic> toMap() => {
     'name': name, 'categoryId': categoryId,
@@ -37,6 +74,7 @@ class PantryItem {
     'expiresAt': expiresAt != null ? Timestamp.fromDate(expiresAt!) : null,
     'lastNudgedAt': lastNudgedAt != null ? Timestamp.fromDate(lastNudgedAt!) : null,
     'lastPurchasedAt': lastPurchasedAt != null ? Timestamp.fromDate(lastPurchasedAt!) : null,
+    'location': location?.id,
   };
 
   factory PantryItem.fromFirestore(DocumentSnapshot doc) {
@@ -52,6 +90,7 @@ class PantryItem {
       expiresAt: (d['expiresAt'] as Timestamp?)?.toDate(),
       lastNudgedAt: (d['lastNudgedAt'] as Timestamp?)?.toDate(),
       lastPurchasedAt: (d['lastPurchasedAt'] as Timestamp?)?.toDate(),
+      location: PantryLocation.fromId(d['location'] as String?),
     );
   }
 
@@ -66,6 +105,7 @@ class PantryItem {
     DateTime? expiresAt,
     DateTime? lastNudgedAt,
     DateTime? lastPurchasedAt,
+    PantryLocation? location,
   }) => PantryItem(
     id: id,
     name: name ?? this.name,
@@ -78,5 +118,6 @@ class PantryItem {
     expiresAt: expiresAt ?? this.expiresAt,
     lastNudgedAt: lastNudgedAt ?? this.lastNudgedAt,
     lastPurchasedAt: lastPurchasedAt ?? this.lastPurchasedAt,
+    location: location ?? this.location,
   );
 }

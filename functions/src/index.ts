@@ -25,9 +25,10 @@ export const syncTasksV2 = onSchedule('every 3 minutes', async () => {
   } else if (result.synced > 0 || result.errors > 0) {
     logger.info('Google Tasks sync', result);
   } else {
-    // List found but nothing new — log once per hour on the xx:00 tick.
+    // List found but nothing new — log every 15 minutes so the flow stays
+    // diagnosable without spamming logs every 3 minutes.
     const now = new Date();
-    if (now.getUTCMinutes() < 3) {
+    if (now.getUTCMinutes() % 15 < 3) {
       logger.info('Google Tasks idle', {
         listName: result.listName,
         tasksSeen: result.tasksSeen,
