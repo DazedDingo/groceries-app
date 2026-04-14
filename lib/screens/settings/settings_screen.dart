@@ -171,6 +171,13 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const Divider(),
           ListTile(
+            leading: const Icon(Icons.bug_report_outlined),
+            title: const Text('Report an issue'),
+            subtitle: const Text('File a bug or idea on GitHub'),
+            onTap: () => context.go('/settings/report-issue'),
+          ),
+          const Divider(),
+          ListTile(
             title: const Text('Sign out'),
             onTap: () async {
               await ref.read(authServiceProvider).signOut();

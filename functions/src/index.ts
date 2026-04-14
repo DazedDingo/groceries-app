@@ -5,6 +5,7 @@ import * as logger from 'firebase-functions/logger';
 import { handleIftttWebhook } from './addToList.js';
 import { syncGoogleTasks } from './syncGoogleTasks.js';
 import { nudgeRestock } from './nudgeRestock.js';
+export { submitIssue } from './submitIssue.js';
 
 admin.initializeApp();
 

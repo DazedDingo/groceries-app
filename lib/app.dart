@@ -13,6 +13,7 @@ import 'screens/pantry/pantry_screen.dart';
 import 'screens/pantry/pantry_item_detail_screen.dart';
 import 'screens/settings/settings_screen.dart';
 import 'screens/settings/manage_categories_screen.dart';
+import 'screens/settings/report_issue_screen.dart';
 import 'screens/shopping_list/history_screen.dart';
 import 'screens/shopping_list/templates_screen.dart';
 import 'screens/recipes/recipes_screen.dart';
@@ -75,6 +76,7 @@ final _router = GoRouter(
         GoRoute(path: '/plan', builder: (_, __) => const MealPlanScreen()),
         GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
         GoRoute(path: '/settings/categories', builder: (_, __) => const ManageCategoriesScreen()),
+        GoRoute(path: '/settings/report-issue', builder: (_, __) => const ReportIssueScreen()),
       ],
     ),
   ],
