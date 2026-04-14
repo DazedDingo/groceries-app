@@ -168,9 +168,9 @@ class _DiscoverRecipesScreenState extends ConsumerState<DiscoverRecipesScreen> {
   }
 
   Future<void> _saveRecipe(ImportedRecipe imported) async {
-    final householdId = ref.read(householdIdProvider).value ?? '';
+    final householdId = await ref.read(householdIdProvider.future) ?? '';
     if (householdId.isEmpty) return;
-    final user = ref.read(authStateProvider).value;
+    final user = await ref.read(authStateProvider.future);
     try {
       await ref.read(recipesServiceProvider).addRecipe(
             householdId: householdId,
