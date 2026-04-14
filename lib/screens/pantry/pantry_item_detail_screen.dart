@@ -59,6 +59,7 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
           IconButton(
             icon: const Icon(Icons.delete),
             onPressed: () async {
+              final navigator = Navigator.of(context);
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
@@ -71,8 +72,7 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
               );
               if (confirm != true || !mounted) return;
               await ref.read(pantryServiceProvider).deleteItem(householdId, widget.itemId);
-              if (!mounted) return;
-              Navigator.pop(context);
+              navigator.pop();
             },
           ),
         ],

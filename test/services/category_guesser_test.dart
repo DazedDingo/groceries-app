@@ -4,14 +4,14 @@ import 'package:groceries_app/models/category.dart';
 import 'package:groceries_app/services/category_guesser.dart';
 
 final _categories = [
-  GroceryCategory(id: '1', name: 'Meats', color: const Color(0xFFFF0000), addedBy: 'system'),
-  GroceryCategory(id: '2', name: 'Dairy', color: const Color(0xFF0000FF), addedBy: 'system'),
-  GroceryCategory(id: '3', name: 'Produce', color: const Color(0xFF00FF00), addedBy: 'system'),
-  GroceryCategory(id: '4', name: 'Bakery', color: const Color(0xFFFFFF00), addedBy: 'system'),
-  GroceryCategory(id: '5', name: 'Spices', color: const Color(0xFFFF00FF), addedBy: 'system'),
-  GroceryCategory(id: '6', name: 'Frozen', color: const Color(0xFF00FFFF), addedBy: 'system'),
-  GroceryCategory(id: '7', name: 'Drinks', color: const Color(0xFF888888), addedBy: 'system'),
-  GroceryCategory(id: '8', name: 'Household', color: const Color(0xFF444444), addedBy: 'system'),
+  const GroceryCategory(id: '1', name: 'Meats', color: Color(0xFFFF0000), addedBy: 'system'),
+  const GroceryCategory(id: '2', name: 'Dairy', color: Color(0xFF0000FF), addedBy: 'system'),
+  const GroceryCategory(id: '3', name: 'Produce', color: Color(0xFF00FF00), addedBy: 'system'),
+  const GroceryCategory(id: '4', name: 'Bakery', color: Color(0xFFFFFF00), addedBy: 'system'),
+  const GroceryCategory(id: '5', name: 'Spices', color: Color(0xFFFF00FF), addedBy: 'system'),
+  const GroceryCategory(id: '6', name: 'Frozen', color: Color(0xFF00FFFF), addedBy: 'system'),
+  const GroceryCategory(id: '7', name: 'Drinks', color: Color(0xFF888888), addedBy: 'system'),
+  const GroceryCategory(id: '8', name: 'Household', color: Color(0xFF444444), addedBy: 'system'),
 ];
 
 void main() {
