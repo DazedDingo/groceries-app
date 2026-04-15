@@ -1,0 +1,242 @@
+import 'dart:async';
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:groceries_app/providers/auth_provider.dart';
+import 'package:groceries_app/providers/categories_provider.dart';
+import 'package:groceries_app/providers/gemini_key_provider.dart';
+import 'package:groceries_app/providers/household_provider.dart';
+import 'package:groceries_app/providers/items_provider.dart';
+import 'package:groceries_app/screens/shopping_list/bulk_voice_screen.dart';
+import 'package:groceries_app/services/auth_service.dart';
+import 'package:groceries_app/services/bulk_voice_parser.dart';
+import 'package:groceries_app/services/categories_service.dart';
+import 'package:groceries_app/services/category_overrides.dart';
+import 'package:groceries_app/services/household_service.dart';
+import 'package:groceries_app/services/items_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class _FakeParser {
+  final List<String> calls = [];
+  Future<List<ParsedVoiceItem>> Function(String) handler;
+  _FakeParser(this.handler);
+  Future<List<ParsedVoiceItem>> call(String t) {
+    calls.add(t);
+    return handler(t);
+  }
+}
+
+Widget _wrap({
+  required FakeFirebaseFirestore db,
+  required _FakeParser parser,
+  String householdId = 'hh1',
+  bool autoStartListening = false,
+}) {
+  final mockUser = MockUser(uid: 'u1', email: 'a@b.com', displayName: 'Alice');
+  final auth = MockFirebaseAuth(mockUser: mockUser, signedIn: true);
+  db.doc('users/${mockUser.uid}').set({'householdId': householdId});
+
+  return ProviderScope(
+    overrides: [
+      householdIdProvider.overrideWith((ref) async => householdId),
+      householdServiceProvider.overrideWithValue(HouseholdService(db: db)),
+      authStateProvider.overrideWith((ref) => Stream.value(mockUser)),
+      authServiceProvider.overrideWithValue(AuthService(auth: auth)),
+      itemsServiceProvider.overrideWithValue(ItemsService(db: db)),
+      categoriesServiceProvider.overrideWithValue(CategoriesService(db: db)),
+      categoryOverrideServiceProvider
+          .overrideWithValue(CategoryOverrideService(db: db)),
+      bulkVoiceParseFnProvider.overrideWithValue(parser.call),
+    ],
+    child: MaterialApp(
+      home: BulkVoiceScreen(autoStartListening: autoStartListening),
+    ),
+  );
+}
+
+BulkVoiceScreenState _state(WidgetTester tester) =>
+    tester.state<BulkVoiceScreenState>(find.byType(BulkVoiceScreen));
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
+  testWidgets('shows missing-key banner when no Gemini key set', (tester) async {
+    final parser = _FakeParser((_) async => []);
+    await tester.pumpWidget(_wrap(db: FakeFirebaseFirestore(), parser: parser));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Set a Gemini API key'), findsOneWidget);
+  });
+
+  testWidgets('hides missing-key banner once a key is set', (tester) async {
+    SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
+    final parser = _FakeParser((_) async => []);
+    await tester.pumpWidget(_wrap(db: FakeFirebaseFirestore(), parser: parser));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Set a Gemini API key'), findsNothing);
+  });
+
+  testWidgets('Add N to list button is disabled when no items', (tester) async {
+    final parser = _FakeParser((_) async => []);
+    await tester.pumpWidget(_wrap(db: FakeFirebaseFirestore(), parser: parser));
+    await tester.pumpAndSettle();
+    final btn = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Add 0 to list'),
+    );
+    expect(btn.onPressed, isNull);
+  });
+
+  testWidgets('renders parsed items and bulk-adds to Firestore', (tester) async {
+    SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
+    final db = FakeFirebaseFirestore();
+    final parser = _FakeParser((_) async => []);
+    await tester.pumpWidget(_wrap(db: db, parser: parser));
+    await tester.pumpAndSettle();
+
+    _state(tester).seedForTest(
+      transcript: 'one milk and two bread',
+      items: [
+        ParsedVoiceItem(name: 'milk', quantity: 1),
+        ParsedVoiceItem(name: 'bread', quantity: 2),
+      ],
+    );
+    await tester.pump();
+
+    expect(find.text('milk'), findsOneWidget);
+    expect(find.text('bread'), findsOneWidget);
+    expect(find.text('Items (2)'), findsOneWidget);
+
+    await tester.runAsync(() async {
+      await tester.tap(find.widgetWithText(FilledButton, 'Add 2 to list'));
+      // Drain pending real-async work (Firestore writes via fake plugin).
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+    });
+    await tester.pumpAndSettle();
+
+    final snap = await db.collection('households/hh1/items').get();
+    expect(snap.docs.length, 2);
+    final names = snap.docs.map((d) => d.data()['name']).toSet();
+    expect(names, {'milk', 'bread'});
+  });
+
+  testWidgets('dismissing an item removes it from the list', (tester) async {
+    SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
+    final parser = _FakeParser((_) async => []);
+    await tester.pumpWidget(_wrap(db: FakeFirebaseFirestore(), parser: parser));
+    await tester.pumpAndSettle();
+
+    _state(tester).seedForTest(items: [
+      ParsedVoiceItem(name: 'milk', quantity: 1),
+      ParsedVoiceItem(name: 'bread', quantity: 2),
+    ]);
+    await tester.pump();
+
+    await tester.drag(find.text('milk'), const Offset(-500, 0));
+    await tester.pumpAndSettle();
+
+    expect(find.text('milk'), findsNothing);
+    expect(find.text('bread'), findsOneWidget);
+    expect(find.text('Items (1)'), findsOneWidget);
+  });
+
+  testWidgets('Clear empties items and transcript', (tester) async {
+    SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
+    final parser = _FakeParser((_) async => []);
+    await tester.pumpWidget(_wrap(db: FakeFirebaseFirestore(), parser: parser));
+    await tester.pumpAndSettle();
+
+    _state(tester).seedForTest(
+      transcript: 'milk',
+      items: [ParsedVoiceItem(name: 'milk', quantity: 1)],
+    );
+    await tester.pump();
+
+    await tester.tap(find.widgetWithText(TextButton, 'Clear'));
+    await tester.pump();
+
+    expect(find.text('milk'), findsNothing);
+    expect(find.text('Items (0)'), findsOneWidget);
+  });
+
+  testWidgets('refresh button calls injected parser and renders results',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
+    final parser = _FakeParser(
+      (_) async => [ParsedVoiceItem(name: 'eggs', quantity: 12)],
+    );
+    await tester.pumpWidget(_wrap(db: FakeFirebaseFirestore(), parser: parser));
+    await tester.pumpAndSettle();
+
+    _state(tester).seedForTest(transcript: 'twelve eggs');
+    await tester.pump();
+
+    await tester.tap(find.byTooltip('Re-parse transcript'));
+    await tester.pumpAndSettle();
+
+    expect(parser.calls, ['twelve eggs']);
+    expect(find.text('eggs'), findsOneWidget);
+    expect(find.text('Items (1)'), findsOneWidget);
+  });
+
+  testWidgets('parse failure surfaces an error banner', (tester) async {
+    SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
+    final parser = _FakeParser((_) => Future.error(Exception('rate limit')));
+    await tester.pumpWidget(_wrap(db: FakeFirebaseFirestore(), parser: parser));
+    await tester.pumpAndSettle();
+
+    _state(tester).seedForTest(transcript: 'something');
+    await tester.pump();
+
+    await tester.tap(find.byTooltip('Re-parse transcript'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Parse failed'), findsOneWidget);
+    expect(find.textContaining('rate limit'), findsOneWidget);
+  });
+
+  testWidgets('stale parse result does not clobber newer one', (tester) async {
+    SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
+    final completers = <String, Completer<List<ParsedVoiceItem>>>{};
+    final parser = _FakeParser((t) {
+      final c = Completer<List<ParsedVoiceItem>>();
+      completers[t] = c;
+      return c.future;
+    });
+
+    await tester.pumpWidget(_wrap(db: FakeFirebaseFirestore(), parser: parser));
+    await tester.pumpAndSettle();
+    final state = _state(tester);
+
+    // Kick off the slow parse first (don't await; it's deferred).
+    state.seedForTest(transcript: 'slow');
+    state.triggerParseForTest();
+    await tester.pump();
+
+    // Now start a newer parse against a different transcript.
+    state.seedForTest(transcript: 'fast');
+    state.triggerParseForTest();
+    await tester.pump();
+
+    expect(completers.keys, containsAll(['slow', 'fast']));
+
+    // Resolve the newer parse first.
+    completers['fast']!.complete(
+      [ParsedVoiceItem(name: 'fast-item', quantity: 1)],
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('fast-item'), findsOneWidget);
+
+    // Then resolve the older parse — it must NOT overwrite the newer result.
+    completers['slow']!.complete(
+      [ParsedVoiceItem(name: 'slow-item', quantity: 9)],
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('fast-item'), findsOneWidget);
+    expect(find.text('slow-item'), findsNothing);
+  });
+}

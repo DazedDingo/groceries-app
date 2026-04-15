@@ -16,12 +16,16 @@ import '../../services/category_guesser.dart';
 /// (handling corrections, dedupes, filler words), and lets the user review
 /// before bulk-adding to the shopping list.
 class BulkVoiceScreen extends ConsumerStatefulWidget {
-  const BulkVoiceScreen({super.key});
+  /// When true, skip mic init (used by widget tests so STT doesn't try to
+  /// touch a real platform channel).
+  final bool autoStartListening;
+  const BulkVoiceScreen({super.key, this.autoStartListening = true});
   @override
-  ConsumerState<BulkVoiceScreen> createState() => _BulkVoiceScreenState();
+  ConsumerState<BulkVoiceScreen> createState() => BulkVoiceScreenState();
 }
 
-class _BulkVoiceScreenState extends ConsumerState<BulkVoiceScreen> {
+@visibleForTesting
+class BulkVoiceScreenState extends ConsumerState<BulkVoiceScreen> {
   final _speech = SpeechToText();
   bool _available = false;
   bool _listening = false;
@@ -32,6 +36,19 @@ class _BulkVoiceScreenState extends ConsumerState<BulkVoiceScreen> {
   Timer? _debounce;
   List<ParsedVoiceItem> _items = [];
   String? _errorMessage;
+  int _parseSeq = 0;
+
+  @visibleForTesting
+  void seedForTest({String transcript = '', List<ParsedVoiceItem> items = const []}) {
+    setState(() {
+      _committedTranscript = transcript;
+      _liveTranscript = '';
+      _items = List.of(items);
+    });
+  }
+
+  @visibleForTesting
+  Future<void> triggerParseForTest() => _runParse();
 
   String get _fullTranscript {
     if (_liveTranscript.isEmpty) return _committedTranscript;
@@ -42,7 +59,7 @@ class _BulkVoiceScreenState extends ConsumerState<BulkVoiceScreen> {
   @override
   void initState() {
     super.initState();
-    _init();
+    if (widget.autoStartListening) _init();
   }
 
   @override
@@ -155,18 +172,18 @@ class _BulkVoiceScreenState extends ConsumerState<BulkVoiceScreen> {
           'No Gemini API key set. Add one in Settings → Bulk voice add.');
       return;
     }
+    final mySeq = ++_parseSeq;
     setState(() => _parsing = true);
     try {
-      final parser = BulkVoiceParser(apiKey: key);
-      final parsed = await parser.parse(transcript);
-      parser.dispose();
-      if (!mounted) return;
+      final parseFn = ref.read(bulkVoiceParseFnProvider);
+      final parsed = await parseFn(transcript);
+      if (!mounted || mySeq != _parseSeq) return;
       setState(() {
         _items = parsed;
         _parsing = false;
       });
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted || mySeq != _parseSeq) return;
       setState(() {
         _parsing = false;
         _errorMessage = 'Parse failed: $e';
@@ -176,7 +193,7 @@ class _BulkVoiceScreenState extends ConsumerState<BulkVoiceScreen> {
 
   Future<void> _addAllToList() async {
     if (_items.isEmpty) return;
-    final householdId = ref.read(householdIdProvider).value ?? '';
+    final householdId = await ref.read(householdIdProvider.future) ?? '';
     if (householdId.isEmpty) return;
     final categories = ref.read(categoriesProvider).value ?? [];
     final overrides = ref.read(categoryOverridesProvider).value ?? {};

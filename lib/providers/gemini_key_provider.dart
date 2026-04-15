@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/bulk_voice_parser.dart';
 
 /// Gemini API key, stored locally per device in SharedPreferences.
 /// Used by the bulk voice add feature to parse spoken transcripts into
@@ -7,6 +8,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 final geminiKeyProvider =
     StateNotifierProvider<GeminiKeyNotifier, String>(
         (ref) => GeminiKeyNotifier());
+
+/// Function that parses a transcript into structured items.
+/// Overridden in tests to swap in canned responses without hitting the network.
+typedef BulkVoiceParseFn = Future<List<ParsedVoiceItem>> Function(String transcript);
+
+final bulkVoiceParseFnProvider = Provider<BulkVoiceParseFn>((ref) {
+  return (String transcript) async {
+    final key = ref.read(geminiKeyProvider);
+    if (key.isEmpty) {
+      throw StateError('No Gemini API key set');
+    }
+    final parser = BulkVoiceParser(apiKey: key);
+    try {
+      return await parser.parse(transcript);
+    } finally {
+      parser.dispose();
+    }
+  };
+});
 
 class GeminiKeyNotifier extends StateNotifier<String> {
   static const _prefsKey = 'geminiApiKey';
