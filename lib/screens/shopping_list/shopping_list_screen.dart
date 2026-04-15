@@ -947,6 +947,13 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                   child: const Icon(Icons.add),
                 ),
                 const SizedBox(height: 8),
+                FloatingActionButton.small(
+                  heroTag: 'bulk-voice',
+                  onPressed: () => context.push('/list/bulk-voice'),
+                  tooltip: 'Bulk voice add',
+                  child: const Icon(Icons.record_voice_over),
+                ),
+                const SizedBox(height: 8),
                 VoiceFab(householdId: householdId),
               ],
             ),

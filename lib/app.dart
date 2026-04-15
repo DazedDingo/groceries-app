@@ -17,6 +17,7 @@ import 'screens/settings/manage_locations_screen.dart';
 import 'screens/settings/report_issue_screen.dart';
 import 'screens/shopping_list/history_screen.dart';
 import 'screens/shopping_list/templates_screen.dart';
+import 'screens/shopping_list/bulk_voice_screen.dart';
 import 'screens/recipes/recipes_screen.dart';
 import 'screens/recipes/recipe_detail_screen.dart';
 import 'screens/recipes/add_recipe_screen.dart';
@@ -42,6 +43,7 @@ final _router = GoRouter(
           routes: [
             GoRoute(path: 'history', builder: (_, __) => const HistoryScreen()),
             GoRoute(path: 'templates', builder: (_, __) => const TemplatesScreen()),
+            GoRoute(path: 'bulk-voice', builder: (_, __) => const BulkVoiceScreen()),
           ],
         ),
         GoRoute(path: '/pantry', builder: (_, __) => const PantryScreen()),

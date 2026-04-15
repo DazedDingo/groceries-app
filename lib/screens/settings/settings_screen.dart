@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/gemini_key_provider.dart';
 import '../../providers/household_provider.dart';
 import '../../providers/recipe_search_provider.dart';
 import '../../services/notification_service.dart';
@@ -162,6 +163,16 @@ class SettingsScreen extends ConsumerWidget {
                 trailing: Icon(Icons.check, color: Colors.green),
               ),
               _SpoonacularKeyTile(),
+            ],
+          ),
+          const Divider(),
+
+          // --- Bulk voice add ---
+          ExpansionTile(
+            title: const Text('Bulk voice add'),
+            subtitle: const Text('AI parsing for hands-free pantry catalogue'),
+            children: [
+              _GeminiKeyTile(),
             ],
           ),
           const Divider(),
@@ -330,6 +341,130 @@ class _SpoonacularKeyTileState extends ConsumerState<_SpoonacularKeyTile> {
               tooltip: 'Remove key',
               onPressed: () =>
                   ref.read(spoonacularKeyProvider.notifier).set(''),
+            )
+          : const Icon(Icons.chevron_right),
+      onTap: () {
+        _ctrl.text = key;
+        setState(() => _editing = true);
+      },
+    );
+  }
+}
+
+class _GeminiKeyTile extends ConsumerStatefulWidget {
+  @override
+  ConsumerState<_GeminiKeyTile> createState() => _GeminiKeyTileState();
+}
+
+class _GeminiKeyTileState extends ConsumerState<_GeminiKeyTile> {
+  bool _editing = false;
+  final _ctrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final key = ref.watch(geminiKeyProvider);
+    final hasKey = key.isNotEmpty;
+
+    if (_editing) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Gemini API key',
+                style: TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 4),
+            Text(
+              'Powers bulk voice add. The free tier handles thousands of pantry '
+              'sessions per month at no cost.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('How to get a key',
+                      style: Theme.of(context).textTheme.labelLarge),
+                  const SizedBox(height: 6),
+                  const Text('1. Go to aistudio.google.com/app/apikey'),
+                  const Text('2. Sign in with your Google account.'),
+                  const Text('3. Click "Create API key" and copy it.'),
+                  const Text('4. Paste it below.'),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: () => launchUrl(
+                      Uri.parse('https://aistudio.google.com/app/apikey'),
+                      mode: LaunchMode.externalApplication,
+                    ),
+                    icon: const Icon(Icons.open_in_new, size: 16),
+                    label: const Text('Open Google AI Studio'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _ctrl,
+              autofocus: true,
+              decoration: const InputDecoration(
+                hintText: 'Paste API key',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => setState(() => _editing = false),
+                    child: const Text('Cancel'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () async {
+                      await ref
+                          .read(geminiKeyProvider.notifier)
+                          .set(_ctrl.text);
+                      if (!mounted) return;
+                      setState(() => _editing = false);
+                    },
+                    child: const Text('Save'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListTile(
+      leading: const Icon(Icons.auto_awesome),
+      title: const Text('Google Gemini'),
+      subtitle: Text(hasKey ? 'Key saved' : 'Tap to add your free API key'),
+      trailing: hasKey
+          ? IconButton(
+              icon: const Icon(Icons.delete_outline),
+              tooltip: 'Remove key',
+              onPressed: () =>
+                  ref.read(geminiKeyProvider.notifier).set(''),
             )
           : const Icon(Icons.chevron_right),
       onTap: () {
