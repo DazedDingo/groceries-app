@@ -40,13 +40,15 @@ Future<CartReceipt> cartItemDetached(
           .firstOrNull;
 
       if (pantryItem == null) {
-        // Genuinely new item — create a pantry entry.
+        // Genuinely new item — create a pantry entry. Optimal is only set when
+        // the shopping item was flagged recurring; otherwise leave it 0 so the
+        // restocker doesn't fire for one-off purchases.
         createdPantryId = await container.read(pantryServiceProvider).addItem(
           householdId: householdId,
           name: item.name,
           categoryId: item.categoryId,
           preferredStores: item.preferredStores,
-          optimalQuantity: item.quantity,
+          optimalQuantity: item.isRecurring ? item.quantity : 0,
           currentQuantity: item.quantity,
           unit: item.unit,
         );

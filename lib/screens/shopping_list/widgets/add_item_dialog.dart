@@ -43,8 +43,6 @@ class AddItemDialog extends StatefulWidget {
 }
 
 class _AddItemDialogState extends State<AddItemDialog> {
-  // Autocomplete manages its own controller; we only keep a reference to read from it.
-  TextEditingController? _autocompleteCtrl;
   late final TextEditingController _qtyCtrl;
   late final TextEditingController _noteCtrl;
   GroceryCategory? _category;
@@ -52,8 +50,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
   int _quantity = 1;
   String? _unit;
   bool _isRecurring = false;
-
-  String get _nameText => _autocompleteCtrl?.text ?? '';
+  late String _nameText;
 
   @override
   void initState() {
@@ -61,11 +58,11 @@ class _AddItemDialogState extends State<AddItemDialog> {
     _qtyCtrl = TextEditingController(text: '1');
     _noteCtrl = TextEditingController();
     _category = widget.initialCategory;
+    _nameText = widget.initialName;
   }
 
   @override
   void dispose() {
-    // Do NOT dispose _autocompleteCtrl — Autocomplete owns it.
     _qtyCtrl.dispose();
     _noteCtrl.dispose();
     super.dispose();
@@ -81,6 +78,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
   void _onNameChanged(String val) {
     final guess = guessCategory(val, widget.categories, widget.categoryOverrides);
     setState(() {
+      _nameText = val;
       if (guess != null && !_categoryManuallyChanged) _category = guess;
     });
   }
@@ -89,9 +87,11 @@ class _AddItemDialogState extends State<AddItemDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Add item'),
+      scrollable: true,
       content: Column(mainAxisSize: MainAxisSize.min, children: [
         Autocomplete<String>(
           initialValue: TextEditingValue(text: widget.initialName),
+          optionsViewOpenDirection: OptionsViewOpenDirection.up,
           optionsBuilder: (textEditingValue) {
             final raw = textEditingValue.text;
             if (raw.isEmpty) return const Iterable.empty();
@@ -131,12 +131,8 @@ class _AddItemDialogState extends State<AddItemDialog> {
 
             return results.take(10);
           },
-          onSelected: (selection) {
-            _onNameChanged(selection);
-            setState(() {});
-          },
+          onSelected: _onNameChanged,
           fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-            _autocompleteCtrl = controller;
             return TextField(
               controller: controller,
               focusNode: focusNode,
