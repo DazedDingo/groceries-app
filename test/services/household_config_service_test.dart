@@ -56,5 +56,43 @@ void main() {
       expect(keysA['geminiKey'], 'KEY-A');
       expect(keysB['geminiKey'], 'KEY-B');
     });
+
+    test('apiKeysStream emits on every change (reactive)', () async {
+      final updates = <Map<String, String>>[];
+      final sub = service.apiKeysStream('hh1').listen(updates.add);
+      // Initial emission (doc doesn't exist) → empty strings.
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(updates.length, 1);
+      expect(updates.first['geminiKey'], '');
+
+      await service.setKey('hh1', 'geminiKey', 'V1');
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      await service.setKey('hh1', 'geminiKey', 'V2');
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+
+      final gem = updates.map((m) => m['geminiKey']).toList();
+      expect(gem, containsAll(['', 'V1', 'V2']));
+      await sub.cancel();
+    });
+
+    test('setKey on a nonexistent doc creates it', () async {
+      final docPre = await db.doc('households/brandnew/config/apiKeys').get();
+      expect(docPre.exists, false);
+      await service.setKey('brandnew', 'geminiKey', 'hello');
+      final docPost = await db.doc('households/brandnew/config/apiKeys').get();
+      expect(docPost.exists, true);
+      expect(docPost.data()?['geminiKey'], 'hello');
+    });
+
+    test('unknown key names round-trip without touching known fields',
+        () async {
+      // Defensive: the service writes arbitrary field names; new kinds of
+      // keys can be added in future without schema changes.
+      await service.setKey('hh1', 'geminiKey', 'GEM');
+      await service.setKey('hh1', 'futureExternalKey', 'FUTURE');
+      final doc = await db.doc('households/hh1/config/apiKeys').get();
+      expect(doc.data()?['geminiKey'], 'GEM');
+      expect(doc.data()?['futureExternalKey'], 'FUTURE');
+    });
   });
 }

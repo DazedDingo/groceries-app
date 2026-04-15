@@ -197,7 +197,9 @@ class BulkVoiceScreenState extends ConsumerState<BulkVoiceScreen> {
     if (householdId.isEmpty) return;
     final categories = ref.read(categoriesProvider).value ?? [];
     final overrides = ref.read(categoryOverridesProvider).value ?? {};
-    final user = ref.read(authStateProvider).valueOrNull;
+    // Await the auth stream's first emission so attribution doesn't fall
+    // back to "Unknown" when the screen is opened before auth resolves.
+    final user = await ref.read(authStateProvider.future);
     final addedBy = AddedBy(
       uid: user?.uid,
       displayName: user?.displayName ?? 'Unknown',

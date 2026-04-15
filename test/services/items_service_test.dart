@@ -107,6 +107,73 @@ void main() {
       expect(hist.docs.every((d) => d['action'] == 'added'), isTrue);
     });
 
+    test('addItems preserves unit field per item (mixed null/non-null)',
+        () async {
+      const addedBy = AddedBy(
+        uid: 'u1', displayName: 'Alice', source: ItemSource.voiceInApp,
+      );
+      await service.addItems(
+        householdId: 'hh1',
+        items: const [
+          (name: 'apples', categoryId: 'produce', quantity: 6, unit: null),
+          (name: 'flour', categoryId: 'baking', quantity: 1, unit: 'kg'),
+        ],
+        addedBy: addedBy,
+      );
+      final items = await fakeDb.collection('households/hh1/items').get();
+      final apples = items.docs.firstWhere((d) => d['name'] == 'apples');
+      final flour = items.docs.firstWhere((d) => d['name'] == 'flour');
+      expect(apples['unit'], isNull);
+      expect(flour['unit'], 'kg');
+    });
+
+    test('addItems records correct attribution and addedAt timestamp',
+        () async {
+      const addedBy = AddedBy(
+        uid: 'u1', displayName: 'Bob Smith', source: ItemSource.voiceInApp,
+      );
+      await service.addItems(
+        householdId: 'hh1',
+        items: const [
+          (name: 'rice', categoryId: 'pantry', quantity: 1, unit: null),
+        ],
+        addedBy: addedBy,
+      );
+      final items = await fakeDb.collection('households/hh1/items').get();
+      final rice = items.docs.first;
+      expect((rice['addedBy'] as Map)['displayName'], 'Bob Smith');
+      expect((rice['addedBy'] as Map)['uid'], 'u1');
+      expect((rice['addedBy'] as Map)['source'], 'voice_in_app');
+      expect(rice['addedAt'], isNotNull);
+
+      final hist = await fakeDb.collection('households/hh1/history').get();
+      expect(hist.docs.first['byName'], 'Bob Smith');
+    });
+
+    test('addItems isolates writes per household', () async {
+      const addedBy = AddedBy(
+        uid: 'u1', displayName: 'Alice', source: ItemSource.app,
+      );
+      await service.addItems(
+        householdId: 'hh1',
+        items: const [
+          (name: 'milk', categoryId: 'dairy', quantity: 1, unit: null),
+        ],
+        addedBy: addedBy,
+      );
+      await service.addItems(
+        householdId: 'hh2',
+        items: const [
+          (name: 'eggs', categoryId: 'dairy', quantity: 12, unit: null),
+        ],
+        addedBy: addedBy,
+      );
+      final hh1 = await fakeDb.collection('households/hh1/items').get();
+      final hh2 = await fakeDb.collection('households/hh2/items').get();
+      expect(hh1.docs.map((d) => d['name']).toList(), ['milk']);
+      expect(hh2.docs.map((d) => d['name']).toList(), ['eggs']);
+    });
+
     test('addItems with empty list is a no-op', () async {
       const addedBy = AddedBy(
         uid: 'u1', displayName: 'Alice', source: ItemSource.app,
