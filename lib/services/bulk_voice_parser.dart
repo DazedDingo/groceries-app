@@ -38,7 +38,7 @@ class BulkVoiceParser {
 
   static const _endpoint =
       'https://generativelanguage.googleapis.com/v1beta/models/'
-      'gemini-2.5-flash:generateContent';
+      'gemini-2.5-flash-lite:generateContent';
 
   static const _systemInstruction = '''
 You convert spoken pantry/grocery cataloguing transcripts into a clean JSON list.

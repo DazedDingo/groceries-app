@@ -56,6 +56,40 @@ class ItemsService {
     await batch.commit();
   }
 
+  /// Bulk add: writes all items + their history entries in a single batch.
+  /// More efficient than looping `addItem` and avoids partial-write states.
+  Future<void> addItems({
+    required String householdId,
+    required List<({String name, String categoryId, int quantity, String? unit})> items,
+    required AddedBy addedBy,
+  }) async {
+    if (items.isEmpty) return;
+    final batch = _db.batch();
+    for (final item in items) {
+      final itemRef = _db.collection('households/$householdId/items').doc();
+      batch.set(itemRef, {
+        'name': item.name,
+        'quantity': item.quantity,
+        'unit': item.unit,
+        'note': null,
+        'categoryId': item.categoryId,
+        'preferredStores': <String>[],
+        'pantryItemId': null,
+        'recipeSource': null,
+        'isRecurring': false,
+        'addedBy': addedBy.toMap(),
+        'addedAt': FieldValue.serverTimestamp(),
+      });
+      final histRef = _db.collection('households/$householdId/history').doc();
+      batch.set(histRef, HistoryEntry.toMap(
+        itemName: item.name, categoryId: item.categoryId,
+        action: HistoryAction.added, quantity: item.quantity,
+        byName: addedBy.displayName,
+      ));
+    }
+    await batch.commit();
+  }
+
   Future<void> updateItem({
     required String householdId,
     required String itemId,

@@ -7,11 +7,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:groceries_app/providers/auth_provider.dart';
+import 'package:groceries_app/providers/household_key_notifier.dart';
 import 'package:groceries_app/providers/household_provider.dart';
 import 'package:groceries_app/providers/recipe_search_provider.dart';
 import 'package:groceries_app/providers/recipes_provider.dart';
 import 'package:groceries_app/screens/recipes/discover_recipes_screen.dart';
 import 'package:groceries_app/services/auth_service.dart';
+import 'package:groceries_app/services/household_config_service.dart';
 import 'package:groceries_app/services/household_service.dart';
 import 'package:groceries_app/services/recipe_search_service.dart';
 import 'package:groceries_app/services/recipes_service.dart';
@@ -61,6 +63,8 @@ Widget _wrap({
       authStateProvider.overrideWith((ref) => Stream.value(mockUser)),
       authServiceProvider.overrideWithValue(AuthService(auth: auth)),
       recipesServiceProvider.overrideWithValue(RecipesService(db: db)),
+      householdConfigServiceProvider
+          .overrideWithValue(HouseholdConfigService(db: db)),
     ],
     child: MaterialApp.router(routerConfig: router),
   );
@@ -73,9 +77,11 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  Future<void> setSpoonacularKey(String v) async {
-    SharedPreferences.setMockInitialValues(
-        v.isEmpty ? {} : {'spoonacularApiKey': v});
+  Future<void> seedSpoonacularKey(FakeFirebaseFirestore db, String v) async {
+    if (v.isEmpty) return;
+    await db
+        .doc('households/hh1/config/apiKeys')
+        .set({'spoonacularKey': v});
   }
 
   testWidgets('shows TheMealDB selected by default and empty state prompt',
@@ -114,12 +120,13 @@ void main() {
   });
 
   testWidgets('Spoonacular banner hidden when key is set', (tester) async {
-    await setSpoonacularKey('MY-KEY');
+    final db = FakeFirebaseFirestore();
+    await seedSpoonacularKey(db, 'MY-KEY');
     final client = MockClient((req) async => http.Response('{}', 200));
     final service = RecipeSearchService(client: client);
     await tester.pumpWidget(_wrap(
       searchService: service,
-      db: FakeFirebaseFirestore(),
+      db: db,
     ));
     await tester.pumpAndSettle();
 

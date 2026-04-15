@@ -205,36 +205,38 @@ class BulkVoiceScreenState extends ConsumerState<BulkVoiceScreen> {
     );
     final service = ref.read(itemsServiceProvider);
 
-    int success = 0;
-    final failures = <String>[];
-    for (final item in _items) {
-      try {
-        final cat = guessCategory(item.name, categories, overrides);
-        await service.addItem(
-          householdId: householdId,
-          name: item.name,
-          categoryId: cat?.id ?? 'uncategorised',
-          preferredStores: [],
-          pantryItemId: null,
-          quantity: item.quantity,
-          unit: item.unit,
-          addedBy: addedBy,
-        );
-        success++;
-      } catch (e) {
-        failures.add('${item.name}: $e');
-      }
+    final payload = _items.map((item) {
+      final cat = guessCategory(item.name, categories, overrides);
+      return (
+        name: item.name,
+        categoryId: cat?.id ?? 'uncategorised',
+        quantity: item.quantity,
+        unit: item.unit,
+      );
+    }).toList();
+
+    int added = 0;
+    String? error;
+    try {
+      await service.addItems(
+        householdId: householdId,
+        items: payload,
+        addedBy: addedBy,
+      );
+      added = payload.length;
+    } catch (e) {
+      error = e.toString();
     }
 
     if (!mounted) return;
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     messenger.showSnackBar(SnackBar(
-      content: Text(failures.isEmpty
-          ? 'Added $success items to your list'
-          : 'Added $success, failed ${failures.length}'),
+      content: Text(error == null
+          ? 'Added $added items to your list'
+          : 'Bulk add failed: $error'),
     ));
-    navigator.pop();
+    if (error == null) navigator.pop();
   }
 
   void _editItem(int index) async {

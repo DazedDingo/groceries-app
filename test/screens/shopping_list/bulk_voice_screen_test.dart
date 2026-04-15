@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:groceries_app/providers/auth_provider.dart';
 import 'package:groceries_app/providers/categories_provider.dart';
 import 'package:groceries_app/providers/gemini_key_provider.dart';
+import 'package:groceries_app/providers/household_key_notifier.dart';
 import 'package:groceries_app/providers/household_provider.dart';
 import 'package:groceries_app/providers/items_provider.dart';
 import 'package:groceries_app/screens/shopping_list/bulk_voice_screen.dart';
@@ -14,6 +15,7 @@ import 'package:groceries_app/services/auth_service.dart';
 import 'package:groceries_app/services/bulk_voice_parser.dart';
 import 'package:groceries_app/services/categories_service.dart';
 import 'package:groceries_app/services/category_overrides.dart';
+import 'package:groceries_app/services/household_config_service.dart';
 import 'package:groceries_app/services/household_service.dart';
 import 'package:groceries_app/services/items_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,6 +50,8 @@ Widget _wrap({
       categoriesServiceProvider.overrideWithValue(CategoriesService(db: db)),
       categoryOverrideServiceProvider
           .overrideWithValue(CategoryOverrideService(db: db)),
+      householdConfigServiceProvider
+          .overrideWithValue(HouseholdConfigService(db: db)),
       bulkVoiceParseFnProvider.overrideWithValue(parser.call),
     ],
     child: MaterialApp(
@@ -92,7 +96,6 @@ void main() {
   });
 
   testWidgets('renders parsed items and bulk-adds to Firestore', (tester) async {
-    SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
     final db = FakeFirebaseFirestore();
     final parser = _FakeParser((_) async => []);
     await tester.pumpWidget(_wrap(db: db, parser: parser));
@@ -111,12 +114,17 @@ void main() {
     expect(find.text('bread'), findsOneWidget);
     expect(find.text('Items (2)'), findsOneWidget);
 
-    await tester.runAsync(() async {
-      await tester.tap(find.widgetWithText(FilledButton, 'Add 2 to list'));
-      // Drain pending real-async work (Firestore writes via fake plugin).
-      await Future<void>.delayed(const Duration(milliseconds: 50));
-    });
-    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Add 2 to list'));
+    // The bulk add is async; pump multiple frames + use runAsync so the
+    // fake firestore batch.commit can resolve.
+    for (var i = 0; i < 10; i++) {
+      await tester.runAsync(() => Future<void>.delayed(
+            const Duration(milliseconds: 50),
+          ));
+      await tester.pump();
+      final snap = await db.collection('households/hh1/items').get();
+      if (snap.docs.length >= 2) break;
+    }
 
     final snap = await db.collection('households/hh1/items').get();
     expect(snap.docs.length, 2);

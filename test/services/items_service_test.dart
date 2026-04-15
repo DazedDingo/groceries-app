@@ -79,6 +79,47 @@ void main() {
       expect(hist.docs.first['quantity'], 2);
     });
 
+    test('addItems writes all items + history entries in one batch', () async {
+      const addedBy = AddedBy(
+        uid: 'u1', displayName: 'Alice', source: ItemSource.voiceInApp,
+      );
+      await service.addItems(
+        householdId: 'hh1',
+        items: const [
+          (name: 'milk', categoryId: 'dairy', quantity: 1, unit: null),
+          (name: 'flour', categoryId: 'baking', quantity: 2, unit: 'kg'),
+          (name: 'eggs', categoryId: 'dairy', quantity: 12, unit: null),
+        ],
+        addedBy: addedBy,
+      );
+
+      final items = await fakeDb.collection('households/hh1/items').get();
+      expect(items.docs.length, 3);
+      final names = items.docs.map((d) => d['name']).toSet();
+      expect(names, {'milk', 'flour', 'eggs'});
+      final flour = items.docs.firstWhere((d) => d['name'] == 'flour');
+      expect(flour['unit'], 'kg');
+      expect(flour['quantity'], 2);
+
+      final hist = await fakeDb.collection('households/hh1/history').get();
+      expect(hist.docs.length, 3,
+          reason: 'each addItems entry should also create a history record');
+      expect(hist.docs.every((d) => d['action'] == 'added'), isTrue);
+    });
+
+    test('addItems with empty list is a no-op', () async {
+      const addedBy = AddedBy(
+        uid: 'u1', displayName: 'Alice', source: ItemSource.app,
+      );
+      await service.addItems(
+        householdId: 'hh1',
+        items: const [],
+        addedBy: addedBy,
+      );
+      final items = await fakeDb.collection('households/hh1/items').get();
+      expect(items.docs, isEmpty);
+    });
+
     test('updateItem persists summed quantity for the merge flow', () async {
       // Shopping-list "Add to quantity" path calls updateItem with
       // target.quantity + result.quantity. Verifies the primitive that
