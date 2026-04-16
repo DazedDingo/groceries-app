@@ -34,7 +34,7 @@ A shared household grocery app built with Flutter and Firebase. Create a househo
 - US / metric unit toggle with automatic conversion
 - Color-coded, customizable categories
 - Push notifications for restock nudges and household events
-- Material 3 themed UI
+- Material 3 themed UI with an optional **refined** variant (sage palette, rounded cards, tighter typography) — toggleable in Settings
 
 ## Tech Stack
 
