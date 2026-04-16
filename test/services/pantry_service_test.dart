@@ -101,6 +101,35 @@ void main() {
       expect(snap.docs, isEmpty);
     });
 
+    test('deleteItems removes only the listed ids in a single batch', () async {
+      await seedItem(id: 'p1');
+      await fakeDb.doc('households/hh1/pantry/p2').set({
+        'name': 'Bread', 'categoryId': 'bakery', 'preferredStores': [],
+        'optimalQuantity': 1, 'currentQuantity': 1,
+        'restockAfterDays': null, 'lastNudgedAt': null, 'lastPurchasedAt': null,
+        'isHighPriority': false,
+      });
+      await fakeDb.doc('households/hh1/pantry/p3').set({
+        'name': 'Cheese', 'categoryId': 'dairy', 'preferredStores': [],
+        'optimalQuantity': 1, 'currentQuantity': 1,
+        'restockAfterDays': null, 'lastNudgedAt': null, 'lastPurchasedAt': null,
+        'isHighPriority': false,
+      });
+
+      await service.deleteItems(householdId: 'hh1', itemIds: ['p1', 'p3']);
+
+      final snap = await fakeDb.collection('households/hh1/pantry').get();
+      expect(snap.docs.length, 1);
+      expect(snap.docs.first.id, 'p2');
+    });
+
+    test('deleteItems with empty list is a no-op', () async {
+      await seedItem();
+      await service.deleteItems(householdId: 'hh1', itemIds: const []);
+      final snap = await fakeDb.collection('households/hh1/pantry').get();
+      expect(snap.docs.length, 1);
+    });
+
     test('pantryStream defaults isHighPriority to false for legacy items', () async {
       // Legacy items written before the field existed have no isHighPriority key
       await fakeDb.doc('households/hh1/pantry/legacy').set({

@@ -8,11 +8,17 @@ class PantryItemTile extends StatelessWidget {
   final VoidCallback onIncrement;
   final VoidCallback onAddToList;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
+  final bool isSelecting;
+  final bool isSelected;
 
   const PantryItemTile({
     super.key, required this.item, required this.categoryName,
     required this.onDecrement, required this.onIncrement,
     required this.onAddToList, required this.onTap,
+    this.onLongPress,
+    this.isSelecting = false,
+    this.isSelected = false,
   });
 
   @override
@@ -20,6 +26,11 @@ class PantryItemTile extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return ListTile(
       onTap: onTap,
+      onLongPress: onLongPress,
+      selected: isSelected,
+      leading: isSelecting
+          ? Checkbox(value: isSelected, onChanged: (_) => onTap())
+          : null,
       title: Row(
         children: [
           Expanded(child: Text(item.name)),
@@ -70,22 +81,24 @@ class PantryItemTile extends StatelessWidget {
             ),
         ],
       ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.remove),
-            onPressed: onDecrement,
-            visualDensity: VisualDensity.compact,
-          ),
-          Text('${item.currentQuantity}', style: const TextStyle(fontSize: 16)),
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: onIncrement,
-            visualDensity: VisualDensity.compact,
-          ),
-        ],
-      ),
+      trailing: isSelecting
+          ? null
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.remove),
+                  onPressed: onDecrement,
+                  visualDensity: VisualDensity.compact,
+                ),
+                Text('${item.currentQuantity}', style: const TextStyle(fontSize: 16)),
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: onIncrement,
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
+            ),
     );
   }
 

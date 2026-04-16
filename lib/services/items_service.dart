@@ -120,6 +120,28 @@ class ItemsService {
     await batch.commit();
   }
 
+  /// Bulk-delete shopping items. Each item gets its own history entry so the
+  /// audit log reflects one "deleted" line per item (matching single-delete
+  /// behaviour) rather than a single bulk marker that readers would have to
+  /// special-case.
+  Future<void> deleteItems({
+    required String householdId,
+    required List<ShoppingItem> items,
+  }) async {
+    if (items.isEmpty) return;
+    final batch = _db.batch();
+    for (final item in items) {
+      batch.delete(_db.doc('households/$householdId/items/${item.id}'));
+      final histRef = _db.collection('households/$householdId/history').doc();
+      batch.set(histRef, HistoryEntry.toMap(
+        itemName: item.name, categoryId: item.categoryId,
+        action: HistoryAction.deleted, quantity: item.quantity,
+        byName: item.addedBy.displayName,
+      ));
+    }
+    await batch.commit();
+  }
+
   Future<void> checkOff({
     required String householdId,
     required ShoppingItem item,

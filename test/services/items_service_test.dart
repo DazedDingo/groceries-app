@@ -187,6 +187,33 @@ void main() {
       expect(items.docs, isEmpty);
     });
 
+    test('deleteItems removes all items + writes one history row each', () async {
+      // Bulk delete should mirror single-delete: one Firestore delete + one
+      // history "deleted" entry per item, all in a single atomic batch.
+      final a = await seedItem(id: 'a', name: 'Apples', quantity: 4);
+      final b = await seedItem(id: 'b', name: 'Bread', quantity: 1);
+      final c = await seedItem(id: 'c', name: 'Cheese', quantity: 2);
+
+      await service.deleteItems(householdId: 'hh1', items: [a, b, c]);
+
+      final items = await fakeDb.collection('households/hh1/items').get();
+      expect(items.docs, isEmpty);
+      final hist = await fakeDb.collection('households/hh1/history').get();
+      expect(hist.docs.length, 3);
+      expect(hist.docs.every((d) => d['action'] == 'deleted'), isTrue);
+      final names = hist.docs.map((d) => d['itemName']).toSet();
+      expect(names, {'Apples', 'Bread', 'Cheese'});
+    });
+
+    test('deleteItems with empty list is a no-op', () async {
+      await seedItem(id: 'a');
+      await service.deleteItems(householdId: 'hh1', items: const []);
+      final items = await fakeDb.collection('households/hh1/items').get();
+      expect(items.docs.length, 1);
+      final hist = await fakeDb.collection('households/hh1/history').get();
+      expect(hist.docs, isEmpty);
+    });
+
     test('updateItem persists summed quantity for the merge flow', () async {
       // Shopping-list "Add to quantity" path calls updateItem with
       // target.quantity + result.quantity. Verifies the primitive that

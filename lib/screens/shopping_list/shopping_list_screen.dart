@@ -325,6 +325,52 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
     }
   }
 
+  Future<void> _deleteSelected(String householdId, List<ShoppingItem> allItems) async {
+    final selected = allItems.where((i) => _selectedIds.contains(i.id)).toList();
+    if (selected.isEmpty) return;
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Delete ${selected.length} item${selected.length == 1 ? '' : 's'}?'),
+        content: const Text('This removes the selected items from your shopping list. They will not be added to the pantry.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(ctx).colorScheme.error),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+
+    for (final item in selected) {
+      _knownItemIds.add(item.id);
+    }
+    try {
+      await ref.read(itemsServiceProvider).deleteItems(
+        householdId: householdId, items: selected,
+      );
+      if (mounted) {
+        setState(() {
+          _selecting = false;
+          _selectedIds.clear();
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Deleted ${selected.length} item${selected.length == 1 ? '' : 's'}')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete: $e')),
+        );
+      }
+    }
+  }
+
   Future<void> _confirmBought(String householdId, List<ShoppingItem> allItems) async {
     final selected = allItems.where((i) => _selectedIds.contains(i.id)).toList();
     if (selected.isEmpty) return;
@@ -920,15 +966,35 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: FilledButton.icon(
-                  onPressed: _selectedIds.isEmpty
-                      ? null
-                      : () => _confirmBought(householdId, allItems),
-                  icon: const Icon(Icons.shopping_bag),
-                  label: Text('Confirm ${_selectedIds.length} bought'),
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size.fromHeight(48),
-                  ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _selectedIds.isEmpty
+                            ? null
+                            : () => _deleteSelected(householdId, allItems),
+                        icon: const Icon(Icons.delete_outline),
+                        label: Text('Delete ${_selectedIds.length}'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Theme.of(context).colorScheme.error,
+                          minimumSize: const Size.fromHeight(48),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: _selectedIds.isEmpty
+                            ? null
+                            : () => _confirmBought(householdId, allItems),
+                        icon: const Icon(Icons.shopping_bag),
+                        label: Text('Confirm ${_selectedIds.length}'),
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size.fromHeight(48),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

@@ -66,4 +66,16 @@ class RecipesService {
   }) async {
     await _db.doc('households/$householdId/recipes/$recipeId').delete();
   }
+
+  Future<void> deleteRecipes({
+    required String householdId,
+    required List<String> recipeIds,
+  }) async {
+    if (recipeIds.isEmpty) return;
+    final batch = _db.batch();
+    for (final id in recipeIds) {
+      batch.delete(_db.doc('households/$householdId/recipes/$id'));
+    }
+    await batch.commit();
+  }
 }

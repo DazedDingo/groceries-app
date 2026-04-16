@@ -114,4 +114,18 @@ class PantryService {
   Future<void> deleteItem(String householdId, String itemId) async {
     await _db.doc('households/$householdId/pantry/$itemId').delete();
   }
+
+  /// Bulk-delete pantry items in a single batch. Pantry has no history log,
+  /// so this is just N deletes committed atomically.
+  Future<void> deleteItems({
+    required String householdId,
+    required List<String> itemIds,
+  }) async {
+    if (itemIds.isEmpty) return;
+    final batch = _db.batch();
+    for (final id in itemIds) {
+      batch.delete(_db.doc('households/$householdId/pantry/$id'));
+    }
+    await batch.commit();
+  }
 }

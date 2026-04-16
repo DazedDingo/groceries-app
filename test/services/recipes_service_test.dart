@@ -63,6 +63,29 @@ void main() {
     expect(recipes, isEmpty);
   });
 
+  test('deleteRecipes removes only the listed ids in one batch', () async {
+    final a = await service.addRecipe(
+        householdId: hid, name: 'Recipe A', ingredients: const []);
+    final b = await service.addRecipe(
+        householdId: hid, name: 'Recipe B', ingredients: const []);
+    final c = await service.addRecipe(
+        householdId: hid, name: 'Recipe C', ingredients: const []);
+
+    await service.deleteRecipes(householdId: hid, recipeIds: [a, c]);
+
+    final remaining = await service.recipesStream(hid).first;
+    expect(remaining.length, 1);
+    expect(remaining.first.id, b);
+  });
+
+  test('deleteRecipes with empty list is a no-op', () async {
+    await service.addRecipe(
+        householdId: hid, name: 'Survivor', ingredients: const []);
+    await service.deleteRecipes(householdId: hid, recipeIds: const []);
+    final remaining = await service.recipesStream(hid).first;
+    expect(remaining.length, 1);
+  });
+
   test('addRecipe persists addedBy fields and addedAt timestamp', () async {
     final id = await service.addRecipe(
       householdId: hid,

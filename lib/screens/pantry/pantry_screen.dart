@@ -17,11 +17,87 @@ import '../shared/empty_state.dart';
 import 'bulk_voice_screen.dart';
 import 'widgets/pantry_item_tile.dart';
 
-class PantryScreen extends ConsumerWidget {
+class PantryScreen extends ConsumerStatefulWidget {
   const PantryScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PantryScreen> createState() => _PantryScreenState();
+}
+
+class _PantryScreenState extends ConsumerState<PantryScreen> {
+  final Set<String> _selectedIds = {};
+  bool _selecting = false;
+
+  void _enterSelecting(String id) {
+    setState(() {
+      _selecting = true;
+      _selectedIds.add(id);
+    });
+  }
+
+  void _toggleSelection(String id) {
+    setState(() {
+      if (_selectedIds.contains(id)) {
+        _selectedIds.remove(id);
+        if (_selectedIds.isEmpty) _selecting = false;
+      } else {
+        _selectedIds.add(id);
+      }
+    });
+  }
+
+  void _cancelSelecting() {
+    setState(() {
+      _selecting = false;
+      _selectedIds.clear();
+    });
+  }
+
+  Future<void> _deleteSelected(String householdId) async {
+    final ids = _selectedIds.toList();
+    if (ids.isEmpty) return;
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Delete ${ids.length} pantry item${ids.length == 1 ? '' : 's'}?'),
+        content: const Text('This permanently removes the selected items from your pantry. Linked shopping list items are unaffected.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(ctx).colorScheme.error),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+
+    try {
+      await ref.read(pantryServiceProvider).deleteItems(
+        householdId: householdId, itemIds: ids,
+      );
+      if (mounted) {
+        setState(() {
+          _selecting = false;
+          _selectedIds.clear();
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Deleted ${ids.length} pantry item${ids.length == 1 ? '' : 's'}')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete: $e')),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final pantry = ref.watch(filteredPantryProvider);
     final selectedCat = ref.watch(pantrySelectedCategoryProvider);
     final householdId = ref.watch(householdIdProvider).value ?? '';
@@ -66,10 +142,13 @@ class PantryScreen extends ConsumerWidget {
       }
     }
 
-    Widget buildTile(item) => PantryItemTile(
+    Widget buildTile(PantryItem item) => PantryItemTile(
       key: Key(item.id),
       item: item,
       categoryName: categoryName(item.categoryId),
+      isSelecting: _selecting,
+      isSelected: _selectedIds.contains(item.id),
+      onLongPress: () => _enterSelecting(item.id),
       onDecrement: () => pantryService.decrementQuantity(
           householdId: householdId, itemId: item.id, current: item.currentQuantity),
       onIncrement: () => pantryService.incrementQuantity(
@@ -87,45 +166,63 @@ class PantryScreen extends ConsumerWidget {
           source: ItemSource.app,
         ),
       ),
-      onTap: () => context.push('/pantry/${item.id}'),
+      onTap: () {
+        if (_selecting) {
+          _toggleSelection(item.id);
+        } else {
+          context.push('/pantry/${item.id}');
+        }
+      },
     );
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pantry'),
-        actions: [
-          const HelpButton(
-            screenTitle: 'Pantry',
-            sections: [
-              HelpSection(icon: Icons.touch_app, title: 'Opening an item',
-                  body: 'Tap any item to open its detail screen, where you can set optimal quantity, shelf life, location, and high-priority toggle.'),
-              HelpSection(icon: Icons.exposure, title: 'Adjusting stock',
-                  body: 'Use the + and - buttons on each tile to change the current quantity without opening the detail screen.'),
-              HelpSection(icon: Icons.add_shopping_cart, title: 'Adding to list',
-                  body: 'When an item is below optimal, tap "Add to list" on the tile to request a restock on your shopping list.'),
-              HelpSection(icon: Icons.star, title: 'High priority',
-                  body: 'Mark an item high priority in its detail screen. It will float to the top of your shopping list and trigger restock nudges immediately when low.'),
-              HelpSection(icon: Icons.warning_amber, title: 'Stock indicators',
-                  body: 'Warning icon = below optimal quantity. Expiry banners appear at the top when items are expired or expiring soon.'),
-              HelpSection(icon: Icons.place, title: 'Locations',
-                  body: 'Set Fridge, Freezer, Pantry, Counter, or Other on each item so you know exactly where to look at home.'),
-            ],
-          ),
-          IconButton(
-            icon: const Icon(Icons.mic),
-            tooltip: 'Bulk voice add',
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const PantryBulkVoiceScreen(),
-              ),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.playlist_add),
-            onPressed: () => _showBulkAddDialog(context, ref, householdId, categories),
-            tooltip: 'Bulk add',
-          ),
-        ],
+        title: _selecting
+            ? Text('${_selectedIds.length} selected')
+            : const Text('Pantry'),
+        actions: _selecting
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: _cancelSelecting,
+                  tooltip: 'Cancel selection',
+                ),
+              ]
+            : [
+                const HelpButton(
+                  screenTitle: 'Pantry',
+                  sections: [
+                    HelpSection(icon: Icons.touch_app, title: 'Opening an item',
+                        body: 'Tap any item to open its detail screen, where you can set optimal quantity, shelf life, location, and high-priority toggle.'),
+                    HelpSection(icon: Icons.exposure, title: 'Adjusting stock',
+                        body: 'Use the + and - buttons on each tile to change the current quantity without opening the detail screen.'),
+                    HelpSection(icon: Icons.add_shopping_cart, title: 'Adding to list',
+                        body: 'When an item is below optimal, tap "Add to list" on the tile to request a restock on your shopping list.'),
+                    HelpSection(icon: Icons.star, title: 'High priority',
+                        body: 'Mark an item high priority in its detail screen. It will float to the top of your shopping list and trigger restock nudges immediately when low.'),
+                    HelpSection(icon: Icons.warning_amber, title: 'Stock indicators',
+                        body: 'Warning icon = below optimal quantity. Expiry banners appear at the top when items are expired or expiring soon.'),
+                    HelpSection(icon: Icons.place, title: 'Locations',
+                        body: 'Set Fridge, Freezer, Pantry, Counter, or Other on each item so you know exactly where to look at home.'),
+                    HelpSection(icon: Icons.select_all, title: 'Bulk delete',
+                        body: 'Long-press any item to enter selection mode, then tap multiple items and use "Delete" to remove them in one go.'),
+                  ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.mic),
+                  tooltip: 'Bulk voice add',
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const PantryBulkVoiceScreen(),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.playlist_add),
+                  onPressed: () => _showBulkAddDialog(context, ref, householdId, categories),
+                  tooltip: 'Bulk add',
+                ),
+              ],
       ),
       body: Column(
         children: [
@@ -263,12 +360,31 @@ class PantryScreen extends ConsumerWidget {
                     ],
                   ),
           ),
+          if (_selecting)
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: FilledButton.icon(
+                  onPressed: _selectedIds.isEmpty
+                      ? null
+                      : () => _deleteSelected(householdId),
+                  icon: const Icon(Icons.delete_outline),
+                  label: Text('Delete ${_selectedIds.length}'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                    minimumSize: const Size.fromHeight(48),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddDialog(context, ref, householdId, categories),
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: _selecting
+          ? null
+          : FloatingActionButton(
+              onPressed: () => _showAddDialog(context, ref, householdId, categories),
+              child: const Icon(Icons.add),
+            ),
     );
   }
 
