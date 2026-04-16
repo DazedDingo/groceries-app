@@ -72,6 +72,35 @@ void main() {
       expect(items.first.isHighPriority, isTrue);
     });
 
+    test('addItems writes all rows in a single batch with provided current/optimal', () async {
+      await service.addItems(householdId: 'hh1', items: [
+        (name: 'Pasta', categoryId: 'pantry', currentQuantity: 3, optimalQuantity: 6, unit: null),
+        (name: 'Tomato tins', categoryId: 'pantry', currentQuantity: 0, optimalQuantity: 4, unit: null),
+        (name: 'Olive oil', categoryId: 'pantry', currentQuantity: 1, optimalQuantity: 1, unit: 'L'),
+      ]);
+      final snap = await fakeDb.collection('households/hh1/pantry').get();
+      expect(snap.docs.length, 3);
+      final byName = {for (final d in snap.docs) d['name']: d.data()};
+      expect(byName['Pasta']!['currentQuantity'], 3);
+      expect(byName['Pasta']!['optimalQuantity'], 6);
+      expect(byName['Tomato tins']!['currentQuantity'], 0);
+      expect(byName['Tomato tins']!['optimalQuantity'], 4);
+      expect(byName['Olive oil']!['unit'], 'L');
+      // Every row gets the defaulted fields so the document shape matches
+      // what addItem() produces — downstream readers don't need special cases.
+      for (final d in snap.docs) {
+        expect(d['preferredStores'], <String>[]);
+        expect(d['location'], isNull);
+        expect(d['expiresAt'], isNull);
+      }
+    });
+
+    test('addItems is a no-op on an empty payload (no writes, no throw)', () async {
+      await service.addItems(householdId: 'hh1', items: []);
+      final snap = await fakeDb.collection('households/hh1/pantry').get();
+      expect(snap.docs, isEmpty);
+    });
+
     test('pantryStream defaults isHighPriority to false for legacy items', () async {
       // Legacy items written before the field existed have no isHighPriority key
       await fakeDb.doc('households/hh1/pantry/legacy').set({

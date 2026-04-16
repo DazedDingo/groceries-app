@@ -38,6 +38,43 @@ class PantryService {
     return ref.id;
   }
 
+  /// Bulk-create pantry items in a single atomic batch. Used by the voice
+  /// bulk-add flow so a dictated list lands together rather than trickling in
+  /// one Firestore round-trip per item. Callers provide both `currentQuantity`
+  /// (what's on hand right now) and `optimalQuantity` (target stock level) —
+  /// the voice review UI lets the user split them per item before committing.
+  Future<void> addItems({
+    required String householdId,
+    required List<({
+      String name,
+      String categoryId,
+      int currentQuantity,
+      int optimalQuantity,
+      String? unit,
+    })> items,
+  }) async {
+    if (items.isEmpty) return;
+    final batch = _db.batch();
+    final col = _db.collection('households/$householdId/pantry');
+    for (final item in items) {
+      batch.set(col.doc(), {
+        'name': item.name,
+        'categoryId': item.categoryId,
+        'preferredStores': <String>[],
+        'optimalQuantity': item.optimalQuantity,
+        'currentQuantity': item.currentQuantity,
+        'restockAfterDays': null,
+        'shelfLifeDays': null,
+        'unit': item.unit,
+        'expiresAt': null,
+        'lastNudgedAt': null,
+        'lastPurchasedAt': null,
+        'location': null,
+      });
+    }
+    await batch.commit();
+  }
+
   Future<void> updateItem(String householdId, String itemId, Map<String, dynamic> updates) async {
     await _db.doc('households/$householdId/pantry/$itemId').update(updates);
   }

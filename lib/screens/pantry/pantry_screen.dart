@@ -14,6 +14,7 @@ import '../../services/category_guesser.dart';
 import '../../services/text_item_parser.dart';
 import '../shared/bulk_add_dialog.dart';
 import '../shared/empty_state.dart';
+import 'bulk_voice_screen.dart';
 import 'widgets/pantry_item_tile.dart';
 
 class PantryScreen extends ConsumerWidget {
@@ -109,6 +110,15 @@ class PantryScreen extends ConsumerWidget {
               HelpSection(icon: Icons.place, title: 'Locations',
                   body: 'Set Fridge, Freezer, Pantry, Counter, or Other on each item so you know exactly where to look at home.'),
             ],
+          ),
+          IconButton(
+            icon: const Icon(Icons.mic),
+            tooltip: 'Bulk voice add',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const PantryBulkVoiceScreen(),
+              ),
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.playlist_add),
