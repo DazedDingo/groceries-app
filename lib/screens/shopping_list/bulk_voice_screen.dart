@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import '../../models/item.dart';
 import '../../providers/auth_provider.dart';
@@ -19,7 +21,17 @@ class BulkVoiceScreen extends ConsumerStatefulWidget {
   /// When true, skip mic init (used by widget tests so STT doesn't try to
   /// touch a real platform channel).
   final bool autoStartListening;
-  const BulkVoiceScreen({super.key, this.autoStartListening = true});
+
+  /// How long of a gap in incoming speech results before the app auto-advances
+  /// to the next item (plays a ding + commits the live transcript). Overridable
+  /// for tests; runtime default is 2500 ms.
+  final Duration silenceAutoAdvance;
+
+  const BulkVoiceScreen({
+    super.key,
+    this.autoStartListening = true,
+    this.silenceAutoAdvance = const Duration(milliseconds: 2500),
+  });
   @override
   ConsumerState<BulkVoiceScreen> createState() => BulkVoiceScreenState();
 }
@@ -34,6 +46,7 @@ class BulkVoiceScreenState extends ConsumerState<BulkVoiceScreen> {
   String _liveTranscript = '';
   String _committedTranscript = '';
   Timer? _debounce;
+  Timer? _silenceTimer;
   List<ParsedVoiceItem> _items = [];
   String? _errorMessage;
   int _parseSeq = 0;
@@ -50,6 +63,14 @@ class BulkVoiceScreenState extends ConsumerState<BulkVoiceScreen> {
   @visibleForTesting
   Future<void> triggerParseForTest() => _runParse();
 
+  @visibleForTesting
+  void setListeningForTest(bool v) {
+    _listening = v;
+  }
+
+  @visibleForTesting
+  void triggerSilenceTimeoutForTest() => _onSilenceTimeout();
+
   String get _fullTranscript {
     if (_liveTranscript.isEmpty) return _committedTranscript;
     if (_committedTranscript.isEmpty) return _liveTranscript;
@@ -65,6 +86,7 @@ class BulkVoiceScreenState extends ConsumerState<BulkVoiceScreen> {
   @override
   void dispose() {
     _debounce?.cancel();
+    _silenceTimer?.cancel();
     _speech.cancel();
     super.dispose();
   }
@@ -100,19 +122,7 @@ class BulkVoiceScreenState extends ConsumerState<BulkVoiceScreen> {
       _errorMessage = null;
     });
     _speech.listen(
-      onResult: (result) {
-        if (!mounted) return;
-        setState(() {
-          _liveTranscript = result.recognizedWords;
-        });
-        if (result.finalResult) {
-          _committedTranscript = _committedTranscript.isEmpty
-              ? _liveTranscript
-              : '$_committedTranscript $_liveTranscript';
-          _liveTranscript = '';
-          _scheduleParse();
-        }
-      },
+      onResult: _onSpeechResult,
       listenFor: const Duration(minutes: 5),
       pauseFor: const Duration(seconds: 4),
       listenOptions: SpeechListenOptions(
@@ -123,21 +133,61 @@ class BulkVoiceScreenState extends ConsumerState<BulkVoiceScreen> {
     );
   }
 
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    if (!mounted) return;
+    setState(() {
+      _liveTranscript = result.recognizedWords;
+    });
+    if (result.finalResult) {
+      _committedTranscript = _committedTranscript.isEmpty
+          ? _liveTranscript
+          : '$_committedTranscript $_liveTranscript';
+      _liveTranscript = '';
+      _scheduleParse();
+    }
+    // Arm the silence-based auto-advance on every result (partial or final):
+    // any fresh speech activity resets the countdown.
+    _armSilenceTimer();
+  }
+
+  /// Resets the silence-auto-advance countdown. When it fires (silenceAutoAdvance
+  /// after the last STT result), we play a ding, commit whatever live transcript
+  /// we have with a " next " separator, and force-parse — so the user doesn't
+  /// have to literally say "next" between items.
+  void _armSilenceTimer() {
+    _silenceTimer?.cancel();
+    _silenceTimer = Timer(widget.silenceAutoAdvance, _onSilenceTimeout);
+  }
+
+  void _onSilenceTimeout() {
+    if (!mounted || !_listening) return;
+    final hasSomething =
+        _liveTranscript.trim().isNotEmpty || _committedTranscript.trim().isNotEmpty;
+    if (!hasSomething) return;
+    // Audible + haptic feedback: "item captured, next please".
+    SystemSound.play(SystemSoundType.alert);
+    HapticFeedback.mediumImpact();
+    setState(() {
+      if (_liveTranscript.trim().isNotEmpty) {
+        _committedTranscript = _committedTranscript.isEmpty
+            ? _liveTranscript
+            : '$_committedTranscript $_liveTranscript';
+        _liveTranscript = '';
+      }
+      // Append an explicit separator so Gemini reliably treats the next
+      // utterance as a new item even when the user runs them together.
+      if (!_committedTranscript.trimRight().toLowerCase().endsWith('next')) {
+        _committedTranscript = '${_committedTranscript.trimRight()} next ';
+      }
+    });
+    _scheduleParse(immediate: true);
+  }
+
   void _restartListening() {
     Future.delayed(const Duration(milliseconds: 300), () {
       if (!mounted || !_listening) return;
       _speech.listen(
-        onResult: (result) {
-          if (!mounted) return;
-          setState(() => _liveTranscript = result.recognizedWords);
-          if (result.finalResult) {
-            _committedTranscript = _committedTranscript.isEmpty
-                ? _liveTranscript
-                : '$_committedTranscript $_liveTranscript';
-            _liveTranscript = '';
-            _scheduleParse();
-          }
-        },
+        onResult: _onSpeechResult,
         listenFor: const Duration(minutes: 5),
         pauseFor: const Duration(seconds: 4),
         listenOptions: SpeechListenOptions(
@@ -151,6 +201,7 @@ class BulkVoiceScreenState extends ConsumerState<BulkVoiceScreen> {
 
   void _stopListening() {
     setState(() => _listening = false);
+    _silenceTimer?.cancel();
     _speech.stop();
     _scheduleParse(immediate: true);
   }

@@ -323,6 +323,57 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets(
+      'silence timeout commits live transcript, appends "next", and re-parses',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
+    final parser = _FakeParser(
+      (_) async => [ParsedVoiceItem(name: 'milk', quantity: 1)],
+    );
+    await tester.pumpWidget(_wrap(db: FakeFirebaseFirestore(), parser: parser));
+    await tester.pumpAndSettle();
+
+    final state = _state(tester);
+    state.seedForTest(transcript: 'one milk');
+    state.setListeningForTest(true);
+    state.triggerSilenceTimeoutForTest();
+    await tester.pumpAndSettle();
+
+    expect(parser.calls, isNotEmpty);
+    expect(parser.calls.last.toLowerCase(), contains('next'));
+    expect(find.text('milk'), findsOneWidget);
+  });
+
+  testWidgets('silence timeout is a no-op when not listening', (tester) async {
+    SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
+    final parser = _FakeParser((_) async => []);
+    await tester.pumpWidget(_wrap(db: FakeFirebaseFirestore(), parser: parser));
+    await tester.pumpAndSettle();
+
+    final state = _state(tester);
+    state.seedForTest(transcript: 'one milk');
+    // listening stays false (default in test wrapper)
+    state.triggerSilenceTimeoutForTest();
+    await tester.pumpAndSettle();
+
+    expect(parser.calls, isEmpty);
+  });
+
+  testWidgets('silence timeout with empty transcript is a no-op',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
+    final parser = _FakeParser((_) async => []);
+    await tester.pumpWidget(_wrap(db: FakeFirebaseFirestore(), parser: parser));
+    await tester.pumpAndSettle();
+
+    final state = _state(tester);
+    state.setListeningForTest(true);
+    state.triggerSilenceTimeoutForTest();
+    await tester.pumpAndSettle();
+
+    expect(parser.calls, isEmpty);
+  });
+
   testWidgets('stale parse result does not clobber newer one', (tester) async {
     SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
     final completers = <String, Completer<List<ParsedVoiceItem>>>{};
