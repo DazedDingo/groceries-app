@@ -374,6 +374,70 @@ void main() {
     expect(parser.calls, isEmpty);
   });
 
+  testWidgets('silence timeout does not double-append "next" when present',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
+    final parser = _FakeParser((_) async => []);
+    await tester.pumpWidget(_wrap(db: FakeFirebaseFirestore(), parser: parser));
+    await tester.pumpAndSettle();
+
+    final state = _state(tester);
+    state.seedForTest(transcript: 'one milk next');
+    state.setListeningForTest(true);
+    state.triggerSilenceTimeoutForTest();
+    await tester.pumpAndSettle();
+
+    expect(parser.calls, hasLength(1));
+    // Should NOT contain "next next" (case-insensitive); the existing
+    // trailing "next" is reused as-is.
+    expect(parser.calls.single.toLowerCase(), isNot(contains('next next')));
+    expect(parser.calls.single.toLowerCase(), contains('next'));
+  });
+
+  testWidgets('silence timeout dedups "next" case-insensitively',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
+    final parser = _FakeParser((_) async => []);
+    await tester.pumpWidget(_wrap(db: FakeFirebaseFirestore(), parser: parser));
+    await tester.pumpAndSettle();
+
+    final state = _state(tester);
+    // Mixed case + trailing whitespace — both should still be detected.
+    state.seedForTest(transcript: 'two bread NEXT  ');
+    state.setListeningForTest(true);
+    state.triggerSilenceTimeoutForTest();
+    await tester.pumpAndSettle();
+
+    expect(parser.calls, hasLength(1));
+    expect(parser.calls.single.toLowerCase(), isNot(contains('next next')));
+  });
+
+  testWidgets(
+      'silence timeout fires the parse via the immediate (non-debounced) path',
+      (tester) async {
+    // Regression guard: the silence handler must call _scheduleParse with
+    // immediate:true so the user doesn't sit through the 1500ms debounce
+    // after the audible ding.
+    SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
+    final parser = _FakeParser(
+      (_) async => [ParsedVoiceItem(name: 'cinnamon', quantity: 3)],
+    );
+    await tester.pumpWidget(_wrap(db: FakeFirebaseFirestore(), parser: parser));
+    await tester.pumpAndSettle();
+
+    final state = _state(tester);
+    state.seedForTest(transcript: 'three cinnamon sticks');
+    state.setListeningForTest(true);
+    state.triggerSilenceTimeoutForTest();
+    // Pump only a single short frame — well under the 1500ms debounce.
+    // If the immediate path is wired up, the parse already fired.
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pumpAndSettle();
+
+    expect(parser.calls, hasLength(1));
+    expect(find.text('cinnamon'), findsOneWidget);
+  });
+
   testWidgets('stale parse result does not clobber newer one', (tester) async {
     SharedPreferences.setMockInitialValues({'geminiApiKey': 'AIzaTEST'});
     final completers = <String, Completer<List<ParsedVoiceItem>>>{};
