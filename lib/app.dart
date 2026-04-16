@@ -18,6 +18,7 @@ import 'screens/settings/report_issue_screen.dart';
 import 'screens/shopping_list/history_screen.dart';
 import 'screens/shopping_list/templates_screen.dart';
 import 'screens/shopping_list/bulk_voice_screen.dart';
+import 'screens/pantry/bulk_voice_screen.dart';
 import 'screens/recipes/recipes_screen.dart';
 import 'screens/recipes/recipe_detail_screen.dart';
 import 'screens/recipes/add_recipe_screen.dart';
@@ -47,6 +48,7 @@ final _router = GoRouter(
           ],
         ),
         GoRoute(path: '/pantry', builder: (_, __) => const PantryScreen()),
+        GoRoute(path: '/pantry/bulk-voice', builder: (_, __) => const PantryBulkVoiceScreen()),
         GoRoute(
           path: '/pantry/:itemId',
           builder: (_, state) => PantryItemDetailScreen(itemId: state.pathParameters['itemId']!),
@@ -91,14 +93,14 @@ final _router = GoRouter(
   ],
 );
 
-class GroceriesApp extends StatefulWidget {
+class GroceriesApp extends ConsumerStatefulWidget {
   const GroceriesApp({super.key});
 
   @override
-  State<GroceriesApp> createState() => _GroceriesAppState();
+  ConsumerState<GroceriesApp> createState() => _GroceriesAppState();
 }
 
-class _GroceriesAppState extends State<GroceriesApp> {
+class _GroceriesAppState extends ConsumerState<GroceriesApp> {
   late final AppLinks _appLinks;
   StreamSubscription<Uri>? _linkSub;
 
@@ -138,10 +140,12 @@ class _GroceriesAppState extends State<GroceriesApp> {
 
   @override
   Widget build(BuildContext context) {
+    final variant = ref.watch(themeVariantProvider);
+    final refined = variant == ThemeVariant.refined;
     return MaterialApp.router(
       title: 'Groceries',
-      theme: appTheme,
-      darkTheme: appDarkTheme,
+      theme: refined ? appRefinedTheme : appTheme,
+      darkTheme: refined ? appRefinedDarkTheme : appDarkTheme,
       themeMode: ThemeMode.system,
       routerConfig: _router,
     );

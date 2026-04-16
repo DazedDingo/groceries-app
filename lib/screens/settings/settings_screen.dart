@@ -12,6 +12,7 @@ import '../../providers/household_provider.dart';
 import '../../providers/recipe_search_provider.dart';
 import '../../services/notification_service.dart';
 import '../../services/unit_converter.dart';
+import '../../theme/app_theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 final notificationServiceProvider = Provider<NotificationService>((ref) => NotificationService());
@@ -70,6 +71,16 @@ class SettingsScreen extends ConsumerWidget {
           const Divider(),
 
           // --- Preferences ---
+          SwitchListTile(
+            title: const Text('Refined theme'),
+            subtitle: Text(ref.watch(themeVariantProvider) == ThemeVariant.refined
+                ? 'Softer palette, rounded cards, tighter type'
+                : 'Stock Material look'),
+            value: ref.watch(themeVariantProvider) == ThemeVariant.refined,
+            onChanged: (v) => ref.read(themeVariantProvider.notifier).set(
+                  v ? ThemeVariant.refined : ThemeVariant.classic,
+                ),
+          ),
           SwitchListTile(
             title: const Text('Use US units'),
             subtitle: Text(ref.watch(unitSystemProvider) == UnitSystem.us

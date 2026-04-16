@@ -13,6 +13,7 @@ import 'package:groceries_app/services/auth_service.dart';
 import 'package:groceries_app/services/household_config_service.dart';
 import 'package:groceries_app/services/household_service.dart';
 import 'package:groceries_app/services/notification_service.dart';
+import 'package:groceries_app/theme/app_theme.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -225,6 +226,86 @@ void main() {
 
     final doc = await db.doc('households/hh1/config/apiKeys').get();
     expect(doc.data()?['geminiKey'], 'AIza-KEEP');
+  });
+
+  testWidgets('Refined theme tile reflects current variant', (tester) async {
+    final db = FakeFirebaseFirestore();
+    await tester.pumpWidget(_wrap(db: db));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Refined theme'), findsOneWidget);
+    expect(find.text('Stock Material look'), findsOneWidget);
+  });
+
+  testWidgets('toggling Refined theme flips the provider and persists',
+      (tester) async {
+    final db = FakeFirebaseFirestore();
+    await tester.pumpWidget(_wrap(db: db));
+    await tester.pumpAndSettle();
+
+    final toggle = find.ancestor(
+      of: find.text('Refined theme'),
+      matching: find.byType(SwitchListTile),
+    );
+    expect(toggle, findsOneWidget);
+
+    await tester.tap(toggle);
+    // The notifier's set() is async (writes to SharedPreferences); give it a
+    // few microtasks to land before asserting.
+    for (var i = 0; i < 20; i++) {
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+    }
+    await tester.pumpAndSettle();
+
+    expect(find.text('Softer palette, rounded cards, tighter type'),
+        findsOneWidget);
+
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString('themeVariant'), 'refined');
+
+    // Flip back off.
+    await tester.tap(toggle);
+    for (var i = 0; i < 20; i++) {
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+    }
+    await tester.pumpAndSettle();
+    expect(find.text('Stock Material look'), findsOneWidget);
+    expect((await SharedPreferences.getInstance()).getString('themeVariant'),
+        'classic');
+  });
+
+  testWidgets('Refined tile honours pre-existing persisted preference',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({'themeVariant': 'refined'});
+    final db = FakeFirebaseFirestore();
+    await tester.pumpWidget(_wrap(db: db));
+    await tester.pumpAndSettle();
+    // Give the notifier's _load() a chance to pick up the seeded value.
+    for (var i = 0; i < 20; i++) {
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+    }
+    await tester.pumpAndSettle();
+
+    expect(find.text('Softer palette, rounded cards, tighter type'),
+        findsOneWidget);
+  });
+
+  testWidgets('ProviderScope default variant yields classic theme on screen',
+      (tester) async {
+    // Mount the real screen inside a ProviderScope and check that
+    // Theme.of(context) resolves to the classic palette by default.
+    final db = FakeFirebaseFirestore();
+    await tester.pumpWidget(_wrap(db: db));
+    await tester.pumpAndSettle();
+
+    final ctx = tester.element(find.text('Settings'));
+    // Sanity: the resolved primary should match the classic theme's seed,
+    // not the refined sage. This guards against an accidental flip of the
+    // default variant for existing users.
+    expect(
+      Theme.of(ctx).colorScheme.primary,
+      isNot(equals(appRefinedTheme.colorScheme.primary)),
+    );
   });
 
   testWidgets('delete button clears the key', (tester) async {
