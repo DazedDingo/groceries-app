@@ -27,6 +27,8 @@ Verified against `git log`. Do **not** re-propose these.
 - **Help button on all main screens** (`0937a37`).
 - **Per-household API keys in Firestore** (`b5c28af`, `075db4b`).
 - **Meal plan screen + provider + service** (pre-existing; not in v1's scope at all).
+- **Category guesser parity** (`dd46081`, 2026-04-17). Dart `category_guesser.dart` now length-sorts keywords to match `functions/src/categoryGuesser.ts`. "orange juice" → Drinks on-device and server-side.
+- **Cook This: dedupe + unit-aware compare** (`b178b9f`, 2026-04-17). Three-bucket modal (inStock / onList / missing); only missing items are added. `hasEnough()` in `unit_converter.dart` normalises weight (g/kg/oz/lb) and volume (ml/L/fl oz/gal/cups) before comparing.
 
 v1 rated ~8 of the last 30 commits as open work when they were already shipped. Treat v1 as a snapshot of intent, not current state.
 
@@ -34,8 +36,9 @@ v1 rated ~8 of the last 30 commits as open work when they were already shipped. 
 
 ## 1. Corrections to v1 claims
 
-- **Category keyword table is 28 entries, not 42** (`lib/services/category_guesser.dart`). The TS mirror (`functions/src/categoryGuesser.ts`) sorts by keyword length — the Dart version doesn't. **This is a real parity bug**: "orange juice" matches "orange" → Produce on-device but Beverages server-side. Fix the Dart sort before anything else in this file.
-- **`lib/services/unit_converter.dart` already exists.** Cook This simply doesn't wire it in (`lib/screens/recipes/recipe_detail_screen.dart`). Any item below that treats unit conversion as "new work" is overstating effort.
+- **~~Category keyword table parity bug~~** — **fixed in `dd46081`**. See §0.
+- **~~Cook This doesn't wire unit_converter~~** — **fixed in `b178b9f`**. See §0.
+- **Category keyword table is still 28 entries, not 42.** Aliases (cilantro/coriander, aubergine/eggplant, capsicum/bell pepper, zucchini/courgette) remain open work under §3.
 - **Authored dark mode is L, not M.** Both themes rely on `ColorScheme.fromSeed(brightness: dark)` (`lib/theme/app_theme.dart`). OLED surface tuning + accent tone mapping + AA contrast verification against sage surfaces is real work, not a weekend.
 - **`syncGoogleTasks` 3-minute cadence** asserted in v1 is not visible in source. Cadence is defined by whatever scheduler invokes it; verify before quoting.
 
@@ -47,7 +50,7 @@ Reordered against the real bottleneck: **activation, then daily-utility compound
 
 1. **Onboarding → first check-off in under 60 seconds.** `setup_screen.dart` is a two-option form that dumps the user onto an empty list. Replace with: create-or-join card → partner invite with copy-link → 3 sample items preloaded and celebrated on first check. Without this, every other improvement is wasted on users who never activate. **M, one-shot.**
 2. **Cadence-aware suggestions + consumption-rate restock — bundled.** Both read the same `HistoryEntry` stream. Compute per-item rolling cadence in a scheduled Cloud Function, write to `households/{id}/itemStats`. Surface as dismissable "due soon" chips atop the shopping list; use the same signal to override `restockAfterDays` in `nudgeRestock.ts`. This is the single hardest thing for competitors to copy and the "it knows us" moment. **M, thread.**
-3. **Cook This: dedupe against list + wire existing `unit_converter.dart`.** Two S tasks. Dedupe against `shoppingListProvider` in the Cook This modal so it doesn't add items already queued. Swap the `pantryItem.currentQuantity >= needed` raw compare for a unit-aware compare. Shippable in a day. **S, one-shot.**
+3. ~~**Cook This: dedupe against list + wire existing `unit_converter.dart`.**~~ **Shipped `b178b9f`** (2026-04-17). Three-bucket modal (inStock / onList / missing) + `hasEnough()` unit-aware compare. Validation metric (§12) still needs baselining.
 4. **Trip completion sheet.** Listener on list-count 1→0 → bottom sheet with count · duration · attribution breakdown, subtle confetti on first-of-day, haptic pair. Reuses the history stream. **S, one-shot.**
 5. **Recipe imagery + `lastCookedAt`.** Adds two fields to `lib/models/recipe.dart` + image picker in add-recipe + grid in `recipes_screen.dart`. Unlocks Hero transitions and makes a future cook mode worth building. **M, thread** — schema migration is the only gotcha.
 
@@ -57,9 +60,9 @@ Presence / activity chips / reactions (v1's #2) is charming but **second-order**
 
 ## 3. Intelligence the user doesn't have to ask for
 
-- **Category guesser parity + sort-by-length in Dart.** See §1. `category_guesser.dart` needs the same length-sorted matching as `functions/src/categoryGuesser.ts`; add cilantro/coriander, aubergine/eggplant, capsicum/bell pepper, zucchini/courgette aliases keyed off a `locale` setting. The inline "wrong? tap to fix" chip training `categoryOverridesProvider` (`lib/providers/categories_provider.dart`) is still valid — the override plumbing exists, the UI doesn't. **S, one-shot.**
+- **Category guesser aliases + locale awareness.** Parity sort shipped (`dd46081`); still outstanding — cilantro/coriander, aubergine/eggplant, capsicum/bell pepper, zucchini/courgette aliases keyed off a `locale` setting. The inline "wrong? tap to fix" chip training `categoryOverridesProvider` (`lib/providers/categories_provider.dart`) is still valid — the override plumbing exists, the UI doesn't. **S, one-shot.**
 - **Cadence detection** → see Top 5 #2.
-- **Cook This dedupe + unit conversion** → see Top 5 #3.
+- ~~**Cook This dedupe + unit conversion**~~ → **shipped `b178b9f`**.
 - **Consumption-rate restock** → bundled into Top 5 #2.
 - **Smarter suggestion ranking when adding an item.** Fuzzy matching is shipped (`3b43a3a`) but ranks by name similarity only. Rank by recency × frequency × priority. **S, one-shot.**
 
