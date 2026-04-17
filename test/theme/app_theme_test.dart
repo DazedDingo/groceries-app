@@ -113,6 +113,49 @@ void main() {
       expect(appRefinedTheme.snackBarTheme.behavior, SnackBarBehavior.floating);
       expect(appRefinedTheme.inputDecorationTheme.filled, isTrue);
     });
+
+    test('elevation scale constants are monotonically increasing', () {
+      // The scale must be finite and ordered so the vocabulary stays tight.
+      expect(refinedElevationRest, 0);
+      expect(refinedElevationHover, 2);
+      expect(refinedElevationPressed, 6);
+      expect(refinedElevationRest, lessThan(refinedElevationHover));
+      expect(refinedElevationHover, lessThan(refinedElevationPressed));
+    });
+
+    test('refined theme applies the 3-step elevation scale', () {
+      expect(appRefinedTheme.cardTheme.elevation, refinedElevationRest);
+      expect(appRefinedTheme.floatingActionButtonTheme.elevation,
+          refinedElevationHover);
+      expect(appRefinedTheme.floatingActionButtonTheme.highlightElevation,
+          refinedElevationPressed);
+      expect(appRefinedTheme.navigationBarTheme.elevation,
+          refinedElevationHover);
+      expect(appRefinedTheme.dialogTheme.elevation, refinedElevationPressed);
+      expect(appRefinedTheme.bottomSheetTheme.elevation,
+          refinedElevationPressed);
+    });
+
+    test('refined nav bar is the tighter 56px height', () {
+      expect(appRefinedTheme.navigationBarTheme.height, 56);
+      expect(appRefinedDarkTheme.navigationBarTheme.height, 56);
+    });
+
+    test('refined theme has a sage-tinted shadow color (not default black)', () {
+      // If shadowColor falls back to the Material default, elevation muddies
+      // the sage palette instead of reinforcing it.
+      expect(appRefinedTheme.shadowColor, isNotNull);
+      expect(appRefinedTheme.shadowColor, isNot(Colors.black));
+      expect(appRefinedDarkTheme.shadowColor, isNotNull);
+      expect(appRefinedDarkTheme.shadowColor, isNot(Colors.black));
+    });
+
+    test('refined bottomSheet uses rounded top corners', () {
+      final shape = appRefinedTheme.bottomSheetTheme.shape;
+      expect(shape, isA<RoundedRectangleBorder>());
+      final rr = shape as RoundedRectangleBorder;
+      expect(rr.borderRadius, isA<BorderRadius>());
+    });
   });
 
   group('render smoke', () {

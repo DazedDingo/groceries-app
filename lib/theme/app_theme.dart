@@ -62,6 +62,13 @@ final appDarkTheme = ThemeData(
 
 const _refinedSeed = Color(0xFF2F7D4F); // deeper, less neon than Material green
 
+/// 3-step elevation scale for the refined theme — used across card / FAB /
+/// dialog / modal. Keeps the visual vocabulary finite: flat at rest, a single
+/// soft lift at hover, a deeper lift when pressed or modal.
+const double refinedElevationRest = 0;
+const double refinedElevationHover = 2;
+const double refinedElevationPressed = 6;
+
 ThemeData _buildRefined(Brightness brightness) {
   final scheme = ColorScheme.fromSeed(
     seedColor: _refinedSeed,
@@ -78,12 +85,16 @@ ThemeData _buildRefined(Brightness brightness) {
     labelLarge: baseText.labelLarge?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 0.1),
   );
 
+  // Sage-tinted shadow so elevation reads with the palette instead of muddying it.
+  final shadowColor = _refinedSeed.withValues(alpha: isDark ? 0.8 : 0.35);
+
   return ThemeData(
     useMaterial3: true,
     brightness: brightness,
     colorScheme: scheme,
     scaffoldBackgroundColor: isDark ? scheme.surface : const Color(0xFFF7F6F2),
     textTheme: textTheme,
+    shadowColor: shadowColor,
     splashFactory: InkSparkle.splashFactory,
     appBarTheme: AppBarTheme(
       centerTitle: false,
@@ -95,10 +106,11 @@ ThemeData _buildRefined(Brightness brightness) {
       titleTextStyle: textTheme.titleLarge?.copyWith(color: scheme.onSurface),
     ),
     cardTheme: CardThemeData(
-      elevation: 0,
+      elevation: refinedElevationRest,
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       color: scheme.surface,
       surfaceTintColor: Colors.transparent,
+      shadowColor: shadowColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.6)),
@@ -134,8 +146,8 @@ ThemeData _buildRefined(Brightness brightness) {
       ),
     ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
-      elevation: 2,
-      highlightElevation: 4,
+      elevation: refinedElevationHover,
+      highlightElevation: refinedElevationPressed,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
     ),
     chipTheme: ChipThemeData(
@@ -164,8 +176,8 @@ ThemeData _buildRefined(Brightness brightness) {
       ),
     ),
     navigationBarTheme: NavigationBarThemeData(
-      height: 68,
-      elevation: 2,
+      height: 56,
+      elevation: refinedElevationHover,
       backgroundColor: isDark ? scheme.surface : Colors.white,
       surfaceTintColor: Colors.transparent,
       indicatorColor: scheme.primaryContainer,
@@ -185,7 +197,15 @@ ThemeData _buildRefined(Brightness brightness) {
     ),
     dialogTheme: DialogThemeData(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      elevation: 3,
+      elevation: refinedElevationPressed,
+      shadowColor: shadowColor,
+    ),
+    bottomSheetTheme: BottomSheetThemeData(
+      elevation: refinedElevationPressed,
+      shadowColor: shadowColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
     ),
     switchTheme: SwitchThemeData(
       thumbIcon: WidgetStateProperty.resolveWith((states) {

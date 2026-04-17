@@ -13,16 +13,22 @@ const _defaultStores = [
   {'name': 'Ocado', 'trolleySlug': 'ocado'},
 ];
 
+// Desaturated, value-spaced palette tuned to the refined sage theme.
+// Categories are rendered as small (r=6) circle avatars and as low-alpha
+// chip fills (~0.3), so AA text contrast isn't the gating concern — visual
+// distinctness and palette harmony are. Hues are spread around the wheel;
+// saturation kept low so they sit next to the sage primary without clashing.
+// Hex values chosen so no two categories share a hue bucket.
 const _defaultCategories = [
-  {'name': 'Meats', 'color': '#EF5350'},
-  {'name': 'Dairy', 'color': '#42A5F5'},
-  {'name': 'Produce', 'color': '#66BB6A'},
-  {'name': 'Spices', 'color': '#FFA726'},
-  {'name': 'Frozen', 'color': '#29B6F6'},
-  {'name': 'Bakery', 'color': '#8D6E63'},
-  {'name': 'Drinks', 'color': '#AB47BC'},
-  {'name': 'Household', 'color': '#78909C'},
-  {'name': 'Uncategorised', 'color': '#546E7A'},
+  {'name': 'Meats', 'color': '#C46B5B'},     // muted terracotta
+  {'name': 'Dairy', 'color': '#7E9CB8'},     // dusty sky
+  {'name': 'Produce', 'color': '#8CB07E'},   // sage-adjacent
+  {'name': 'Spices', 'color': '#D69D5B'},    // muted ochre
+  {'name': 'Frozen', 'color': '#8FC3C6'},    // soft teal
+  {'name': 'Bakery', 'color': '#A08972'},    // warm taupe
+  {'name': 'Drinks', 'color': '#9F7FB2'},    // dusty plum
+  {'name': 'Household', 'color': '#7B8B96'}, // slate blue-grey
+  {'name': 'Uncategorised', 'color': '#8A8E8F'}, // neutral
 ];
 
 class HouseholdService {
