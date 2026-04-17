@@ -168,34 +168,41 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const Divider(),
 
-          // --- Advanced ---
-          ExpansionTile(
-            title: const Text('Advanced'),
-            children: [
-              _WebhookStatusTile(),
-              ListTile(
-                title: const Text('Copy IFTTT webhook URL'),
-                subtitle: const Text('Use this in your IFTTT Google Assistant applet'),
-                onTap: () async {
-                  final token = await notifService.getWebhookToken(householdId, user?.uid ?? '');
-                  if (token != null) {
-                    await Clipboard.setData(ClipboardData(
-                      text: 'https://us-central1-gorceries-app-8c24e.cloudfunctions.net/addItemWebhook/$token',
-                    ));
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Webhook URL copied')),
-                      );
-                    }
-                  }
-                },
+          // --- IFTTT integration ---
+          // Promoted out of "Advanced" — status is live (see _WebhookStatusTile)
+          // and the token actions are the only plumbing around it; hiding them
+          // behind an ExpansionTile made silent webhook failures invisible.
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+            child: Text(
+              'IFTTT integration',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
-              ListTile(
-                title: const Text('Rotate webhook token'),
-                subtitle: const Text('Invalidates your current IFTTT applet URL'),
-                onTap: () => notifService.rotateWebhookToken(householdId, user?.uid ?? ''),
-              ),
-            ],
+            ),
+          ),
+          _WebhookStatusTile(),
+          ListTile(
+            title: const Text('Copy IFTTT webhook URL'),
+            subtitle: const Text('Use this in your IFTTT Google Assistant applet'),
+            onTap: () async {
+              final token = await notifService.getWebhookToken(householdId, user?.uid ?? '');
+              if (token != null) {
+                await Clipboard.setData(ClipboardData(
+                  text: 'https://us-central1-gorceries-app-8c24e.cloudfunctions.net/addItemWebhook/$token',
+                ));
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Webhook URL copied')),
+                  );
+                }
+              }
+            },
+          ),
+          ListTile(
+            title: const Text('Rotate webhook token'),
+            subtitle: const Text('Invalidates your current IFTTT applet URL'),
+            onTap: () => notifService.rotateWebhookToken(householdId, user?.uid ?? ''),
           ),
           const Divider(),
           ListTile(

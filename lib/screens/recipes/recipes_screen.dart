@@ -152,7 +152,6 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
             return EmptyState(
               icon: Icons.restaurant_menu,
               title: 'No recipes yet',
-              subtitle: 'Save your favourite recipes and quickly add ingredients to your shopping list',
               action: FilledButton.icon(
                 onPressed: () => context.go('/recipes/new'),
                 icon: const Icon(Icons.add),

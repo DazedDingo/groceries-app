@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:groceries_app/providers/auth_provider.dart';
 import 'package:groceries_app/providers/household_key_notifier.dart';
 import 'package:groceries_app/providers/household_provider.dart';
+import 'package:groceries_app/providers/webhook_status_provider.dart';
 import 'package:groceries_app/screens/settings/settings_screen.dart';
 import 'package:groceries_app/services/auth_service.dart';
 import 'package:groceries_app/services/household_config_service.dart';
@@ -108,6 +109,10 @@ Widget _wrap({required FakeFirebaseFirestore db, String householdId = 'hh1'}) {
           .overrideWithValue(HouseholdConfigService(db: db)),
       notificationServiceProvider
           .overrideWithValue(_FakeNotificationService()),
+      // Override so the IFTTT status tile isn't stuck on the spinner forever
+      // (the real provider talks to the live FirebaseFirestore singleton).
+      webhookStatusProvider.overrideWith(
+          (ref) => Stream<WebhookStatus>.value(const WebhookStatus())),
     ],
     child: MaterialApp.router(routerConfig: router),
   );
@@ -328,4 +333,57 @@ void main() {
     expect(find.text('Tap to add your free API key'), findsOneWidget);
   });
 
+  group('IFTTT section (tranche 5: Advanced flattened)', () {
+    testWidgets('IFTTT integration is a top-level section, no "Advanced" tile',
+        (tester) async {
+      final db = FakeFirebaseFirestore();
+      await tester.pumpWidget(_wrap(db: db));
+      await tester.pumpAndSettle();
+
+      // Scroll through settings so every tile gets built.
+      final scrollable = find.byType(Scrollable).first;
+      await tester.scrollUntilVisible(
+        find.text('IFTTT integration'),
+        200,
+        scrollable: scrollable,
+      );
+
+      expect(find.text('IFTTT integration'), findsOneWidget);
+      // The old ExpansionTile label is gone.
+      expect(find.text('Advanced'), findsNothing);
+    });
+
+    testWidgets('webhook status + URL + rotate tiles render without expansion',
+        (tester) async {
+      // In the old layout these were children of an ExpansionTile and
+      // invisible until tapped. Now they should render directly.
+      final db = FakeFirebaseFirestore();
+      await tester.pumpWidget(_wrap(db: db));
+      await tester.pumpAndSettle();
+
+      final scrollable = find.byType(Scrollable).first;
+      await tester.scrollUntilVisible(
+        find.text('Copy IFTTT webhook URL'),
+        200,
+        scrollable: scrollable,
+      );
+      expect(find.text('Copy IFTTT webhook URL'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.text('Rotate webhook token'),
+        200,
+        scrollable: scrollable,
+      );
+      expect(find.text('Rotate webhook token'), findsOneWidget);
+
+      // The status tile's "No trigger yet" copy only shows when the
+      // webhook-status doc has no data, which is the default test state.
+      await tester.scrollUntilVisible(
+        find.text('No trigger yet'),
+        -200,
+        scrollable: scrollable,
+      );
+      expect(find.text('No trigger yet'), findsOneWidget);
+    });
+  });
 }

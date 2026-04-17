@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 class EmptyState extends StatelessWidget {
   final IconData icon;
   final String title;
-  final String subtitle;
+  // Optional: when an action button already makes the next step obvious,
+  // a subtitle just adds sterile marketing copy. Omit it in those cases.
+  final String? subtitle;
   final Widget? action;
 
   const EmptyState({
     super.key,
     required this.icon,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     this.action,
   });
 
@@ -26,14 +28,16 @@ class EmptyState extends StatelessWidget {
             Icon(icon, size: 64, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4)),
             const SizedBox(height: 16),
             Text(title, style: theme.textTheme.titleMedium),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+            if (subtitle != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                subtitle!,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
+            ],
             if (action != null) ...[
               const SizedBox(height: 24),
               action!,
