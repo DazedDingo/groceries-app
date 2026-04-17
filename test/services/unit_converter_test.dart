@@ -107,4 +107,93 @@ void main() {
       });
     });
   });
+
+  group('hasEnough', () {
+    group('same unit', () {
+      test('sufficient grams', () {
+        expect(hasEnough(500, 'g', 200, 'g'), isTrue);
+      });
+      test('insufficient grams', () {
+        expect(hasEnough(100, 'g', 200, 'g'), isFalse);
+      });
+      test('equal quantities', () {
+        expect(hasEnough(200, 'g', 200, 'g'), isTrue);
+      });
+      test('both null units', () {
+        expect(hasEnough(3, null, 2, null), isTrue);
+        expect(hasEnough(1, null, 2, null), isFalse);
+      });
+      test('both empty units', () {
+        expect(hasEnough(3, '', 2, ''), isTrue);
+      });
+    });
+
+    group('same-system magnitude conversion (weight)', () {
+      test('1kg pantry covers 200g recipe', () {
+        expect(hasEnough(1, 'kg', 200, 'g'), isTrue);
+      });
+      test('500g pantry does not cover 1kg recipe', () {
+        expect(hasEnough(500, 'g', 1, 'kg'), isFalse);
+      });
+      test('case-insensitive unit match', () {
+        expect(hasEnough(1, 'KG', 200, 'G'), isTrue);
+      });
+    });
+
+    group('same-system magnitude conversion (volume)', () {
+      test('1L pantry covers 500ml recipe', () {
+        expect(hasEnough(1, 'L', 500, 'ml'), isTrue);
+      });
+      test('500ml pantry does not cover 1L recipe', () {
+        expect(hasEnough(500, 'ml', 1, 'L'), isFalse);
+      });
+      test('cups to ml', () {
+        // 2 cups = 480ml
+        expect(hasEnough(2, 'cups', 400, 'ml'), isTrue);
+        expect(hasEnough(2, 'cups', 500, 'ml'), isFalse);
+      });
+    });
+
+    group('cross-system weight conversion', () {
+      test('10oz pantry covers 200g recipe', () {
+        // 10 * 28.3495 = 283.5g > 200
+        expect(hasEnough(10, 'oz', 200, 'g'), isTrue);
+      });
+      test('5oz pantry does not cover 200g recipe', () {
+        // 5 * 28.3495 = 141.75g < 200
+        expect(hasEnough(5, 'oz', 200, 'g'), isFalse);
+      });
+      test('1lb pantry covers 400g recipe', () {
+        // 1 * 453.592 > 400
+        expect(hasEnough(1, 'lb', 400, 'g'), isTrue);
+      });
+    });
+
+    group('cross-system volume conversion', () {
+      test('1gal pantry covers 2L recipe', () {
+        // 1 * 3785.41 ml > 2000 ml
+        expect(hasEnough(1, 'gal', 2, 'L'), isTrue);
+      });
+      test('1fl oz does not cover 100ml', () {
+        // 29.57ml < 100ml
+        expect(hasEnough(1, 'fl oz', 100, 'ml'), isFalse);
+      });
+    });
+
+    group('incompatible or unknown units fall back to raw compare', () {
+      test('weight vs volume: raw compare', () {
+        // Can't convert, fall back to quantity compare
+        expect(hasEnough(500, 'g', 200, 'ml'), isTrue);
+        expect(hasEnough(100, 'g', 200, 'ml'), isFalse);
+      });
+      test('unknown same unit: direct compare', () {
+        expect(hasEnough(3, 'packs', 2, 'packs'), isTrue);
+        expect(hasEnough(1, 'packs', 2, 'packs'), isFalse);
+      });
+      test('unknown different units: raw quantity compare', () {
+        expect(hasEnough(5, 'cans', 3, 'bags'), isTrue);
+        expect(hasEnough(2, 'cans', 3, 'bags'), isFalse);
+      });
+    });
+  });
 }

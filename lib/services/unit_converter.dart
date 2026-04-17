@@ -80,3 +80,49 @@ String formatQuantityUnit(int quantity, String? unit, UnitSystem system) {
 
   return '$quantity $unit';
 }
+
+// Canonical weight (grams) per supported unit.
+const _weightToGrams = <String, double>{
+  'g': 1.0,
+  'kg': 1000.0,
+  'oz': 28.3495,
+  'lb': 453.592,
+};
+
+// Canonical volume (millilitres) per supported unit.
+const _volumeToMl = <String, double>{
+  'ml': 1.0,
+  'l': 1000.0,
+  'fl oz': 29.5735,
+  'gal': 3785.41,
+  'cups': 240.0,
+};
+
+/// True when pantry stock is enough to satisfy a recipe requirement, with
+/// unit-aware comparison across known weight/volume conversions.
+///
+/// - Same unit (or both null/empty): direct quantity compare.
+/// - Both units in the same category (weight ↔ weight, volume ↔ volume):
+///   normalise to base unit (g or ml) and compare.
+/// - Cross-category (e.g. g vs ml) or unknown units: fall back to direct
+///   compare — we can't convert, so trust the pantry presence signal.
+bool hasEnough(num pantryQty, String? pantryUnit, num recipeQty, String? recipeUnit) {
+  final p = pantryUnit?.toLowerCase().trim() ?? '';
+  final r = recipeUnit?.toLowerCase().trim() ?? '';
+
+  if (p == r) return pantryQty >= recipeQty;
+
+  final pGrams = _weightToGrams[p];
+  final rGrams = _weightToGrams[r];
+  if (pGrams != null && rGrams != null) {
+    return pantryQty * pGrams >= recipeQty * rGrams;
+  }
+
+  final pMl = _volumeToMl[p];
+  final rMl = _volumeToMl[r];
+  if (pMl != null && rMl != null) {
+    return pantryQty * pMl >= recipeQty * rMl;
+  }
+
+  return pantryQty >= recipeQty;
+}

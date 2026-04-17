@@ -26,15 +26,22 @@ void _showCookThisDialog(
 ]) {
   final pantryItems = ref.read(pantryProvider).value ?? [];
   final pantryNames = {for (final p in pantryItems) p.name.toLowerCase(): p};
+  final listItems = ref.read(itemsProvider).value ?? [];
+  final listNames = {for (final i in listItems) i.name.toLowerCase().trim()};
 
-  // Classify ingredients
+  // Classify ingredients into three buckets: in pantry, already on list, missing.
   final inStock = <RecipeIngredient>[];
+  final onList = <RecipeIngredient>[];
   final missing = <RecipeIngredient>[];
   for (final ing in recipe.ingredients) {
     final pantryItem = pantryNames[ing.name.toLowerCase()];
     final needed = ing.quantity * multiplier;
-    if (pantryItem != null && pantryItem.currentQuantity >= needed) {
+    final pantryCovers = pantryItem != null &&
+        hasEnough(pantryItem.currentQuantity, pantryItem.unit, needed, ing.unit);
+    if (pantryCovers) {
       inStock.add(ing);
+    } else if (listNames.contains(ing.name.toLowerCase().trim())) {
+      onList.add(ing);
     } else {
       missing.add(ing);
     }
@@ -66,7 +73,11 @@ void _showCookThisDialog(
             Text('Pantry check', style: Theme.of(ctx).textTheme.titleLarge),
             const SizedBox(height: 4),
             Text(
-              '${inStock.length} in stock, ${missing.length} missing',
+              [
+                if (inStock.isNotEmpty) '${inStock.length} in stock',
+                if (onList.isNotEmpty) '${onList.length} on list',
+                if (missing.isNotEmpty) '${missing.length} missing',
+              ].join(', '),
               style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(ctx).colorScheme.onSurfaceVariant,
               ),
@@ -85,6 +96,20 @@ void _showCookThisDialog(
                       dense: true,
                       contentPadding: EdgeInsets.zero,
                       leading: Icon(Icons.cancel_outlined, color: Theme.of(ctx).colorScheme.error, size: 20),
+                      title: Text(ing.name),
+                      trailing: Text(formatQuantityUnit(ing.quantity * multiplier, ing.unit, unitSystem)),
+                    )),
+                    const Divider(),
+                  ],
+                  if (onList.isNotEmpty) ...[
+                    Text('Already on list', style: Theme.of(ctx).textTheme.titleSmall?.copyWith(
+                      color: Theme.of(ctx).colorScheme.primary,
+                    )),
+                    const SizedBox(height: 4),
+                    ...onList.map((ing) => ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(Icons.shopping_cart_outlined, color: Theme.of(ctx).colorScheme.primary, size: 20),
                       title: Text(ing.name),
                       trailing: Text(formatQuantityUnit(ing.quantity * multiplier, ing.unit, unitSystem)),
                     )),
@@ -159,7 +184,7 @@ void _showCookThisDialog(
                     child: FilledButton.icon(
                       onPressed: () => Navigator.pop(ctx),
                       icon: const Icon(Icons.check_circle),
-                      label: const Text('All in stock!'),
+                      label: Text(onList.isEmpty ? 'All in stock!' : 'Ready to cook'),
                     ),
                   ),
               ],
