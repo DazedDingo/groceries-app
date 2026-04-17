@@ -32,12 +32,19 @@ const _keywords = <String, String>{
   'water': 'Drinks', 'juice': 'Drinks', 'beer': 'Drinks', 'wine': 'Drinks',
   'coffee': 'Drinks', 'tea': 'Drinks', 'soda': 'Drinks', 'cola': 'Drinks',
   'squash': 'Drinks', 'lemonade': 'Drinks', 'smoothie': 'Drinks',
+  'orange juice': 'Drinks',
   // Household
   'soap': 'Household', 'shampoo': 'Household', 'detergent': 'Household',
   'cleaner': 'Household', 'tissue': 'Household', 'toilet': 'Household',
   'bleach': 'Household', 'sponge': 'Household', 'bin bag': 'Household',
   'washing up': 'Household', 'toothpaste': 'Household', 'deodorant': 'Household',
 };
+
+// Longest keyword first so multi-word keys ("orange juice") match before
+// shorter substrings ("orange"). Mirrors functions/src/categoryGuesser.ts.
+final List<MapEntry<String, String>> _sortedKeywords =
+    _keywords.entries.toList()
+      ..sort((a, b) => b.key.length.compareTo(a.key.length));
 
 /// Returns the matching [GroceryCategory] from [categories] for [itemName],
 /// or null if no match found.
@@ -58,7 +65,7 @@ GroceryCategory? guessCategory(
     } catch (_) {}
   }
 
-  for (final entry in _keywords.entries) {
+  for (final entry in _sortedKeywords) {
     if (lower.contains(entry.key)) {
       try {
         return categories.firstWhere(

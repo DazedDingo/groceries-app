@@ -52,21 +52,34 @@ void main() {
     });
 
     group('drinks', () {
-      test('orange juice matches Produce (orange keyword wins)', () {
-        // "orange" keyword matches before "juice" — known guesser behavior
-        expect(guessCategory('orange juice', _categories)?.name, 'Produce');
+      test('orange juice matches Drinks (longer keyword wins)', () {
+        // "orange juice" is a specific keyword and longer than "orange" —
+        // length-sorted matching picks the specific term.
+        expect(guessCategory('orange juice', _categories)?.name, 'Drinks');
       });
-      test('apple juice matches Produce (apple keyword wins)', () {
+      test('apple juice falls back to Produce', () {
+        // No specific "apple juice" keyword; "apple" and "juice" are same length,
+        // insertion order wins → apple (Produce).
         expect(guessCategory('apple juice', _categories)?.name, 'Produce');
       });
       test('coffee', () => expect(guessCategory('coffee', _categories)?.name, 'Drinks'));
       test('beer', () => expect(guessCategory('beer', _categories)?.name, 'Drinks'));
-      test('lemonade matches Drinks', () {
-        // "lemon" keyword matches Produce before "lemonade" → Drinks
-        // This documents the current keyword-priority behavior
-        expect(guessCategory('lemonade', _categories)?.name, 'Produce');
+      test('lemonade matches Drinks (longer than lemon)', () {
+        expect(guessCategory('lemonade', _categories)?.name, 'Drinks');
       });
       test('soda', () => expect(guessCategory('soda', _categories)?.name, 'Drinks'));
+    });
+
+    group('length-sorted keyword priority', () {
+      test('ice cream matches Frozen, not cream→Dairy', () {
+        expect(guessCategory('ice cream', _categories)?.name, 'Frozen');
+      });
+      test('washing up liquid matches Household', () {
+        expect(guessCategory('washing up liquid', _categories)?.name, 'Household');
+      });
+      test('bin bags matches Household', () {
+        expect(guessCategory('bin bags', _categories)?.name, 'Household');
+      });
     });
 
     group('household', () {
