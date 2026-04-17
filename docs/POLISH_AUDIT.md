@@ -29,6 +29,7 @@ Verified against `git log`. Do **not** re-propose these.
 - **Meal plan screen + provider + service** (pre-existing; not in v1's scope at all).
 - **Category guesser parity** (`dd46081`, 2026-04-17). Dart `category_guesser.dart` now length-sorts keywords to match `functions/src/categoryGuesser.ts`. "orange juice" → Drinks on-device and server-side.
 - **Cook This: dedupe + unit-aware compare** (`b178b9f`, 2026-04-17). Three-bucket modal (inStock / onList / missing); only missing items are added. `hasEnough()` in `unit_converter.dart` normalises weight (g/kg/oz/lb) and volume (ml/L/fl oz/gal/cups) before comparing.
+- **Tranche 1 polish** (v0.1.33, 2026-04-17): check-off animation (180ms scale+fade on swipe, secondary `selectionClick` haptic after success) in `item_tile.dart`; pull-to-refresh on shopping, pantry, recipes screens (invalidates provider + short haptic); trip-completion bottom sheet triggered on list ≥1 → 0 with per-person breakdown, duration, and first-of-day celebration icon. See `trip_completion_sheet.dart` + shopping_list_screen `_maybeShowTripCompletion`.
 
 v1 rated ~8 of the last 30 commits as open work when they were already shipped. Treat v1 as a snapshot of intent, not current state.
 
@@ -51,7 +52,7 @@ Reordered against the real bottleneck: **activation, then daily-utility compound
 1. **Onboarding → first check-off in under 60 seconds.** `setup_screen.dart` is a two-option form that dumps the user onto an empty list. Replace with: create-or-join card → partner invite with copy-link → 3 sample items preloaded and celebrated on first check. Without this, every other improvement is wasted on users who never activate. **M, one-shot.**
 2. **Cadence-aware suggestions + consumption-rate restock — bundled.** Both read the same `HistoryEntry` stream. Compute per-item rolling cadence in a scheduled Cloud Function, write to `households/{id}/itemStats`. Surface as dismissable "due soon" chips atop the shopping list; use the same signal to override `restockAfterDays` in `nudgeRestock.ts`. This is the single hardest thing for competitors to copy and the "it knows us" moment. **M, thread.**
 3. ~~**Cook This: dedupe against list + wire existing `unit_converter.dart`.**~~ **Shipped `b178b9f`** (2026-04-17). Three-bucket modal (inStock / onList / missing) + `hasEnough()` unit-aware compare. Validation metric (§12) still needs baselining.
-4. **Trip completion sheet.** Listener on list-count 1→0 → bottom sheet with count · duration · attribution breakdown, subtle confetti on first-of-day, haptic pair. Reuses the history stream. **S, one-shot.**
+4. ~~**Trip completion sheet.**~~ **Shipped v0.1.33.** See §0.
 5. **Recipe imagery + `lastCookedAt`.** Adds two fields to `lib/models/recipe.dart` + image picker in add-recipe + grid in `recipes_screen.dart`. Unlocks Hero transitions and makes a future cook mode worth building. **M, thread** — schema migration is the only gotcha.
 
 Presence / activity chips / reactions (v1's #2) is charming but **second-order**. Defer until activation is fixed — you can't socialise an empty household.
@@ -70,11 +71,11 @@ Presence / activity chips / reactions (v1's #2) is charming but **second-order**
 
 ## 4. Moments of delight
 
-- **Trip completion sheet** → Top 5 #4.
-- **Check-off animation.** `lib/widgets/item_tile.dart:120` has `HapticFeedback.mediumImpact` + dismissible + snackbar but no scale/fade. Wrap in `AnimatedSwitcher`; 180ms scale-down + fade + short secondary haptic for the tick. **S, one-shot.**
+- ~~**Trip completion sheet**~~ → **shipped v0.1.33**.
+- ~~**Check-off animation.**~~ → **shipped v0.1.33**. 180ms `AnimatedScale` + `AnimatedOpacity` wrap in `item_tile.dart`, with secondary `selectionClick` haptic on successful check-off.
 - **Per-screen empty-state illustrations.** `lib/screens/shared/empty_state.dart` is icon+title+subtitle. Extend with an `illustration` slot; commission 4 sage-palette vectors (pantry nap, empty list, no recipes, no meal plan). Playful copy. **S code, M art, one-shot.**
 - **Onboarding** → Top 5 #1.
-- **Motion language.** No pull-to-refresh anywhere; chips recolor without motion; no Hero between recipe card and detail. Add `RefreshIndicator` with sage tint, spring on chip toggle, Hero on recipe image (requires §6 imagery first). **S per piece, thread** — this is taste, not a ticket.
+- **Motion language.** Pull-to-refresh shipped v0.1.33 on shopping/pantry/recipes. Chips still recolor without motion; no Hero between recipe card and detail. Spring on chip toggle, Hero on recipe image (requires §6 imagery first) still open. **S per piece, thread** — taste, not a ticket.
 
 ---
 

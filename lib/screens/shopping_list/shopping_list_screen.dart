@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/items_provider.dart';
 import '../../providers/categories_provider.dart';
@@ -15,6 +17,7 @@ import 'widgets/filter_bar.dart';
 import 'widgets/voice_fab.dart';
 import 'widgets/add_item_dialog.dart';
 import 'widgets/barcode_scanner_dialog.dart';
+import 'widgets/trip_completion_sheet.dart';
 import '../../services/unit_converter.dart';
 import '../../services/category_guesser.dart';
 import '../shared/bulk_add_dialog.dart';
@@ -38,6 +41,47 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   bool _selecting = false;
   bool _restockChecked = false;
   Set<String> _knownItemIds = {};
+  bool _tripSheetShowing = false;
+  bool _sawNonEmptyList = false;
+
+  static const _kLastTripDatePref = 'lastTripCompletionDate';
+
+  Future<bool> _isFirstTripOfDay() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now();
+    final todayKey = '${today.year}-${today.month}-${today.day}';
+    final last = prefs.getString(_kLastTripDatePref);
+    if (last != todayKey) {
+      await prefs.setString(_kLastTripDatePref, todayKey);
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> _onRefresh() async {
+    ref.invalidate(itemsProvider);
+    ref.invalidate(pantryProvider);
+    await Future.delayed(const Duration(milliseconds: 400));
+    HapticFeedback.selectionClick();
+  }
+
+  Future<void> _maybeShowTripCompletion(String householdId) async {
+    if (_tripSheetShowing) return;
+    _tripSheetShowing = true;
+    try {
+      final history = ref.read(historyProvider(householdId)).value ?? [];
+      final firstOfDay = await _isFirstTripOfDay();
+      final stats = computeTripStats(
+        history: history,
+        now: DateTime.now(),
+        firstOfDay: firstOfDay,
+      );
+      if (stats == null || !mounted) return;
+      await showTripCompletionSheet(context, stats);
+    } finally {
+      _tripSheetShowing = false;
+    }
+  }
 
   void _enterSelecting(String id) {
     setState(() {
@@ -690,6 +734,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
     final pantryItems = ref.watch(pantryProvider).value ?? [];
 
     // Detect items removed externally (by a partner) and show a brief toast.
+    // Also detect list 1→0 transition to trigger the trip-completion sheet.
     ref.listen(itemsProvider, (prev, next) {
       final prevIds = prev?.value?.map((i) => i.id).toSet() ?? {};
       final nextIds = next.value?.map((i) => i.id).toSet() ?? {};
@@ -710,6 +755,21 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
         );
       }
       _knownItemIds = _knownItemIds.intersection(nextIds);
+
+      // Trip completion: list was non-empty during this session, now is empty.
+      // `_sawNonEmptyList` guards against cold-start (load with already-empty
+      // list) and against repeatedly firing on cold loads to the same state.
+      if (nextIds.isNotEmpty) _sawNonEmptyList = true;
+      if (_sawNonEmptyList &&
+          prevIds.isNotEmpty &&
+          nextIds.isEmpty &&
+          householdId.isNotEmpty &&
+          mounted) {
+        _sawNonEmptyList = false;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _maybeShowTripCompletion(householdId);
+        });
+      }
     });
 
     // Check for overdue restocks once pantry data loads
@@ -826,13 +886,22 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
         children: [
           FilterBar(categories: categories),
           Expanded(
-            child: items.isEmpty
-              ? const EmptyState(
-                  icon: Icons.shopping_cart_outlined,
-                  title: 'Your list is empty',
-                  subtitle: 'Tap the microphone button or long-press to add items',
+            child: RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: items.isEmpty
+              ? ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: const [
+                    SizedBox(height: 80),
+                    EmptyState(
+                      icon: Icons.shopping_cart_outlined,
+                      title: 'Your list is empty',
+                      subtitle: 'Tap the microphone button or long-press to add items',
+                    ),
+                  ],
                 )
               : ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
               children: [
                 if (priorityItems.isNotEmpty) ...[
                   Padding(
@@ -960,6 +1029,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                 ];
               }),
               ],
+            ),
             ),
           ),
           if (_selecting)

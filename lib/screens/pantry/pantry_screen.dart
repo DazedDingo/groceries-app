@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../shared/help_button.dart';
@@ -51,6 +52,13 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
       _selecting = false;
       _selectedIds.clear();
     });
+  }
+
+  Future<void> _onRefresh() async {
+    ref.invalidate(pantryProvider);
+    ref.invalidate(itemsProvider);
+    await Future.delayed(const Duration(milliseconds: 400));
+    HapticFeedback.selectionClick();
   }
 
   Future<void> _deleteSelected(String householdId) async {
@@ -245,13 +253,22 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
               ),
             ),
           Expanded(
-            child: pantry.isEmpty
-                ? const EmptyState(
-                    icon: Icons.kitchen,
-                    title: 'Pantry is empty',
-                    subtitle: 'Track what you have at home so you never overbuy',
+            child: RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: pantry.isEmpty
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: const [
+                      SizedBox(height: 80),
+                      EmptyState(
+                        icon: Icons.kitchen,
+                        title: 'Pantry is empty',
+                        subtitle: 'Track what you have at home so you never overbuy',
+                      ),
+                    ],
                   )
                 : ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     children: [
                       if (expired.isNotEmpty) ...[
                         Container(
@@ -359,6 +376,7 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
                       ],
                     ],
                   ),
+            ),
           ),
           if (_selecting)
             SafeArea(

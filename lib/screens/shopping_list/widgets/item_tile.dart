@@ -128,6 +128,10 @@ class _ItemTileState extends State<ItemTile> {
         final isCart = dir == DismissDirection.startToEnd;
         final receipt = isCart ? await widget.onCheckOff() : await widget.onDelete();
 
+        // Short secondary confirm haptic on successful check-off —
+        // pairs with the initial mediumImpact for a "tick" feel.
+        if (isCart) HapticFeedback.selectionClick();
+
         if (mounted) setState(() => _pendingAction = false);
 
         final action = isCart ? 'Marked as bought' : 'Deleted';
@@ -145,7 +149,16 @@ class _ItemTileState extends State<ItemTile> {
 
         return true;
       },
-      child: tile,
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        scale: _pendingAction ? 0.96 : 1.0,
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 180),
+          opacity: _pendingAction ? 0.6 : 1.0,
+          child: tile,
+        ),
+      ),
     );
   }
 }

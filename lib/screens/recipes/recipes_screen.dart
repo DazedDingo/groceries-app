@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/household_provider.dart';
@@ -46,6 +47,13 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
       _selecting = false;
       _selectedIds.clear();
     });
+  }
+
+  Future<void> _onRefresh() async {
+    ref.invalidate(recipesProvider);
+    ref.invalidate(pantryProvider);
+    await Future.delayed(const Duration(milliseconds: 400));
+    HapticFeedback.selectionClick();
   }
 
   Future<void> _deleteSelected(String householdId) async {
@@ -199,21 +207,30 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
                   ),
                 ),
               Expanded(
-                child: filtered.isEmpty
-                    ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Text(
-                            canMakeNow
-                                ? "Nothing you can make right now — pantry's a bit light."
-                                : 'No matching recipes.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant),
+                child: RefreshIndicator(
+                  onRefresh: _onRefresh,
+                  child: filtered.isEmpty
+                    ? ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: [
+                          const SizedBox(height: 80),
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Text(
+                                canMakeNow
+                                    ? "Nothing you can make right now — pantry's a bit light."
+                                    : 'No matching recipes.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant),
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       )
                     : ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: filtered.length,
                   itemBuilder: (_, i) {
                     final r = filtered[i];
@@ -243,6 +260,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
                       },
                     );
                   },
+                ),
                 ),
               ),
               if (_selecting)
