@@ -39,6 +39,24 @@ void main() {
       test('mixed salad', () => expect(guessCategory('mixed salad', _categories)?.name, 'Produce'));
     });
 
+    group('US/UK aliases', () {
+      test('cilantro → Produce', () => expect(guessCategory('cilantro', _categories)?.name, 'Produce'));
+      test('coriander → Produce', () => expect(guessCategory('coriander', _categories)?.name, 'Produce'));
+      test('aubergine → Produce', () => expect(guessCategory('aubergine', _categories)?.name, 'Produce'));
+      test('eggplant → Produce', () => expect(guessCategory('eggplant', _categories)?.name, 'Produce'));
+      test('capsicum → Produce', () => expect(guessCategory('capsicum', _categories)?.name, 'Produce'));
+      test('bell pepper → Produce', () => expect(guessCategory('bell pepper', _categories)?.name, 'Produce'));
+      test('zucchini → Produce', () => expect(guessCategory('zucchini', _categories)?.name, 'Produce'));
+      test('scallion → Produce', () => expect(guessCategory('scallion', _categories)?.name, 'Produce'));
+      test('spring onion → Produce', () => expect(guessCategory('spring onion', _categories)?.name, 'Produce'));
+      test('green onion → Produce', () => expect(guessCategory('green onion', _categories)?.name, 'Produce'));
+      test('arugula → Produce', () => expect(guessCategory('arugula', _categories)?.name, 'Produce'));
+      test('rocket → Produce', () => expect(guessCategory('rocket', _categories)?.name, 'Produce'));
+      test('eggplant beats eggs (longer wins)', () {
+        expect(guessCategory('eggplant parmesan', _categories)?.name, 'Produce');
+      });
+    });
+
     group('bakery', () {
       test('bread', () => expect(guessCategory('bread', _categories)?.name, 'Bakery'));
       test('croissant', () => expect(guessCategory('croissant', _categories)?.name, 'Bakery'));

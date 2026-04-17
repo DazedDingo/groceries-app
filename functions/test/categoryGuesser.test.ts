@@ -37,4 +37,20 @@ describe('guessCategoryName', () => {
   it('returns Frozen for ice cream (not Dairy via cream)', () => {
     expect(guessCategoryName('ice cream')).toBe('Frozen');
   });
+
+  describe('US/UK aliases', () => {
+    it('cilantro → Produce', () => expect(guessCategoryName('cilantro')).toBe('Produce'));
+    it('coriander → Produce', () => expect(guessCategoryName('coriander')).toBe('Produce'));
+    it('aubergine → Produce', () => expect(guessCategoryName('aubergine')).toBe('Produce'));
+    it('eggplant → Produce (beats eggs)', () =>
+      expect(guessCategoryName('eggplant parmesan')).toBe('Produce'));
+    it('capsicum → Produce', () => expect(guessCategoryName('capsicum')).toBe('Produce'));
+    it('bell pepper → Produce', () => expect(guessCategoryName('bell pepper')).toBe('Produce'));
+    it('zucchini → Produce', () => expect(guessCategoryName('zucchini')).toBe('Produce'));
+    it('scallion → Produce', () => expect(guessCategoryName('scallion')).toBe('Produce'));
+    it('spring onion → Produce', () => expect(guessCategoryName('spring onion')).toBe('Produce'));
+    it('green onion → Produce', () => expect(guessCategoryName('green onion')).toBe('Produce'));
+    it('arugula → Produce', () => expect(guessCategoryName('arugula')).toBe('Produce'));
+    it('rocket → Produce', () => expect(guessCategoryName('rocket')).toBe('Produce'));
+  });
 });

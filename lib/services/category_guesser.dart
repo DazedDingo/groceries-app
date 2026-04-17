@@ -18,6 +18,13 @@ const _keywords = <String, String>{
   'cucumber': 'Produce', 'mushroom': 'Produce', 'courgette': 'Produce',
   'avocado': 'Produce', 'lemon': 'Produce', 'lime': 'Produce', 'garlic': 'Produce',
   'fruit': 'Produce', 'veg': 'Produce', 'vegetable': 'Produce', 'salad': 'Produce',
+  // US/UK aliases — keep parity with functions/src/categoryGuesser.ts.
+  'cilantro': 'Produce', 'coriander': 'Produce',
+  'aubergine': 'Produce', 'eggplant': 'Produce',
+  'capsicum': 'Produce', 'bell pepper': 'Produce',
+  'zucchini': 'Produce',
+  'scallion': 'Produce', 'spring onion': 'Produce', 'green onion': 'Produce',
+  'arugula': 'Produce', 'rocket': 'Produce',
   // Bakery
   'bread': 'Bakery', 'roll': 'Bakery', 'bun': 'Bakery', 'cake': 'Bakery',
   'pastry': 'Bakery', 'croissant': 'Bakery', 'muffin': 'Bakery', 'flour': 'Bakery',
@@ -41,10 +48,21 @@ const _keywords = <String, String>{
 };
 
 // Longest keyword first so multi-word keys ("orange juice") match before
-// shorter substrings ("orange"). Mirrors functions/src/categoryGuesser.ts.
-final List<MapEntry<String, String>> _sortedKeywords =
-    _keywords.entries.toList()
-      ..sort((a, b) => b.key.length.compareTo(a.key.length));
+// shorter substrings ("orange"). Ties break by insertion order so the result
+// is deterministic regardless of Dart's sort stability guarantees. Mirrors
+// functions/src/categoryGuesser.ts.
+final List<MapEntry<String, String>> _sortedKeywords = () {
+  final list = _keywords.entries.toList();
+  final indexOf = <String, int>{
+    for (var i = 0; i < list.length; i++) list[i].key: i,
+  };
+  list.sort((a, b) {
+    final byLen = b.key.length.compareTo(a.key.length);
+    if (byLen != 0) return byLen;
+    return indexOf[a.key]!.compareTo(indexOf[b.key]!);
+  });
+  return list;
+}();
 
 /// Returns the matching [GroceryCategory] from [categories] for [itemName],
 /// or null if no match found.

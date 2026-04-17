@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../models/category.dart';
 import '../../../services/category_guesser.dart';
-import '../../../services/fuzzy_match.dart';
+import '../../../services/suggestion_ranker.dart';
 
 class AddItemResult {
   final String name;
@@ -19,12 +19,9 @@ class AddItemDialog extends StatefulWidget {
   final String initialName;
   final List<GroceryCategory> categories;
   final GroceryCategory? initialCategory;
-  /// Items currently on the shopping list — shown first in suggestions.
-  final List<String> currentListItems;
-  /// Previously bought items from history — shown second.
-  final List<String> historySuggestions;
-  /// Pantry item names — shown third.
-  final List<String> pantryItemNames;
+  /// Ranker-scored candidates. Replaces the old split currentList/history/
+  /// pantry lists — callers assemble one unified list and the ranker orders it.
+  final List<SuggestionItem> suggestions;
   final Map<String, String> categoryOverrides;
 
   const AddItemDialog({
@@ -32,9 +29,7 @@ class AddItemDialog extends StatefulWidget {
     this.initialName = '',
     required this.categories,
     this.initialCategory,
-    this.currentListItems = const [],
-    this.historySuggestions = const [],
-    this.pantryItemNames = const [],
+    this.suggestions = const [],
     this.categoryOverrides = const {},
   });
 
@@ -95,41 +90,11 @@ class _AddItemDialogState extends State<AddItemDialog> {
           optionsBuilder: (textEditingValue) {
             final raw = textEditingValue.text;
             if (raw.isEmpty) return const Iterable.empty();
-            final query = raw.toLowerCase();
-
-            // Sources in priority order: on-list → history → pantry.
-            final sources = [
-              widget.currentListItems,
-              widget.historySuggestions,
-              widget.pantryItemNames,
-            ];
-
-            final seen = <String>{};
-            final results = <String>[];
-
-            // Pass 1: substring matches (high confidence).
-            for (final source in sources) {
-              for (final s in source) {
-                final lower = s.toLowerCase();
-                if (lower.contains(query) && seen.add(lower)) {
-                  results.add(s);
-                }
-              }
-            }
-
-            // Pass 2: fuzzy matches not already surfaced (catches typos /
-            // plurals that aren't substrings).
-            for (final source in sources) {
-              for (final s in source) {
-                final lower = s.toLowerCase();
-                if (!seen.contains(lower) && isFuzzyMatch(raw, lower)) {
-                  seen.add(lower);
-                  results.add(s);
-                }
-              }
-            }
-
-            return results.take(10);
+            return rankSuggestions(
+              widget.suggestions,
+              raw,
+              DateTime.now(),
+            );
           },
           onSelected: _onNameChanged,
           fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {

@@ -30,6 +30,7 @@ Verified against `git log`. Do **not** re-propose these.
 - **Category guesser parity** (`dd46081`, 2026-04-17). Dart `category_guesser.dart` now length-sorts keywords to match `functions/src/categoryGuesser.ts`. "orange juice" → Drinks on-device and server-side.
 - **Cook This: dedupe + unit-aware compare** (`b178b9f`, 2026-04-17). Three-bucket modal (inStock / onList / missing); only missing items are added. `hasEnough()` in `unit_converter.dart` normalises weight (g/kg/oz/lb) and volume (ml/L/fl oz/gal/cups) before comparing.
 - **Tranche 1 polish** (v0.1.33, 2026-04-17): check-off animation (180ms scale+fade on swipe, secondary `selectionClick` haptic after success) in `item_tile.dart`; pull-to-refresh on shopping, pantry, recipes screens (invalidates provider + short haptic); trip-completion bottom sheet triggered on list ≥1 → 0 with per-person breakdown, duration, and first-of-day celebration icon. See `trip_completion_sheet.dart` + shopping_list_screen `_maybeShowTripCompletion`.
+- **Tranche 2 polish** (v0.1.34, 2026-04-17): US/UK Produce aliases (cilantro/coriander, aubergine/eggplant, capsicum/bell pepper, zucchini, scallion/spring onion/green onion, arugula/rocket) in both Dart + TS category guessers with insertion-order tiebreak for deterministic sort. Smarter `lib/services/suggestion_ranker.dart` replaces the old three-pass substring/fuzzy loop in `add_item_dialog.dart`: scores candidates by match quality (exact > prefix > substring > fuzzy), recency (14-day half-life, +30 max), log-frequency (+40 max), high-priority pantry (+25), on-list penalty (-40), and source tie-breaks (pantry > history > on-list). `buildSuggestions` merges sources so duplicates collapse.
 
 v1 rated ~8 of the last 30 commits as open work when they were already shipped. Treat v1 as a snapshot of intent, not current state.
 
@@ -39,7 +40,7 @@ v1 rated ~8 of the last 30 commits as open work when they were already shipped. 
 
 - **~~Category keyword table parity bug~~** — **fixed in `dd46081`**. See §0.
 - **~~Cook This doesn't wire unit_converter~~** — **fixed in `b178b9f`**. See §0.
-- **Category keyword table is still 28 entries, not 42.** Aliases (cilantro/coriander, aubergine/eggplant, capsicum/bell pepper, zucchini/courgette) remain open work under §3.
+- **~~Category keyword table is still 28 entries, not 42.~~** US/UK aliases shipped in v0.1.34 (2026-04-17) — see §0.
 - **Authored dark mode is L, not M.** Both themes rely on `ColorScheme.fromSeed(brightness: dark)` (`lib/theme/app_theme.dart`). OLED surface tuning + accent tone mapping + AA contrast verification against sage surfaces is real work, not a weekend.
 - **`syncGoogleTasks` 3-minute cadence** asserted in v1 is not visible in source. Cadence is defined by whatever scheduler invokes it; verify before quoting.
 
@@ -61,11 +62,11 @@ Presence / activity chips / reactions (v1's #2) is charming but **second-order**
 
 ## 3. Intelligence the user doesn't have to ask for
 
-- **Category guesser aliases + locale awareness.** Parity sort shipped (`dd46081`); still outstanding — cilantro/coriander, aubergine/eggplant, capsicum/bell pepper, zucchini/courgette aliases keyed off a `locale` setting. The inline "wrong? tap to fix" chip training `categoryOverridesProvider` (`lib/providers/categories_provider.dart`) is still valid — the override plumbing exists, the UI doesn't. **S, one-shot.**
+- **Category guesser aliases + locale awareness.** Parity sort shipped (`dd46081`); US/UK aliases shipped v0.1.34 (cilantro/coriander, aubergine/eggplant, capsicum/bell pepper, zucchini, scallion/spring onion/green onion, arugula/rocket). `locale` setting and inline "wrong? tap to fix" chip training `categoryOverridesProvider` are still open — the override plumbing exists, the UI doesn't. **S, one-shot.**
 - **Cadence detection** → see Top 5 #2.
 - ~~**Cook This dedupe + unit conversion**~~ → **shipped `b178b9f`**.
 - **Consumption-rate restock** → bundled into Top 5 #2.
-- **Smarter suggestion ranking when adding an item.** Fuzzy matching is shipped (`3b43a3a`) but ranks by name similarity only. Rank by recency × frequency × priority. **S, one-shot.**
+- ~~**Smarter suggestion ranking when adding an item.**~~ → **shipped v0.1.34.** `lib/services/suggestion_ranker.dart` scores candidates by match quality × recency (14d half-life) × log-frequency × high-priority bonus × on-list penalty × source tie-break. Replaces the three-pass substring/fuzzy loop in `add_item_dialog.dart`.
 
 ---
 

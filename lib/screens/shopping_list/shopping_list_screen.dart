@@ -20,6 +20,7 @@ import 'widgets/barcode_scanner_dialog.dart';
 import 'widgets/trip_completion_sheet.dart';
 import '../../services/unit_converter.dart';
 import '../../services/category_guesser.dart';
+import '../../services/suggestion_ranker.dart';
 import '../shared/bulk_add_dialog.dart';
 import '../shared/empty_state.dart';
 import '../../services/text_item_parser.dart';
@@ -113,24 +114,17 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
     final overrides = ref.read(categoryOverridesProvider).value ?? {};
     final history = ref.read(historyProvider(householdId)).value ?? [];
 
-    // Suggestions: current list first (highest priority), then history, then pantry.
-    final currentListItems =
-        (ref.read(itemsProvider).value ?? []).map((i) => i.name).toList();
-    final historySuggestions = history
-        .where((h) => h.action == HistoryAction.bought)
-        .map((h) => h.itemName)
-        .toSet()
-        .toList();
-    final pantryItemNames =
-        (ref.read(pantryProvider).value ?? []).map((p) => p.name).toList();
+    final suggestions = buildSuggestions(
+      currentListItems: ref.read(itemsProvider).value ?? [],
+      history: history,
+      pantryItems: ref.read(pantryProvider).value ?? [],
+    );
 
     final result = await showDialog<AddItemResult>(
       context: context,
       builder: (ctx) => AddItemDialog(
         categories: categories,
-        currentListItems: currentListItems,
-        historySuggestions: historySuggestions,
-        pantryItemNames: pantryItemNames,
+        suggestions: suggestions,
         categoryOverrides: overrides,
       ),
     );

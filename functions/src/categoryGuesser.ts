@@ -16,6 +16,13 @@ const KEYWORDS: Record<string, string> = {
   cucumber: 'Produce', mushroom: 'Produce', courgette: 'Produce',
   avocado: 'Produce', lemon: 'Produce', lime: 'Produce', garlic: 'Produce',
   fruit: 'Produce', veg: 'Produce', vegetable: 'Produce', salad: 'Produce',
+  // US/UK aliases — keep parity with lib/services/category_guesser.dart.
+  cilantro: 'Produce', coriander: 'Produce',
+  aubergine: 'Produce', eggplant: 'Produce',
+  capsicum: 'Produce', 'bell pepper': 'Produce',
+  zucchini: 'Produce',
+  scallion: 'Produce', 'spring onion': 'Produce', 'green onion': 'Produce',
+  arugula: 'Produce', rocket: 'Produce',
   // Bakery
   bread: 'Bakery', roll: 'Bakery', bun: 'Bakery', cake: 'Bakery',
   pastry: 'Bakery', croissant: 'Bakery', muffin: 'Bakery', flour: 'Bakery',
@@ -37,15 +44,26 @@ const KEYWORDS: Record<string, string> = {
   'washing up': 'Household', toothpaste: 'Household', deodorant: 'Household',
 };
 
+// Sort once at module load — longest keyword first; ties break by insertion
+// order so the result is deterministic. Mirrors lib/services/category_guesser.dart.
+const SORTED_KEYWORDS: Array<[string, string]> = (() => {
+  const entries = Object.entries(KEYWORDS);
+  const indexOf = new Map<string, number>(entries.map(([k], i) => [k, i]));
+  entries.sort((a, b) => {
+    const byLen = b[0].length - a[0].length;
+    if (byLen !== 0) return byLen;
+    return (indexOf.get(a[0]) ?? 0) - (indexOf.get(b[0]) ?? 0);
+  });
+  return entries;
+})();
+
 /**
  * Returns the category name for the given item name based on keyword matching,
  * or null if no keyword matches. Mirrors lib/services/category_guesser.dart.
  */
 export function guessCategoryName(itemName: string): string | null {
   const lower = itemName.toLowerCase();
-  // Sort keywords by length (longest first) to match more specific terms first
-  const sortedKeywords = Object.entries(KEYWORDS).sort((a, b) => b[0].length - a[0].length);
-  for (const [keyword, categoryName] of sortedKeywords) {
+  for (const [keyword, categoryName] of SORTED_KEYWORDS) {
     if (lower.includes(keyword)) return categoryName;
   }
   return null;
