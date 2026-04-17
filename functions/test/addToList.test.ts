@@ -4,13 +4,25 @@ import { handleIftttWebhook, parseItemString } from '../src/addToList';
 
 const mockFirestoreGet = jest.fn();
 const mockFirestoreQuery = jest.fn();
+const mockFirestoreSet = jest.fn().mockResolvedValue(undefined);
+const mockDocPath = jest.fn<unknown, [string]>();
 jest.mock('firebase-admin', () => ({
-  firestore: () => ({
-    doc: () => ({ get: mockFirestoreGet }),
-    collection: () => ({
-      where: () => ({ limit: () => ({ get: mockFirestoreQuery }) }),
+  firestore: Object.assign(
+    () => ({
+      doc: (path: string) => {
+        mockDocPath(path);
+        return { get: mockFirestoreGet, set: mockFirestoreSet };
+      },
+      collection: () => ({
+        where: () => ({ limit: () => ({ get: mockFirestoreQuery }) }),
+      }),
     }),
-  }),
+    {
+      FieldValue: {
+        serverTimestamp: () => '__ts__',
+      },
+    },
+  ),
 }));
 
 const mockWriteItem = jest.fn().mockResolvedValue(undefined);
@@ -220,5 +232,45 @@ describe('handleIftttWebhook', () => {
     expect(res._body).toEqual(
       expect.objectContaining({ ok: true, name: 'eggs', quantity: 2 })
     );
+  });
+
+  describe('webhookStatus recording', () => {
+    it('records lastWebhookAt + last item name on success', async () => {
+      mockFirestoreSet.mockClear();
+      mockDocPath.mockClear();
+      const req = makeReq({ body: { item: '2 eggs' } });
+      const res = makeRes();
+      await handleIftttWebhook(req, res, deps);
+      expect(res._status).toBe(200);
+      expect(mockDocPath).toHaveBeenCalledWith(
+        'households/hh-1/config/webhookStatus',
+      );
+      expect(mockFirestoreSet).toHaveBeenCalledWith(
+        expect.objectContaining({
+          lastWebhookAt: '__ts__',
+          lastItemName: 'eggs',
+          lastQuantity: 2,
+        }),
+        { merge: true },
+      );
+    });
+
+    it('still returns 200 if webhookStatus write fails', async () => {
+      mockFirestoreSet.mockRejectedValueOnce(new Error('status write boom'));
+      const req = makeReq({ body: { item: 'bread' } });
+      const res = makeRes();
+      await handleIftttWebhook(req, res, deps);
+      expect(res._status).toBe(200);
+    });
+
+    it('does NOT write status when writeItem fails', async () => {
+      mockWriteItem.mockRejectedValueOnce(new Error('boom'));
+      mockFirestoreSet.mockClear();
+      const req = makeReq();
+      const res = makeRes();
+      await handleIftttWebhook(req, res, deps);
+      expect(res._status).toBe(500);
+      expect(mockFirestoreSet).not.toHaveBeenCalled();
+    });
   });
 });

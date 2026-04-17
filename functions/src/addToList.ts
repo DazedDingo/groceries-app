@@ -142,6 +142,22 @@ export async function handleIftttWebhook(
     return;
   }
 
-  // 8. Success
+  // 8. Record last-webhook status (best-effort; failure here shouldn't break the
+  //    write that just succeeded). Powers the "last trigger Xm ago" line in
+  //    Settings → Advanced.
+  try {
+    await db.doc(`households/${householdId}/config/webhookStatus`).set(
+      {
+        lastWebhookAt: admin.firestore.FieldValue.serverTimestamp(),
+        lastItemName: lowerName,
+        lastQuantity: quantity,
+      },
+      { merge: true },
+    );
+  } catch {
+    // swallow — status is non-critical
+  }
+
+  // 9. Success
   res.status(200).json({ ok: true, name: lowerName, quantity, categoryId });
 }

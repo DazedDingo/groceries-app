@@ -4,12 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:android_intent_plus/android_intent.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/gemini_key_provider.dart';
 import '../../providers/household_provider.dart';
 import '../../providers/recipe_search_provider.dart';
+import '../../providers/webhook_status_provider.dart';
+import '../../services/time_ago.dart';
+import '../../services/wallet_launcher.dart';
 import '../../services/notification_service.dart';
 import '../../services/unit_converter.dart';
 import '../../theme/app_theme.dart';
@@ -132,33 +134,11 @@ class SettingsScreen extends ConsumerWidget {
               }
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.wallet),
-            title: const Text('Open Google Wallet'),
-            subtitle: const Text('Quick access to store loyalty cards'),
-            onTap: () async {
-              const intent = AndroidIntent(
-                action: 'android.intent.action.MAIN',
-                category: 'android.intent.category.LAUNCHER',
-                package: 'com.google.android.apps.walletnfcrel',
-                flags: <int>[0x10000000],
-              );
-              try {
-                await intent.launch();
-              } catch (_) {
-                // App not installed — open Play Store listing
-                final playStore = Uri.parse('market://details?id=com.google.android.apps.walletnfcrel');
-                try {
-                  await launchUrl(playStore, mode: LaunchMode.externalApplication);
-                } catch (_) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Could not open Google Wallet')),
-                    );
-                  }
-                }
-              }
-            },
+          const ListTile(
+            leading: Icon(Icons.wallet),
+            title: Text('Open Google Wallet'),
+            subtitle: Text('Quick access to store loyalty cards'),
+            onTap: openGoogleWallet,
           ),
           const Divider(),
 
@@ -192,6 +172,7 @@ class SettingsScreen extends ConsumerWidget {
           ExpansionTile(
             title: const Text('Advanced'),
             children: [
+              _WebhookStatusTile(),
               ListTile(
                 title: const Text('Copy IFTTT webhook URL'),
                 subtitle: const Text('Use this in your IFTTT Google Assistant applet'),
@@ -519,6 +500,52 @@ class _AboutTileState extends State<_AboutTile> {
         applicationVersion: _versionLine,
         applicationLegalese:
             'A household grocery + pantry + recipe companion.\n\nAuthored by DazedDingo.',
+      ),
+    );
+  }
+}
+
+/// Read-only status line above the "Copy webhook URL" tile. Tells the user
+/// whether their IFTTT integration is actually firing, and what it last added.
+class _WebhookStatusTile extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final status = ref.watch(webhookStatusProvider);
+    return status.when(
+      data: (s) {
+        final lastAt = s.lastWebhookAt;
+        if (lastAt == null) {
+          return const ListTile(
+            dense: true,
+            leading: Icon(Icons.schedule, size: 20),
+            title: Text('IFTTT status'),
+            subtitle: Text('No trigger yet'),
+          );
+        }
+        final name = s.lastItemName ?? 'item';
+        final qty = s.lastQuantity ?? 1;
+        return ListTile(
+          dense: true,
+          leading: const Icon(Icons.check_circle, size: 20, color: Colors.green),
+          title: const Text('IFTTT status'),
+          subtitle: Text(
+            'Last trigger ${timeAgo(lastAt)} — added $qty × $name',
+          ),
+        );
+      },
+      loading: () => const ListTile(
+        dense: true,
+        leading: SizedBox(
+          width: 20, height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+        title: Text('IFTTT status'),
+      ),
+      error: (_, __) => const ListTile(
+        dense: true,
+        leading: Icon(Icons.error_outline, size: 20),
+        title: Text('IFTTT status'),
+        subtitle: Text('Unavailable'),
       ),
     );
   }

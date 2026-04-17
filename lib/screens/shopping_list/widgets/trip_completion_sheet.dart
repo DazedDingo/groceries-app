@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../models/history_entry.dart';
+import '../../../services/wallet_launcher.dart';
 
 class TripStats {
   final int itemCount;
@@ -149,12 +150,20 @@ class _TripCompletionSheet extends StatelessWidget {
               ),
             ],
             const SizedBox(height: 24),
-            Align(
-              alignment: Alignment.centerRight,
-              child: FilledButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Nice'),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton.icon(
+                  key: const ValueKey('trip-sheet-wallet'),
+                  icon: const Icon(Icons.wallet),
+                  label: const Text('Open Wallet'),
+                  onPressed: openGoogleWallet,
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Nice'),
+                ),
+              ],
             ),
           ],
         ),

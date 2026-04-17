@@ -31,6 +31,7 @@ Verified against `git log`. Do **not** re-propose these.
 - **Cook This: dedupe + unit-aware compare** (`b178b9f`, 2026-04-17). Three-bucket modal (inStock / onList / missing); only missing items are added. `hasEnough()` in `unit_converter.dart` normalises weight (g/kg/oz/lb) and volume (ml/L/fl oz/gal/cups) before comparing.
 - **Tranche 1 polish** (v0.1.33, 2026-04-17): check-off animation (180ms scale+fade on swipe, secondary `selectionClick` haptic after success) in `item_tile.dart`; pull-to-refresh on shopping, pantry, recipes screens (invalidates provider + short haptic); trip-completion bottom sheet triggered on list ≥1 → 0 with per-person breakdown, duration, and first-of-day celebration icon. See `trip_completion_sheet.dart` + shopping_list_screen `_maybeShowTripCompletion`.
 - **Tranche 2 polish** (v0.1.34, 2026-04-17): US/UK Produce aliases (cilantro/coriander, aubergine/eggplant, capsicum/bell pepper, zucchini, scallion/spring onion/green onion, arugula/rocket) in both Dart + TS category guessers with insertion-order tiebreak for deterministic sort. Smarter `lib/services/suggestion_ranker.dart` replaces the old three-pass substring/fuzzy loop in `add_item_dialog.dart`: scores candidates by match quality (exact > prefix > substring > fuzzy), recency (14-day half-life, +30 max), log-frequency (+40 max), high-priority pantry (+25), on-list penalty (-40), and source tie-breaks (pantry > history > on-list). `buildSuggestions` merges sources so duplicates collapse.
+- **Tranche 3 polish** (v0.1.35, 2026-04-17): IFTTT `addToList.ts` now writes `households/{id}/config/webhookStatus` (`lastWebhookAt`, `lastItemName`, `lastQuantity`) after a successful webhook fire; failure is swallowed so the primary write still succeeds. New `webhookStatusProvider` streams the doc; Settings → Advanced shows "Last trigger Xm ago — added N × item" via `lib/services/time_ago.dart`. Google Wallet is now a contextual `ActionChip` atop the shopping list (visible only when items exist) and a `TextButton.icon` in the trip-completion sheet, both routed through `lib/services/wallet_launcher.dart` (shared with the settings tile).
 
 v1 rated ~8 of the last 30 commits as open work when they were already shipped. Treat v1 as a snapshot of intent, not current state.
 
@@ -110,9 +111,9 @@ Defer until activation is fixed, then:
 
 Pattern: all three integrate *to* the app, not *with* it. Fixable cheaply.
 
-- **IFTTT / Google Home.** `functions/src/addToList.ts:73` + `settings_screen.dart:195` under collapsed Advanced. Zero in-app discovery, silent failures. Write `lastWebhookAt` on success; surface "last trigger 2m ago" in settings; coach-mark on voice FAB first-run. **S, one-shot.**
+- **IFTTT / Google Home.** `functions/src/addToList.ts` + Settings → Advanced. Silent failures now partially mitigated: `lastWebhookAt` + last-item status shipped v0.1.35. Coach-mark on voice FAB first-run still open. **S, one-shot.**
 - **Google Tasks sync.** `functions/src/syncGoogleTasks.ts` is invisible; failures log-only. Write `householdSyncStatus` doc with last-sync + error state; settings row with enable/disable + re-auth flow. **M, thread** — trust compounds.
-- **Google Wallet.** `settings_screen.dart:140` is just an intent launcher. Surface as a contextual chip atop the list when a trip starts; promote to the trip-complete sheet. **S, one-shot.**
+- ~~**Google Wallet.**~~ → **shipped v0.1.35.** Contextual `ActionChip` atop the shopping list (visible only when items exist) and secondary CTA in the trip-completion sheet. Settings tile now routes through the same `wallet_launcher.dart` helper.
 
 ---
 

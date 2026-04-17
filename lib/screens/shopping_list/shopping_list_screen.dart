@@ -21,6 +21,7 @@ import 'widgets/trip_completion_sheet.dart';
 import '../../services/unit_converter.dart';
 import '../../services/category_guesser.dart';
 import '../../services/suggestion_ranker.dart';
+import '../../services/wallet_launcher.dart';
 import '../shared/bulk_add_dialog.dart';
 import '../shared/empty_state.dart';
 import '../../services/text_item_parser.dart';
@@ -878,6 +879,20 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       ),
       body: Column(
         children: [
+          if (items.isNotEmpty)
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: ActionChip(
+                  key: ValueKey('wallet-chip'),
+                  avatar: Icon(Icons.wallet, size: 18),
+                  label: Text('Open Wallet'),
+                  onPressed: openGoogleWallet,
+                  tooltip: 'Store loyalty cards',
+                ),
+              ),
+            ),
           FilterBar(categories: categories),
           Expanded(
             child: RefreshIndicator(
