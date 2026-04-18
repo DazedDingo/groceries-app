@@ -60,8 +60,11 @@ void main() {
     });
 
     test('falls back to category when name has no match', () {
-      expect(guessShelfLifeDays('Dairy', itemName: 'Kefir'), 10);
-      expect(guessShelfLifeDays('Produce', itemName: 'Exotic fruit'), 7);
+      // Pick a name that doesn't contain any keyword substring. The expanded
+      // table covers most common items — "custard" and "purple dragonthing"
+      // aren't in it, so they must still fall through to the category value.
+      expect(guessShelfLifeDays('Dairy', itemName: 'Custard'), 10);
+      expect(guessShelfLifeDays('Produce', itemName: 'Purple dragonthing'), 7);
     });
 
     test('null or empty itemName falls through to category', () {

@@ -1,10 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../models/history_entry.dart';
 import '../../models/item.dart';
 import '../../models/pantry_item.dart';
 import '../../providers/categories_provider.dart';
+import '../../providers/history_provider.dart';
+import '../../providers/household_provider.dart';
 import '../../providers/items_provider.dart';
 import '../../providers/pantry_provider.dart';
-import '../../services/shelf_life_guesser.dart';
+import '../../services/shelf_life_resolver.dart';
 
 /// Snapshot of what changed when a shopping item was carted or deleted, so the
 /// action can be undone.
@@ -64,10 +67,15 @@ Future<CartReceipt> cartItemDetached(
           .where((c) => c.id == pantryItem!.categoryId)
           .map((c) => c.name)
           .firstOrNull;
-      if (catName != null) {
-        shelfLifeDaysFallback =
-            guessShelfLifeDays(catName, itemName: pantryItem.name);
-      }
+      final hId = container.read(householdIdProvider).value ?? '';
+      final history = hId.isEmpty
+          ? const <HistoryEntry>[]
+          : container.read(historyProvider(hId)).value ?? const <HistoryEntry>[];
+      shelfLifeDaysFallback = resolveShelfLifeDays(
+        itemName: pantryItem.name,
+        categoryName: catName,
+        history: history,
+      );
     }
 
     await container.read(itemsServiceProvider).checkOff(

@@ -29,7 +29,7 @@ import '../../providers/history_provider.dart';
 import '../../models/history_entry.dart';
 import '../../services/expiry_checker.dart';
 import '../../services/restock_checker.dart';
-import '../../services/shelf_life_guesser.dart';
+import '../../services/shelf_life_resolver.dart';
 import '../../services/fuzzy_match.dart';
 import '../shared/help_button.dart';
 
@@ -492,16 +492,20 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
 
       final categories = ref.read(categoriesProvider).value ?? const [];
       final catNameById = {for (final c in categories) c.id: c.name};
+      final history = ref.read(historyProvider(householdId)).value ??
+          const <HistoryEntry>[];
       final fallbacks = <String, int>{};
       for (final it in selected) {
         final pid = it.pantryItemId;
         if (pid == null) continue;
         final pi = pantryMap[pid];
         if (pi == null || pi.shelfLifeDays != null) continue;
-        final catName = catNameById[pi.categoryId];
-        if (catName == null) continue;
-        final guess = guessShelfLifeDays(catName, itemName: pi.name);
-        if (guess != null) fallbacks[pid] = guess;
+        final resolved = resolveShelfLifeDays(
+          itemName: pi.name,
+          categoryName: catNameById[pi.categoryId],
+          history: history,
+        );
+        if (resolved != null) fallbacks[pid] = resolved;
       }
 
       await ref.read(itemsServiceProvider).confirmBought(

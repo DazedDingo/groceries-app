@@ -36,24 +36,31 @@ jobs:
           storeFile=../groceries-release.jks
           EOF
 
-      - name: Build APK
-        run: flutter build apk --release
-
-      - name: Rename APK
-        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/Groceries.apk
-
       - name: Get version from pubspec
         id: version
         run: |
           VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
           echo "tag=v$VERSION" >> $GITHUB_OUTPUT
           echo "name=v$VERSION" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      # Gradle already renames the APK to groceries-v<version>-release.apk via
+      # the applicationVariants block in android/app/build.gradle.kts.
+      # Flatten that to the user-facing name (no build-type suffix) before
+      # attaching to the release.
+      - name: Stage release artifact
+        run: |
+          cp build/app/outputs/flutter-apk/groceries-v${{ steps.version.outputs.version }}-release.apk \
+             build/app/outputs/flutter-apk/Groceries-v${{ steps.version.outputs.version }}.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: ${{ steps.version.outputs.name }}
-          files: build/app/outputs/flutter-apk/Groceries.apk
+          files: build/app/outputs/flutter-apk/Groceries-v${{ steps.version.outputs.version }}.apk
           fail_on_unmatched_files: true
           generate_release_notes: true
