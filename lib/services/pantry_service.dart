@@ -22,6 +22,7 @@ class PantryService {
     required int currentQuantity,
     int? restockAfterDays,
     int? shelfLifeDays,
+    double? unitAmount,
     String? unit,
     String? location,
   }) async {
@@ -30,6 +31,7 @@ class PantryService {
       'optimalQuantity': optimalQuantity, 'currentQuantity': currentQuantity,
       'restockAfterDays': restockAfterDays,
       'shelfLifeDays': shelfLifeDays,
+      'unitAmount': unitAmount,
       'unit': unit,
       'expiresAt': null,
       'lastNudgedAt': null, 'lastPurchasedAt': null,

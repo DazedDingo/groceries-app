@@ -27,16 +27,22 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
   bool _isHighPriority = false;
   bool _initialized = false;
   late final TextEditingController _optimalController;
+  late final TextEditingController _unitAmountController;
+  late final TextEditingController _unitController;
 
   @override
   void initState() {
     super.initState();
     _optimalController = TextEditingController(text: '0');
+    _unitAmountController = TextEditingController();
+    _unitController = TextEditingController();
   }
 
   @override
   void dispose() {
     _optimalController.dispose();
+    _unitAmountController.dispose();
+    _unitController.dispose();
     super.dispose();
   }
 
@@ -53,6 +59,8 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
       _optimalQuantity = item.optimalQuantity;
       _isHighPriority = item.isHighPriority;
       _optimalController.text = '$_optimalQuantity';
+      _unitAmountController.text = _formatUnitAmount(item.unitAmount);
+      _unitController.text = item.unit ?? '';
       // Auto-guess shelf life if not set, and persist it. Priority:
       // learned-from-history (≥3 purchases) > per-item-name > category default.
       if (_selectedShelfLife == null) {
@@ -316,6 +324,94 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
                       ),
                     ],
                   ),
+                  const SizedBox(height: 12),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Per container', style: theme.textTheme.bodyLarge),
+                            Text(
+                              'Describes one container (e.g. 500 g). Separate from the count above.',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      SizedBox(
+                        width: 72,
+                        child: TextField(
+                          controller: _unitAmountController,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.titleMedium,
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                          ],
+                          decoration: const InputDecoration(
+                            isDense: true,
+                            hintText: '500',
+                            border: OutlineInputBorder(),
+                            contentPadding:
+                                EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                          ),
+                          onSubmitted: (val) {
+                            final parsed = double.tryParse(val.trim());
+                            ref.read(pantryServiceProvider).updateItem(
+                                householdId, widget.itemId, {
+                              'unitAmount': parsed,
+                            });
+                          },
+                          onEditingComplete: () {
+                            final parsed =
+                                double.tryParse(_unitAmountController.text.trim());
+                            ref.read(pantryServiceProvider).updateItem(
+                                householdId, widget.itemId, {
+                              'unitAmount': parsed,
+                            });
+                            FocusScope.of(context).unfocus();
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 80,
+                        child: TextField(
+                          controller: _unitController,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.titleMedium,
+                          decoration: const InputDecoration(
+                            isDense: true,
+                            hintText: 'g',
+                            border: OutlineInputBorder(),
+                            contentPadding:
+                                EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                          ),
+                          onSubmitted: (val) {
+                            final trimmed = val.trim();
+                            ref.read(pantryServiceProvider).updateItem(
+                                householdId, widget.itemId, {
+                              'unit': trimmed.isEmpty ? null : trimmed,
+                            });
+                          },
+                          onEditingComplete: () {
+                            final trimmed = _unitController.text.trim();
+                            ref.read(pantryServiceProvider).updateItem(
+                                householdId, widget.itemId, {
+                              'unit': trimmed.isEmpty ? null : trimmed,
+                            });
+                            FocusScope.of(context).unfocus();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 4),
                   SwitchListTile(
                     value: _isHighPriority,
@@ -509,6 +605,12 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
         ],
       ),
     );
+  }
+
+  String _formatUnitAmount(double? v) {
+    if (v == null) return '';
+    if (v == v.roundToDouble()) return v.toInt().toString();
+    return v.toString();
   }
 
   String _formatDate(DateTime date) {

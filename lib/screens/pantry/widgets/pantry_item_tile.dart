@@ -63,6 +63,13 @@ class PantryItemTile extends StatelessWidget {
           Row(
             children: [
               Text('${item.currentQuantity} / ${item.optimalQuantity} optimal'),
+              if (_formatPerContainer(item).isNotEmpty) ...[
+                const SizedBox(width: 6),
+                Text('· ${_formatPerContainer(item)}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        )),
+              ],
               if (item.location != null) ...[
                 const SizedBox(width: 8),
                 Icon(_iconForLocation(item.location),
@@ -130,6 +137,20 @@ class PantryItemTile extends StatelessWidget {
               ],
             ),
     );
+  }
+
+  String _formatPerContainer(PantryItem p) {
+    final amt = p.unitAmount;
+    final u = p.unit?.trim();
+    if (amt != null && amt > 0 && u != null && u.isNotEmpty) {
+      final n = amt == amt.roundToDouble() ? amt.toInt().toString() : amt.toString();
+      return '$n$u';
+    }
+    if (amt != null && amt > 0) {
+      return amt == amt.roundToDouble() ? amt.toInt().toString() : amt.toString();
+    }
+    if (u != null && u.isNotEmpty) return u;
+    return '';
   }
 
   IconData _iconForLocation(String? location) {

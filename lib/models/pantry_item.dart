@@ -32,6 +32,10 @@ class PantryItem {
   final int currentQuantity;
   final int? restockAfterDays;
   final int? shelfLifeDays;
+  /// Per-container amount (e.g. 500 for a "500 g" bag of flour). Together with
+  /// [unit], describes one container. Independent of [currentQuantity]/
+  /// [optimalQuantity], which count whole containers.
+  final double? unitAmount;
   final String? unit;
   final DateTime? expiresAt;
   final DateTime? lastNudgedAt;
@@ -49,7 +53,7 @@ class PantryItem {
     required this.id, required this.name, required this.categoryId,
     required this.preferredStores, required this.optimalQuantity,
     required this.currentQuantity, required this.restockAfterDays,
-    this.shelfLifeDays, this.unit, this.expiresAt,
+    this.shelfLifeDays, this.unitAmount, this.unit, this.expiresAt,
     required this.lastNudgedAt, required this.lastPurchasedAt,
     this.runningLowAt,
     this.location,
@@ -81,6 +85,7 @@ class PantryItem {
     'optimalQuantity': optimalQuantity, 'currentQuantity': currentQuantity,
     'restockAfterDays': restockAfterDays,
     'shelfLifeDays': shelfLifeDays,
+    'unitAmount': unitAmount,
     'unit': unit,
     'expiresAt': expiresAt != null ? Timestamp.fromDate(expiresAt!) : null,
     'lastNudgedAt': lastNudgedAt != null ? Timestamp.fromDate(lastNudgedAt!) : null,
@@ -100,6 +105,7 @@ class PantryItem {
       currentQuantity: d['currentQuantity'] ?? 0,
       restockAfterDays: d['restockAfterDays'],
       shelfLifeDays: d['shelfLifeDays'],
+      unitAmount: (d['unitAmount'] as num?)?.toDouble(),
       unit: d['unit'] as String?,
       expiresAt: (d['expiresAt'] as Timestamp?)?.toDate(),
       lastNudgedAt: (d['lastNudgedAt'] as Timestamp?)?.toDate(),
@@ -118,6 +124,7 @@ class PantryItem {
     int? currentQuantity,
     int? restockAfterDays,
     int? shelfLifeDays,
+    double? unitAmount,
     String? unit,
     DateTime? expiresAt,
     DateTime? lastNudgedAt,
@@ -134,6 +141,7 @@ class PantryItem {
     currentQuantity: currentQuantity ?? this.currentQuantity,
     restockAfterDays: restockAfterDays ?? this.restockAfterDays,
     shelfLifeDays: shelfLifeDays ?? this.shelfLifeDays,
+    unitAmount: unitAmount ?? this.unitAmount,
     unit: unit ?? this.unit,
     expiresAt: expiresAt ?? this.expiresAt,
     lastNudgedAt: lastNudgedAt ?? this.lastNudgedAt,

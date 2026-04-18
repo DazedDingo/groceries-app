@@ -206,24 +206,31 @@ class ItemsService {
     required String householdId,
     required ShoppingItem item,
     PantryItem? pantryItem,
+    /// Days to use as a shelf-life fallback when `pantryItem.shelfLifeDays` is
+    /// null. When non-null and used, it's also persisted to the pantry doc so
+    /// future check-offs stop needing to guess.
+    int? shelfLifeDaysFallback,
   }) async {
     final batch = _db.batch();
     batch.delete(_db.doc('households/$householdId/items/${item.id}'));
     if (pantryItem != null) {
-      // Use the explicit link if available, otherwise fall back to the matched item's id.
       final pantryId = item.pantryItemId ?? pantryItem.id;
-      // Only increment quantity when units are compatible (both null, or both equal).
-      // A mismatch (e.g. list "2 pieces" vs pantry "200g") would corrupt the number,
-      // so we skip the increment but still update lastPurchasedAt.
       final unitsCompatible = item.unit == pantryItem.unit;
       final updates = <String, dynamic>{
         if (unitsCompatible) 'currentQuantity': FieldValue.increment(item.quantity),
         'lastPurchasedAt': FieldValue.serverTimestamp(),
       };
-      if (pantryItem.shelfLifeDays != null) {
+      final effectiveShelfLife =
+          pantryItem.shelfLifeDays ?? shelfLifeDaysFallback;
+      if (effectiveShelfLife != null) {
+        // Always restart the countdown on buy so the banner reflects the
+        // freshly-purchased item, not the leftover from the previous batch.
         updates['expiresAt'] = Timestamp.fromDate(
-          DateTime.now().add(Duration(days: pantryItem.shelfLifeDays!)),
+          DateTime.now().add(Duration(days: effectiveShelfLife)),
         );
+        if (pantryItem.shelfLifeDays == null) {
+          updates['shelfLifeDays'] = effectiveShelfLife;
+        }
       }
       batch.update(
         _db.doc('households/$householdId/pantry/$pantryId'),
@@ -244,6 +251,9 @@ class ItemsService {
     required String householdId,
     required List<ShoppingItem> items,
     required Map<String, PantryItem> pantryItems,
+    /// Keyed by pantry-item id: the shelf-life fallback to apply when that
+    /// pantry entry has no `shelfLifeDays` set.
+    Map<String, int>? shelfLifeDaysFallbacks,
   }) async {
     final batch = _db.batch();
     for (final item in items) {
@@ -255,10 +265,15 @@ class ItemsService {
           if (unitsCompatible) 'currentQuantity': FieldValue.increment(item.quantity),
           'lastPurchasedAt': FieldValue.serverTimestamp(),
         };
-        if (pi.shelfLifeDays != null) {
+        final effectiveShelfLife = pi.shelfLifeDays ??
+            shelfLifeDaysFallbacks?[item.pantryItemId];
+        if (effectiveShelfLife != null) {
           updates['expiresAt'] = Timestamp.fromDate(
-            DateTime.now().add(Duration(days: pi.shelfLifeDays!)),
+            DateTime.now().add(Duration(days: effectiveShelfLife)),
           );
+          if (pi.shelfLifeDays == null) {
+            updates['shelfLifeDays'] = effectiveShelfLife;
+          }
         }
         batch.update(
           _db.doc('households/$householdId/pantry/${item.pantryItemId}'),

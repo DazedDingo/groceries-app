@@ -27,7 +27,9 @@ import '../shared/empty_state.dart';
 import '../../services/text_item_parser.dart';
 import '../../providers/history_provider.dart';
 import '../../models/history_entry.dart';
+import '../../services/expiry_checker.dart';
 import '../../services/restock_checker.dart';
+import '../../services/shelf_life_guesser.dart';
 import '../../services/fuzzy_match.dart';
 import '../shared/help_button.dart';
 
@@ -42,11 +44,13 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   final Set<String> _selectedIds = {};
   bool _selecting = false;
   bool _restockChecked = false;
+  bool _expiryChecked = false;
   Set<String> _knownItemIds = {};
   bool _tripSheetShowing = false;
   bool _sawNonEmptyList = false;
 
   static const _kLastTripDatePref = 'lastTripCompletionDate';
+  static const _kDismissedExpiryFingerprintPref = 'dismissedExpiryFingerprint';
 
   Future<bool> _isFirstTripOfDay() async {
     final prefs = await SharedPreferences.getInstance();
@@ -65,6 +69,59 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
     ref.invalidate(pantryProvider);
     await Future.delayed(const Duration(milliseconds: 400));
     HapticFeedback.selectionClick();
+  }
+
+  Future<void> _maybeShowExpiryBanner(List<PantryItem> pantryList) async {
+    final flagged = findExpiringBelowOptimal(pantryList);
+    if (flagged.isEmpty) return;
+    final fingerprint = expiringFingerprint(flagged);
+
+    final user = ref.read(authStateProvider).valueOrNull;
+    final uid = user?.uid ?? '_anon';
+    final prefKey = '$_kDismissedExpiryFingerprintPref:$uid';
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getString(prefKey) == fingerprint) return; // dismissed for this state
+    if (!mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final lines = flagged.map((p) {
+      final exp = p.expiresAt!;
+      final days = exp.difference(DateTime.now()).inDays;
+      final when = days < 0
+          ? 'expired ${-days}d ago'
+          : days == 0
+              ? 'expires today'
+              : 'expires in ${days}d';
+      return '• ${p.name} ($when, ${p.currentQuantity}/${p.optimalQuantity})';
+    }).join('\n');
+
+    messenger.showMaterialBanner(
+      MaterialBanner(
+        backgroundColor: scheme.errorContainer,
+        leading: Icon(Icons.warning_amber, color: scheme.onErrorContainer),
+        content: Text(
+          '${flagged.length} pantry item${flagged.length == 1 ? '' : 's'} below optimal and expiring:\n$lines',
+          style: TextStyle(color: scheme.onErrorContainer),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              messenger.hideCurrentMaterialBanner();
+              await prefs.setString(prefKey, fingerprint);
+            },
+            child: const Text('Dismiss'),
+          ),
+          TextButton(
+            onPressed: () {
+              messenger.hideCurrentMaterialBanner();
+              context.go('/pantry');
+            },
+            child: const Text('Open pantry'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _maybeShowTripCompletion(String householdId) async {
@@ -433,10 +490,25 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
         }
       }
 
+      final categories = ref.read(categoriesProvider).value ?? const [];
+      final catNameById = {for (final c in categories) c.id: c.name};
+      final fallbacks = <String, int>{};
+      for (final it in selected) {
+        final pid = it.pantryItemId;
+        if (pid == null) continue;
+        final pi = pantryMap[pid];
+        if (pi == null || pi.shelfLifeDays != null) continue;
+        final catName = catNameById[pi.categoryId];
+        if (catName == null) continue;
+        final guess = guessShelfLifeDays(catName, itemName: pi.name);
+        if (guess != null) fallbacks[pid] = guess;
+      }
+
       await ref.read(itemsServiceProvider).confirmBought(
         householdId: householdId,
         items: selected,
         pantryItems: pantryMap,
+        shelfLifeDaysFallbacks: fallbacks,
       );
       if (mounted) {
         setState(() {
@@ -800,14 +872,21 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
 
     // Check for overdue restocks once pantry data loads
     ref.listen(pantryProvider, (prev, next) {
-      if (_restockChecked) return;
       final pantryList = next.value;
       if (pantryList == null) return; // still loading
-      _restockChecked = true;
-      final overdue = findOverdueRestocks(pantryList);
-      if (overdue.isNotEmpty && householdId.isNotEmpty) {
+      if (!_restockChecked) {
+        _restockChecked = true;
+        final overdue = findOverdueRestocks(pantryList);
+        if (overdue.isNotEmpty && householdId.isNotEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _showRestockNudge(householdId, overdue);
+          });
+        }
+      }
+      if (!_expiryChecked) {
+        _expiryChecked = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) _showRestockNudge(householdId, overdue);
+          if (mounted) _maybeShowExpiryBanner(pantryList);
         });
       }
     });

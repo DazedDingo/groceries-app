@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/item.dart';
 import '../../models/pantry_item.dart';
+import '../../providers/categories_provider.dart';
 import '../../providers/items_provider.dart';
 import '../../providers/pantry_provider.dart';
+import '../../services/shelf_life_guesser.dart';
 
 /// Snapshot of what changed when a shopping item was carted or deleted, so the
 /// action can be undone.
@@ -55,10 +57,24 @@ Future<CartReceipt> cartItemDetached(
       }
     }
 
+    int? shelfLifeDaysFallback;
+    if (pantryItem != null && pantryItem.shelfLifeDays == null) {
+      final categories = container.read(categoriesProvider).value ?? const [];
+      final catName = categories
+          .where((c) => c.id == pantryItem!.categoryId)
+          .map((c) => c.name)
+          .firstOrNull;
+      if (catName != null) {
+        shelfLifeDaysFallback =
+            guessShelfLifeDays(catName, itemName: pantryItem.name);
+      }
+    }
+
     await container.read(itemsServiceProvider).checkOff(
       householdId: householdId,
       item: item,
       pantryItem: pantryItem,
+      shelfLifeDaysFallback: shelfLifeDaysFallback,
     );
   } catch (_) {
     // Caller may already be disposed; nothing to surface.
