@@ -79,6 +79,30 @@ class PantryService {
     await _db.doc('households/$householdId/pantry/$itemId').update(updates);
   }
 
+  /// Flag an item as "running low". The pantry screen auto-adds it to the
+  /// shopping list after a grace period (see `itemsDueForPromotion`). Callers
+  /// should record the prior value so an undo can restore it.
+  Future<void> markRunningLow({
+    required String householdId,
+    required String itemId,
+    required DateTime at,
+  }) async {
+    await _db.doc('households/$householdId/pantry/$itemId').update({
+      'runningLowAt': Timestamp.fromDate(at),
+    });
+  }
+
+  /// Clears the running-low flag (either because the user undid the press,
+  /// or the item has been promoted to the shopping list).
+  Future<void> clearRunningLow({
+    required String householdId,
+    required String itemId,
+  }) async {
+    await _db.doc('households/$householdId/pantry/$itemId').update({
+      'runningLowAt': null,
+    });
+  }
+
   Future<void> decrementQuantity({
     required String householdId,
     required String itemId,

@@ -36,6 +36,10 @@ class PantryItem {
   final DateTime? expiresAt;
   final DateTime? lastNudgedAt;
   final DateTime? lastPurchasedAt;
+  /// When the user flagged this item as "running low". After a grace period
+  /// (see `itemsDueForPromotion`) the pantry screen auto-adds it to the
+  /// shopping list and clears this timestamp. Null when not flagged.
+  final DateTime? runningLowAt;
   /// Storage key for the item's location. Matches [PantryLocation.id] for
   /// built-in locations, or is the raw label string for custom locations.
   final String? location;
@@ -47,6 +51,7 @@ class PantryItem {
     required this.currentQuantity, required this.restockAfterDays,
     this.shelfLifeDays, this.unit, this.expiresAt,
     required this.lastNudgedAt, required this.lastPurchasedAt,
+    this.runningLowAt,
     this.location,
     this.isHighPriority = false,
   });
@@ -80,6 +85,7 @@ class PantryItem {
     'expiresAt': expiresAt != null ? Timestamp.fromDate(expiresAt!) : null,
     'lastNudgedAt': lastNudgedAt != null ? Timestamp.fromDate(lastNudgedAt!) : null,
     'lastPurchasedAt': lastPurchasedAt != null ? Timestamp.fromDate(lastPurchasedAt!) : null,
+    'runningLowAt': runningLowAt != null ? Timestamp.fromDate(runningLowAt!) : null,
     'location': location,
     'isHighPriority': isHighPriority,
   };
@@ -98,6 +104,7 @@ class PantryItem {
       expiresAt: (d['expiresAt'] as Timestamp?)?.toDate(),
       lastNudgedAt: (d['lastNudgedAt'] as Timestamp?)?.toDate(),
       lastPurchasedAt: (d['lastPurchasedAt'] as Timestamp?)?.toDate(),
+      runningLowAt: (d['runningLowAt'] as Timestamp?)?.toDate(),
       location: d['location'] as String?,
       isHighPriority: d['isHighPriority'] ?? false,
     );
@@ -115,6 +122,7 @@ class PantryItem {
     DateTime? expiresAt,
     DateTime? lastNudgedAt,
     DateTime? lastPurchasedAt,
+    DateTime? runningLowAt,
     String? location,
     bool? isHighPriority,
   }) => PantryItem(
@@ -130,6 +138,7 @@ class PantryItem {
     expiresAt: expiresAt ?? this.expiresAt,
     lastNudgedAt: lastNudgedAt ?? this.lastNudgedAt,
     lastPurchasedAt: lastPurchasedAt ?? this.lastPurchasedAt,
+    runningLowAt: runningLowAt ?? this.runningLowAt,
     location: location ?? this.location,
     isHighPriority: isHighPriority ?? this.isHighPriority,
   );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../models/pantry_item.dart';
+import '../../../services/running_low_promoter.dart';
 
 class PantryItemTile extends StatelessWidget {
   final PantryItem item;
@@ -7,6 +8,8 @@ class PantryItemTile extends StatelessWidget {
   final VoidCallback onDecrement;
   final VoidCallback onIncrement;
   final VoidCallback onAddToList;
+  final VoidCallback onMarkRunningLow;
+  final VoidCallback onClearRunningLow;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
   final bool isSelecting;
@@ -15,7 +18,10 @@ class PantryItemTile extends StatelessWidget {
   const PantryItemTile({
     super.key, required this.item, required this.categoryName,
     required this.onDecrement, required this.onIncrement,
-    required this.onAddToList, required this.onTap,
+    required this.onAddToList,
+    required this.onMarkRunningLow,
+    required this.onClearRunningLow,
+    required this.onTap,
     this.onLongPress,
     this.isSelecting = false,
     this.isSelected = false,
@@ -69,16 +75,36 @@ class PantryItemTile extends StatelessWidget {
               ],
             ],
           ),
-          if (item.isBelowOptimal)
-            TextButton.icon(
-              onPressed: onAddToList,
-              icon: const Icon(Icons.add_shopping_cart, size: 16),
-              label: const Text('Add to list'),
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                visualDensity: VisualDensity.compact,
-              ),
-            ),
+          Wrap(
+            spacing: 8,
+            children: [
+              if (item.isBelowOptimal)
+                TextButton.icon(
+                  onPressed: onAddToList,
+                  icon: const Icon(Icons.add_shopping_cart, size: 16),
+                  label: const Text('Add to list'),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ),
+              if (item.runningLowAt == null)
+                TextButton.icon(
+                  onPressed: onMarkRunningLow,
+                  icon: const Icon(Icons.trending_down, size: 16),
+                  label: const Text('Running low'),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                )
+              else
+                _RunningLowChip(
+                  flaggedAt: item.runningLowAt!,
+                  onClear: onClearRunningLow,
+                ),
+            ],
+          ),
         ],
       ),
       trailing: isSelecting
@@ -121,5 +147,31 @@ class PantryItemTile extends StatelessWidget {
   String _labelForLocation(String? location) {
     if (location == null) return '';
     return PantryLocation.fromId(location)?.label ?? location;
+  }
+}
+
+class _RunningLowChip extends StatelessWidget {
+  final DateTime flaggedAt;
+  final VoidCallback onClear;
+  const _RunningLowChip({required this.flaggedAt, required this.onClear});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final dueAt = flaggedAt.add(runningLowDelay);
+    final daysLeft = dueAt.difference(DateTime.now()).inDays;
+    final label = daysLeft <= 0
+        ? 'Running low — adding next open'
+        : 'Running low — adds in ${daysLeft + 1}d';
+    return InputChip(
+      avatar: Icon(Icons.trending_down, size: 14, color: scheme.onSecondaryContainer),
+      label: Text(label, style: Theme.of(context).textTheme.labelSmall),
+      onDeleted: onClear,
+      deleteIcon: const Icon(Icons.close, size: 14),
+      deleteButtonTooltipMessage: 'Cancel running-low',
+      backgroundColor: scheme.secondaryContainer,
+      visualDensity: VisualDensity.compact,
+      padding: EdgeInsets.zero,
+    );
   }
 }

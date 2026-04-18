@@ -12,6 +12,7 @@ import '../../models/item.dart';
 import '../../models/category.dart';
 import '../../models/pantry_item.dart';
 import '../../services/category_guesser.dart';
+import '../../services/running_low_promoter.dart';
 import '../../services/text_item_parser.dart';
 import '../shared/bulk_add_dialog.dart';
 import '../shared/empty_state.dart';
@@ -28,6 +29,8 @@ class PantryScreen extends ConsumerStatefulWidget {
 class _PantryScreenState extends ConsumerState<PantryScreen> {
   final Set<String> _selectedIds = {};
   bool _selecting = false;
+  bool _promotedThisSession = false;
+  final Set<String> _promotingInFlight = {};
 
   void _enterSelecting(String id) {
     setState(() {
@@ -104,6 +107,92 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
     }
   }
 
+  Future<void> _markRunningLow(
+    String householdId,
+    PantryItem item,
+  ) async {
+    final now = DateTime.now();
+    HapticFeedback.selectionClick();
+    final service = ref.read(pantryServiceProvider);
+    await service.markRunningLow(
+      householdId: householdId, itemId: item.id, at: now,
+    );
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text('Running low: ${item.name} — adds to list in 2 days'),
+        duration: const Duration(milliseconds: 2500),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {
+            service.clearRunningLow(
+              householdId: householdId, itemId: item.id,
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _clearRunningLow(String householdId, String itemId) async {
+    HapticFeedback.selectionClick();
+    await ref.read(pantryServiceProvider).clearRunningLow(
+      householdId: householdId, itemId: itemId,
+    );
+  }
+
+  void _maybePromoteRunningLow({
+    required String householdId,
+    required List<PantryItem> pantry,
+    required List<ShoppingItem> shoppingList,
+    required AddedBy addedBy,
+  }) {
+    if (_promotedThisSession) return;
+    if (householdId.isEmpty) return;
+    final due = itemsDueForPromotion(
+      pantry: pantry,
+      shoppingList: shoppingList,
+      now: DateTime.now(),
+    ).where((p) => !_promotingInFlight.contains(p.id)).toList();
+    _promotedThisSession = true;
+    if (due.isEmpty) return;
+
+    final itemsService = ref.read(itemsServiceProvider);
+    final pantryService = ref.read(pantryServiceProvider);
+    for (final item in due) {
+      _promotingInFlight.add(item.id);
+    }
+    Future(() async {
+      for (final item in due) {
+        try {
+          await itemsService.addItem(
+            householdId: householdId,
+            name: item.name,
+            categoryId: item.categoryId,
+            preferredStores: item.preferredStores,
+            pantryItemId: item.id,
+            quantity: (item.optimalQuantity - item.currentQuantity).clamp(1, 999),
+            addedBy: addedBy,
+          );
+          await pantryService.clearRunningLow(
+            householdId: householdId, itemId: item.id,
+          );
+        } finally {
+          _promotingInFlight.remove(item.id);
+        }
+      }
+      if (!mounted) return;
+      final msg = due.length == 1
+          ? 'Added "${due.first.name}" to your list (was running low).'
+          : 'Added ${due.length} running-low items to your list.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(msg), duration: const Duration(seconds: 3)),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final pantry = ref.watch(filteredPantryProvider);
@@ -112,7 +201,23 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
     final categories = ref.watch(categoriesProvider).value ?? [];
     final pantryService = ref.watch(pantryServiceProvider);
     final itemsService = ref.watch(itemsServiceProvider);
+    final items = ref.watch(itemsProvider).value ?? const <ShoppingItem>[];
     final user = ref.watch(authStateProvider).value;
+
+    final addedBy = AddedBy(
+      uid: user?.uid,
+      displayName: user?.displayName ?? 'Unknown',
+      source: ItemSource.app,
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _maybePromoteRunningLow(
+        householdId: householdId,
+        pantry: pantry,
+        shoppingList: items,
+        addedBy: addedBy,
+      );
+    });
 
     final expired = pantry.where((p) => p.isExpired).toList();
     final expiringSoon = pantry.where((p) => p.isExpiringSoon).toList();
@@ -168,12 +273,10 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
         preferredStores: item.preferredStores,
         pantryItemId: item.id,
         quantity: (item.optimalQuantity - item.currentQuantity).clamp(1, 999),
-        addedBy: AddedBy(
-          uid: user?.uid,
-          displayName: user?.displayName ?? 'Unknown',
-          source: ItemSource.app,
-        ),
+        addedBy: addedBy,
       ),
+      onMarkRunningLow: () => _markRunningLow(householdId, item),
+      onClearRunningLow: () => _clearRunningLow(householdId, item.id),
       onTap: () {
         if (_selecting) {
           _toggleSelection(item.id);

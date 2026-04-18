@@ -130,6 +130,26 @@ void main() {
       expect(snap.docs.length, 1);
     });
 
+    test('markRunningLow sets runningLowAt to the given timestamp', () async {
+      await seedItem();
+      final now = DateTime(2026, 4, 18, 10);
+      await service.markRunningLow(
+        householdId: 'hh1', itemId: 'p1', at: now,
+      );
+      final doc = await fakeDb.doc('households/hh1/pantry/p1').get();
+      expect((doc['runningLowAt'] as dynamic).toDate(), now);
+    });
+
+    test('clearRunningLow resets runningLowAt to null', () async {
+      await seedItem();
+      await service.markRunningLow(
+        householdId: 'hh1', itemId: 'p1', at: DateTime(2026, 4, 18),
+      );
+      await service.clearRunningLow(householdId: 'hh1', itemId: 'p1');
+      final doc = await fakeDb.doc('households/hh1/pantry/p1').get();
+      expect(doc['runningLowAt'], isNull);
+    });
+
     test('pantryStream defaults isHighPriority to false for legacy items', () async {
       // Legacy items written before the field existed have no isHighPriority key
       await fakeDb.doc('households/hh1/pantry/legacy').set({

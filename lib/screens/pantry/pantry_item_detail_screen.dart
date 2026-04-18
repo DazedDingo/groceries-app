@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../models/history_entry.dart';
 import '../../models/pantry_item.dart';
 import '../../providers/pantry_provider.dart';
 import '../../providers/household_provider.dart';
 import '../../services/shelf_life_guesser.dart';
+import '../../services/shelf_life_learner.dart';
 import '../../providers/categories_provider.dart';
+import '../../providers/history_provider.dart';
 import '../shared/help_button.dart';
 
 class PantryItemDetailScreen extends ConsumerStatefulWidget {
@@ -49,22 +52,29 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
       _optimalQuantity = item.optimalQuantity;
       _isHighPriority = item.isHighPriority;
       _optimalController.text = '$_optimalQuantity';
-      // Auto-guess shelf life if not set, and persist it
+      // Auto-guess shelf life if not set, and persist it. Priority:
+      // learned-from-history (≥3 purchases) > per-item-name > category default.
       if (_selectedShelfLife == null) {
-        final categories = ref.read(categoriesProvider).value ?? [];
-        final catName = categories
-            .where((c) => c.id == item.categoryId)
-            .map((c) => c.name)
-            .firstOrNull;
-        if (catName != null) {
-          _selectedShelfLife = guessShelfLifeDays(catName);
-          if (_selectedShelfLife != null) {
-            final hId = ref.read(householdIdProvider).value ?? '';
-            if (hId.isNotEmpty) {
-              ref.read(pantryServiceProvider).updateItem(
-                  hId, item.id, {'shelfLifeDays': _selectedShelfLife});
-            }
+        final hId = ref.read(householdIdProvider).value ?? '';
+        final history = hId.isEmpty
+            ? const <HistoryEntry>[]
+            : ref.read(historyProvider(hId)).value ?? const <HistoryEntry>[];
+        _selectedShelfLife =
+            learnedShelfLifeDays(purchaseDatesFor(history, item.name));
+        if (_selectedShelfLife == null) {
+          final categories = ref.read(categoriesProvider).value ?? [];
+          final catName = categories
+              .where((c) => c.id == item.categoryId)
+              .map((c) => c.name)
+              .firstOrNull;
+          if (catName != null) {
+            _selectedShelfLife =
+                guessShelfLifeDays(catName, itemName: item.name);
           }
+        }
+        if (_selectedShelfLife != null && hId.isNotEmpty) {
+          ref.read(pantryServiceProvider).updateItem(
+              hId, item.id, {'shelfLifeDays': _selectedShelfLife});
         }
       }
     }
