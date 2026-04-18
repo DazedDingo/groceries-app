@@ -6,14 +6,16 @@ import 'package:groceries_app/services/running_low_promoter.dart';
 PantryItem _pantry({
   required String id,
   DateTime? runningLowAt,
+  int optimal = 2,
+  int current = 1,
 }) =>
     PantryItem(
       id: id,
       name: id,
       categoryId: 'c',
       preferredStores: const [],
-      optimalQuantity: 2,
-      currentQuantity: 1,
+      optimalQuantity: optimal,
+      currentQuantity: current,
       restockAfterDays: null,
       lastNudgedAt: null,
       lastPurchasedAt: null,
@@ -118,6 +120,41 @@ void main() {
         pantry: [p1, p2, p3], shoppingList: const [], now: now,
       );
       expect(due.map((i) => i.id).toSet(), {'p1', 'p2'});
+    });
+  });
+
+  group('promoteQuantities', () {
+    test('decrements current by 1 and adds (optimal - newCurrent) to list', () {
+      final p = _pantry(id: 'p1', optimal: 5, current: 3);
+      final q = promoteQuantities(p);
+      expect(q.newCurrent, 2);
+      // Check-off will add 3 back → lands at optimal (5).
+      expect(q.listQuantity, 3);
+    });
+
+    test('clamps current at 0 — never negative', () {
+      final p = _pantry(id: 'p1', optimal: 5, current: 0);
+      final q = promoteQuantities(p);
+      expect(q.newCurrent, 0);
+      expect(q.listQuantity, 5);
+    });
+
+    test('handles single-container items (optimal=1, current=1)', () {
+      // One shaker of cinnamon: flagged low → pantry drops to 0, list gets 1.
+      final p = _pantry(id: 'p1', optimal: 1, current: 1);
+      final q = promoteQuantities(p);
+      expect(q.newCurrent, 0);
+      expect(q.listQuantity, 1);
+    });
+
+    test('listQuantity never drops below 1 even if already at/above optimal', () {
+      // Shouldn't happen in practice (why flag running-low at optimal?), but
+      // the clamp is load-bearing: post-decrement current of `optimal` would
+      // make listQuantity = 0 without it.
+      final p = _pantry(id: 'p1', optimal: 2, current: 3);
+      final q = promoteQuantities(p);
+      expect(q.newCurrent, 2);
+      expect(q.listQuantity, 1);
     });
   });
 }

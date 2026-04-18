@@ -167,17 +167,20 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
     Future(() async {
       for (final item in due) {
         try {
+          final q = promoteQuantities(item);
           await itemsService.addItem(
             householdId: householdId,
             name: item.name,
             categoryId: item.categoryId,
             preferredStores: item.preferredStores,
             pantryItemId: item.id,
-            quantity: (item.optimalQuantity - item.currentQuantity).clamp(1, 999),
+            quantity: q.listQuantity,
             addedBy: addedBy,
           );
-          await pantryService.clearRunningLow(
-            householdId: householdId, itemId: item.id,
+          await pantryService.updateItem(
+            householdId,
+            item.id,
+            {'currentQuantity': q.newCurrent, 'runningLowAt': null},
           );
         } finally {
           _promotingInFlight.remove(item.id);

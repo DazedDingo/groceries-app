@@ -28,3 +28,16 @@ List<PantryItem> itemsDueForPromotion({
     return now.difference(flagged) >= delay;
   }).toList();
 }
+
+/// (newCurrentQuantity, shoppingListQuantity) for an item being promoted.
+///
+/// Promoting represents "that container is done" — the pantry count drops by
+/// 1 (clamped at 0), and we add enough to the shopping list to reach optimal
+/// from the post-decrement count so a successful check-off lands back at
+/// optimal (check-off increments pantry by the list quantity).
+({int newCurrent, int listQuantity}) promoteQuantities(PantryItem item) {
+  final newCurrent = item.currentQuantity > 0 ? item.currentQuantity - 1 : 0;
+  final listQuantity =
+      (item.optimalQuantity - newCurrent).clamp(1, 999).toInt();
+  return (newCurrent: newCurrent, listQuantity: listQuantity);
+}
