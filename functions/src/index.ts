@@ -1,11 +1,15 @@
 import * as admin from 'firebase-admin';
 import * as functionsV1 from 'firebase-functions/v1';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { defineSecret } from 'firebase-functions/params';
 import * as logger from 'firebase-functions/logger';
 import { handleIftttWebhook } from './addToList.js';
 import { syncGoogleTasks } from './syncGoogleTasks.js';
 import { nudgeRestock } from './nudgeRestock.js';
+import { processIssueQueue, makeGitHubPoster } from './processIssueQueue.js';
 export { submitIssue } from './submitIssue.js';
+
+const GITHUB_PAT = defineSecret('GITHUB_PAT');
 
 admin.initializeApp();
 
@@ -45,3 +49,14 @@ export const restockNudge = onSchedule('every 6 hours', async () => {
     logger.info('Restock nudge', result);
   }
 });
+
+// Drain the debounced issue queue — files bundled batches to GitHub.
+export const drainIssueQueue = onSchedule(
+  { schedule: 'every 2 minutes', secrets: [GITHUB_PAT] },
+  async () => {
+    const result = await processIssueQueue(makeGitHubPoster(GITHUB_PAT.value()));
+    if (result.dispatched > 0 || result.errors > 0) {
+      logger.info('Issue queue drained', result);
+    }
+  },
+);

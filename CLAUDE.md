@@ -32,7 +32,8 @@ Shared household grocery app: shopping lists, pantry tracking, recipes, meal pla
 - **categoryGuesser.ts** — Maps items to categories (server-side; client-side mirror in `lib/services/category_guesser.dart`. Both length-sort keywords as of `dd46081`; keep them in sync when adding aliases).
 - **nudgeRestock.ts** — Push notifications for pantry restocking.
 - **syncGoogleTasks.ts** — Two-way sync with Google Tasks API.
-- **firestoreWriter.ts** / **submitIssue.ts** — Utility functions.
+- **firestoreWriter.ts** — Utility functions.
+- **submitIssue.ts** / **issueQueue.ts** / **processIssueQueue.ts** — "Fix this" queue. The callable enqueues into `households/{hid}/issueBatches/{id}`; a scheduled drain (every 2 min) bundles each pending batch whose 10-min debounce has lapsed into a single GitHub issue. Submissions from the same user within the window append + reset the clock; clients can cancel while `status == 'pending'`.
 - **types.ts** — Shared TypeScript types.
 
 ### test/
@@ -85,6 +86,7 @@ Shared household grocery app: shopping lists, pantry tracking, recipes, meal pla
   - `mealPlan/{entryId}` — meal plan entries.
   - `categoryOverrides/{overrideId}` — user's category corrections.
   - `config/{docId}` — household settings (units, theme, etc.).
+  - `issueBatches/{batchId}` — "Fix this" queue docs. Per-submitter. `status`: pending|dispatched|cancelled. Client-writable only to set `status = cancelled`; the rest is admin-SDK-only.
 - **Collections at root:**
   - `users/{uid}` — user profile (auth metadata).
   - `invites/{token}` — one-time household join links.

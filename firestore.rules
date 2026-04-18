@@ -66,6 +66,20 @@ service cloud.firestore {
       match /config/{docId} {
         allow read, write: if isMember(householdId);
       }
+
+      match /issueBatches/{batchId} {
+        // Batches are per-submitter: you can only see/cancel your own.
+        allow read: if isMember(householdId)
+          && resource.data.uid == request.auth.uid;
+        // Creation happens server-side via the submitIssue callable.
+        allow create: if false;
+        // Client can only flip status to 'cancelled'; everything else is frozen.
+        allow update: if isMember(householdId)
+          && resource.data.uid == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+          && request.resource.data.status == 'cancelled';
+        allow delete: if false;
+      }
     }
 
     match /users/{uid} {
