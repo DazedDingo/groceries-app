@@ -692,16 +692,25 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
               onPressed: () async {
                 Navigator.pop(ctx);
                 final noteText = noteCtrl.text.trim();
+                final newName = nameCtrl.text.trim();
+                final categoryChanged = categoryId != item.categoryId;
                 try {
                   await ref.read(itemsServiceProvider).updateItem(
                     householdId: householdId,
                     itemId: item.id,
-                    name: nameCtrl.text.trim(),
+                    name: newName,
                     quantity: int.tryParse(qtyCtrl.text) ?? item.quantity,
                     unit: unit,
                     note: noteText.isEmpty ? null : noteText,
                     categoryId: categoryId,
                   );
+                  if (categoryChanged && newName.isNotEmpty) {
+                    await ref.read(categoryOverrideServiceProvider).saveOverride(
+                          householdId: householdId,
+                          itemName: newName,
+                          categoryId: categoryId,
+                        );
+                  }
                 } catch (e) {
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(

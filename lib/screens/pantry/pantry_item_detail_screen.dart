@@ -10,6 +10,7 @@ import '../../services/shelf_life_guesser.dart';
 import '../../services/shelf_life_learner.dart';
 import '../../providers/categories_provider.dart';
 import '../../providers/history_provider.dart';
+import '../../models/category.dart';
 import '../shared/help_button.dart';
 
 class PantryItemDetailScreen extends ConsumerStatefulWidget {
@@ -98,6 +99,8 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
                   body: 'Where this item lives at home (Fridge, Freezer, Pantry, Counter, Other). Shown on the tile as a small icon.'),
               HelpSection(icon: Icons.notifications, title: 'Restock nudge',
                   body: 'Set an interval (e.g. every 7 days) to get a nudge on the shopping list even if you haven\'t bought it recently.'),
+              HelpSection(icon: Icons.category, title: 'Category',
+                  body: 'Which section this item falls under. Change it here if the guesser got it wrong — the correction is saved so future items with the same name land in the right place.'),
             ],
           ),
           IconButton(
@@ -230,6 +233,54 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
                         ],
                       ),
                     ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Category
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Category', style: theme.textTheme.titleSmall),
+                  const SizedBox(height: 8),
+                  Builder(builder: (ctx) {
+                    final categories =
+                        ref.watch(categoriesProvider).value ?? const <GroceryCategory>[];
+                    final knownIds = categories.map((c) => c.id).toSet();
+                    final currentValue =
+                        knownIds.contains(item.categoryId) ? item.categoryId : null;
+                    return DropdownButton<String?>(
+                      value: currentValue,
+                      isExpanded: true,
+                      hint: const Text('Uncategorised'),
+                      items: [
+                        const DropdownMenuItem<String?>(
+                          value: null,
+                          child: Text('Uncategorised'),
+                        ),
+                        ...categories.map((c) => DropdownMenuItem<String?>(
+                              value: c.id,
+                              child: Text(c.name),
+                            )),
+                      ],
+                      onChanged: (val) {
+                        final newId = val ?? 'uncategorised';
+                        if (newId == item.categoryId) return;
+                        ref.read(pantryServiceProvider).updateItem(
+                            householdId, widget.itemId, {'categoryId': newId});
+                        ref.read(categoryOverrideServiceProvider).saveOverride(
+                              householdId: householdId,
+                              itemName: item.name,
+                              categoryId: newId,
+                            );
+                      },
+                    );
+                  }),
                 ],
               ),
             ),

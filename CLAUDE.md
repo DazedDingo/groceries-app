@@ -84,7 +84,7 @@ Shared household grocery app: shopping lists, pantry tracking, recipes, meal pla
   - `templates/{templateId}` — saved shopping list templates.
   - `history/{entryId}` — purchase history (append-only).
   - `mealPlan/{entryId}` — meal plan entries.
-  - `categoryOverrides/{overrideId}` — user's category corrections.
+  - `categoryOverrides/{overrideId}` — user's category corrections. Written whenever the category dropdown on pantry detail or shopping list edit dialog changes, so the guesser learns next time.
   - `config/{docId}` — household settings (units, theme, etc.).
   - `issueBatches/{batchId}` — "Fix this" queue docs. Per-submitter. `status`: pending|dispatched|cancelled. Client-writable only to set `status = cancelled`; the rest is admin-SDK-only.
 - **Collections at root:**
