@@ -89,13 +89,17 @@ class PantryItemTile extends StatelessWidget {
                   ),
                 ),
               if (item.runningLowAt == null)
-                TextButton.icon(
-                  onPressed: onMarkRunningLow,
-                  icon: const Icon(Icons.trending_down, size: 16),
-                  label: const Text('Running low'),
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    visualDensity: VisualDensity.compact,
+                Tooltip(
+                  message:
+                      'Adds to list in 2 days and drops this count by 1',
+                  child: TextButton.icon(
+                    onPressed: onMarkRunningLow,
+                    icon: const Icon(Icons.trending_down, size: 16),
+                    label: const Text('Running low'),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      visualDensity: VisualDensity.compact,
+                    ),
                   ),
                 )
               else

@@ -160,38 +160,57 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
     if (due.isEmpty) return;
 
     final itemsService = ref.read(itemsServiceProvider);
-    final pantryService = ref.read(pantryServiceProvider);
     for (final item in due) {
       _promotingInFlight.add(item.id);
     }
     Future(() async {
+      // Track per-item state so the snackbar's Undo action can reverse each
+      // promotion (restore pantry count + flag + delete shopping-list doc).
+      final undos = <_PromotionUndo>[];
       for (final item in due) {
         try {
           final q = promoteQuantities(item);
-          await itemsService.addItem(
+          final shoppingItemId = await itemsService.promoteFromPantry(
             householdId: householdId,
-            name: item.name,
-            categoryId: item.categoryId,
-            preferredStores: item.preferredStores,
-            pantryItemId: item.id,
-            quantity: q.listQuantity,
+            pantryItem: item,
+            listQuantity: q.listQuantity,
+            newPantryCurrent: q.newCurrent,
             addedBy: addedBy,
           );
-          await pantryService.updateItem(
-            householdId,
-            item.id,
-            {'currentQuantity': q.newCurrent, 'runningLowAt': null},
-          );
+          undos.add(_PromotionUndo(
+            shoppingItemId: shoppingItemId,
+            pantryItemId: item.id,
+            priorCurrent: item.currentQuantity,
+            priorRunningLowAt: item.runningLowAt!,
+          ));
         } finally {
           _promotingInFlight.remove(item.id);
         }
       }
-      if (!mounted) return;
-      final msg = due.length == 1
+      if (!mounted || undos.isEmpty) return;
+      final msg = undos.length == 1
           ? 'Added "${due.first.name}" to your list (was running low).'
-          : 'Added ${due.length} running-low items to your list.';
+          : 'Added ${undos.length} running-low items to your list.';
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), duration: const Duration(seconds: 3)),
+        SnackBar(
+          content: Text(msg),
+          duration: const Duration(seconds: 5),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () async {
+              final svc = ref.read(itemsServiceProvider);
+              for (final u in undos) {
+                await svc.undoPromoteFromPantry(
+                  householdId: householdId,
+                  shoppingItemId: u.shoppingItemId,
+                  pantryItemId: u.pantryItemId,
+                  restoredPantryCurrent: u.priorCurrent,
+                  restoredRunningLowAt: u.priorRunningLowAt,
+                );
+              }
+            },
+          ),
+        ),
       );
     });
   }
@@ -638,4 +657,17 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
       ),
     );
   }
+}
+
+class _PromotionUndo {
+  final String shoppingItemId;
+  final String pantryItemId;
+  final int priorCurrent;
+  final DateTime priorRunningLowAt;
+  const _PromotionUndo({
+    required this.shoppingItemId,
+    required this.pantryItemId,
+    required this.priorCurrent,
+    required this.priorRunningLowAt,
+  });
 }

@@ -705,11 +705,33 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                     categoryId: categoryId,
                   );
                   if (categoryChanged && newName.isNotEmpty) {
-                    await ref.read(categoryOverrideServiceProvider).saveOverride(
-                          householdId: householdId,
-                          itemName: newName,
-                          categoryId: categoryId,
-                        );
+                    final overrideSvc =
+                        ref.read(categoryOverrideServiceProvider);
+                    if (categoryId == 'uncategorised') {
+                      await overrideSvc.clearOverride(
+                        householdId: householdId,
+                        itemName: newName,
+                      );
+                    } else {
+                      await overrideSvc.saveOverride(
+                        householdId: householdId,
+                        itemName: newName,
+                        categoryId: categoryId,
+                      );
+                    }
+                    if (mounted) {
+                      final catName = categories
+                          .where((c) => c.id == categoryId)
+                          .map((c) => c.name)
+                          .firstOrNull ?? 'Uncategorised';
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'Saved — future "$newName" items will be $catName'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    }
                   }
                 } catch (e) {
                   if (mounted) {

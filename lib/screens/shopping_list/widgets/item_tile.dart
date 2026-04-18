@@ -90,6 +90,18 @@ class _ItemTileState extends State<ItemTile> {
               padding: EdgeInsets.only(right: 4),
               child: Icon(Icons.star, size: 14, color: Colors.amber),
             ),
+          if (item.fromRunningLow)
+            Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: Tooltip(
+                message: 'Auto-added: pantry was running low',
+                child: Icon(
+                  Icons.trending_down,
+                  size: 14,
+                  color: theme.colorScheme.tertiary,
+                ),
+              ),
+            ),
           if (item.pantryItemId != null)
             const Padding(
               padding: EdgeInsets.only(right: 4),

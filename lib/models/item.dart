@@ -45,6 +45,10 @@ class ShoppingItem {
   final String? pantryItemId;
   final String? recipeSource;
   final bool isRecurring;
+  /// True when this item was auto-added by the running-low promoter.
+  /// Drives the "running low" badge on the shopping list tile + the Undo
+  /// action on the post-promotion snackbar.
+  final bool fromRunningLow;
   final AddedBy addedBy;
   final DateTime addedAt;
 
@@ -53,6 +57,7 @@ class ShoppingItem {
     this.unit, this.note,
     required this.categoryId, required this.preferredStores,
     required this.pantryItemId, this.recipeSource, this.isRecurring = false,
+    this.fromRunningLow = false,
     required this.addedBy, required this.addedAt,
   });
 
@@ -62,6 +67,7 @@ class ShoppingItem {
     'preferredStores': preferredStores, 'pantryItemId': pantryItemId,
     'recipeSource': recipeSource,
     'isRecurring': isRecurring,
+    'fromRunningLow': fromRunningLow,
     'addedBy': addedBy.toMap(),
     'addedAt': Timestamp.fromDate(addedAt),
   };
@@ -77,6 +83,7 @@ class ShoppingItem {
       pantryItemId: d['pantryItemId'],
       recipeSource: d['recipeSource'],
       isRecurring: d['isRecurring'] ?? false,
+      fromRunningLow: d['fromRunningLow'] ?? false,
       addedBy: AddedBy.fromMap(d['addedBy'] ?? {}),
       addedAt: (d['addedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );

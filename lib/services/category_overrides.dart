@@ -21,6 +21,16 @@ class CategoryOverrideService {
     });
   }
 
+  /// Remove a stored override so the keyword guesser takes over again.
+  Future<void> clearOverride({
+    required String householdId,
+    required String itemName,
+  }) async {
+    final key = itemName.trim().toLowerCase();
+    if (key.isEmpty) return;
+    await _ref(householdId).doc(key).delete();
+  }
+
   /// Stream all overrides as a map of lowercase item name → categoryId.
   Stream<Map<String, String>> overridesStream(String householdId) {
     return _ref(householdId).snapshots().map((snap) {

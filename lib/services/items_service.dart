@@ -56,6 +56,66 @@ class ItemsService {
     await batch.commit();
   }
 
+  /// Atomic running-low promotion: inserts the shopping item + history entry
+  /// AND clears the pantry `runningLowAt` flag + decrements `currentQuantity`
+  /// in a single batched write. Prevents the drift where the add succeeds but
+  /// the pantry update fails (item on list, flag still set, count undecremented).
+  Future<String> promoteFromPantry({
+    required String householdId,
+    required PantryItem pantryItem,
+    required int listQuantity,
+    required int newPantryCurrent,
+    required AddedBy addedBy,
+  }) async {
+    final batch = _db.batch();
+    final itemRef = _db.collection('households/$householdId/items').doc();
+    batch.set(itemRef, {
+      'name': pantryItem.name,
+      'quantity': listQuantity,
+      'unit': pantryItem.unit,
+      'note': null,
+      'categoryId': pantryItem.categoryId,
+      'preferredStores': pantryItem.preferredStores,
+      'pantryItemId': pantryItem.id,
+      'recipeSource': null,
+      'isRecurring': false,
+      'fromRunningLow': true,
+      'addedBy': addedBy.toMap(),
+      'addedAt': FieldValue.serverTimestamp(),
+    });
+    final histRef = _db.collection('households/$householdId/history').doc();
+    batch.set(histRef, HistoryEntry.toMap(
+      itemName: pantryItem.name, categoryId: pantryItem.categoryId,
+      action: HistoryAction.added, quantity: listQuantity,
+      byName: addedBy.displayName,
+    ));
+    batch.update(_db.doc('households/$householdId/pantry/${pantryItem.id}'), {
+      'currentQuantity': newPantryCurrent,
+      'runningLowAt': null,
+    });
+    await batch.commit();
+    return itemRef.id;
+  }
+
+  /// Reverse a running-low promotion: delete the auto-added shopping item,
+  /// restore the pantry's `currentQuantity`, and re-set the `runningLowAt`
+  /// flag. Used by the snackbar Undo action.
+  Future<void> undoPromoteFromPantry({
+    required String householdId,
+    required String shoppingItemId,
+    required String pantryItemId,
+    required int restoredPantryCurrent,
+    required DateTime restoredRunningLowAt,
+  }) async {
+    final batch = _db.batch();
+    batch.delete(_db.doc('households/$householdId/items/$shoppingItemId'));
+    batch.update(_db.doc('households/$householdId/pantry/$pantryItemId'), {
+      'currentQuantity': restoredPantryCurrent,
+      'runningLowAt': Timestamp.fromDate(restoredRunningLowAt),
+    });
+    await batch.commit();
+  }
+
   /// Bulk add: writes all items + their history entries in a single batch.
   /// More efficient than looping `addItem` and avoids partial-write states.
   Future<void> addItems({

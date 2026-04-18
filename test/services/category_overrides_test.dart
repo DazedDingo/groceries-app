@@ -62,5 +62,38 @@ void main() {
       // Different item — no override entry, so the keyword path runs.
       expect(guessCategory('Apple', categories, overrides)?.id, 'produce');
     });
+
+    test('clearOverride removes the stored mapping so guesser takes over again', () async {
+      await service.saveOverride(
+        householdId: 'hh1',
+        itemName: 'Cheddar',
+        categoryId: 'snacks',
+      );
+      var overrides = await service.overridesStream('hh1').first;
+      expect(guessCategory('Cheddar', categories, overrides)?.id, 'snacks');
+
+      await service.clearOverride(householdId: 'hh1', itemName: 'Cheddar');
+
+      final snap = await fakeDb.collection('households/hh1/categoryOverrides').get();
+      expect(snap.docs, isEmpty);
+
+      overrides = await service.overridesStream('hh1').first;
+      // Keyword guesser is back in charge.
+      expect(guessCategory('Cheddar', categories, overrides)?.id, 'dairy');
+    });
+
+    test('clearOverride is case-insensitive and ignores blank input', () async {
+      await service.saveOverride(
+        householdId: 'hh1',
+        itemName: 'Cheddar',
+        categoryId: 'snacks',
+      );
+      await service.clearOverride(householdId: 'hh1', itemName: '  CHEDDAR ');
+      final snap = await fakeDb.collection('households/hh1/categoryOverrides').get();
+      expect(snap.docs, isEmpty);
+
+      // Blank input should no-op rather than throw.
+      await service.clearOverride(householdId: 'hh1', itemName: '   ');
+    });
   });
 }

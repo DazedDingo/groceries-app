@@ -131,6 +131,117 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // Category — first so re-bucketing an item is a one-tap action.
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Builder(builder: (ctx) {
+                final categories =
+                    ref.watch(categoriesProvider).value ?? const <GroceryCategory>[];
+                final overrides =
+                    ref.watch(categoryOverridesProvider).value ??
+                        const <String, String>{};
+                final overrideKey = item.name.trim().toLowerCase();
+                final hasOverride = overrides.containsKey(overrideKey);
+                final knownIds = categories.map((c) => c.id).toSet();
+                final currentValue =
+                    knownIds.contains(item.categoryId) ? item.categoryId : null;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text('Category', style: theme.textTheme.titleSmall),
+                        const Spacer(),
+                        if (hasOverride)
+                          Tooltip(
+                            message:
+                                'Clear saved correction and let the guesser decide next time',
+                            child: TextButton.icon(
+                              onPressed: () async {
+                                await ref
+                                    .read(categoryOverrideServiceProvider)
+                                    .clearOverride(
+                                      householdId: householdId,
+                                      itemName: item.name,
+                                    );
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'Cleared — future items will use the guesser'),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(Icons.restart_alt, size: 14),
+                              label: const Text('Reset'),
+                              style: TextButton.styleFrom(
+                                visualDensity: VisualDensity.compact,
+                                padding: EdgeInsets.zero,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    DropdownButton<String?>(
+                      value: currentValue,
+                      isExpanded: true,
+                      hint: const Text('Uncategorised'),
+                      items: [
+                        const DropdownMenuItem<String?>(
+                          value: null,
+                          child: Text('Uncategorised'),
+                        ),
+                        ...categories.map((c) => DropdownMenuItem<String?>(
+                              value: c.id,
+                              child: Text(c.name),
+                            )),
+                      ],
+                      onChanged: (val) async {
+                        final newId = val ?? 'uncategorised';
+                        if (newId == item.categoryId) return;
+                        await ref.read(pantryServiceProvider).updateItem(
+                            householdId, widget.itemId, {'categoryId': newId});
+                        // Picking Uncategorised = fall back to guesser, not
+                        // a permanent "stick at uncategorised" override.
+                        if (newId == 'uncategorised') {
+                          await ref.read(categoryOverrideServiceProvider)
+                              .clearOverride(
+                                householdId: householdId,
+                                itemName: item.name,
+                              );
+                        } else {
+                          await ref.read(categoryOverrideServiceProvider)
+                              .saveOverride(
+                                householdId: householdId,
+                                itemName: item.name,
+                                categoryId: newId,
+                              );
+                        }
+                        if (!context.mounted) return;
+                        final catName = categories
+                            .where((c) => c.id == newId)
+                            .map((c) => c.name)
+                            .firstOrNull ??
+                            'Uncategorised';
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Saved — future "${item.name}" items will be $catName'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              }),
+            ),
+          ),
+          const SizedBox(height: 16),
+
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -233,54 +344,6 @@ class _PantryItemDetailScreenState extends ConsumerState<PantryItemDetailScreen>
                         ],
                       ),
                     ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Category
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Category', style: theme.textTheme.titleSmall),
-                  const SizedBox(height: 8),
-                  Builder(builder: (ctx) {
-                    final categories =
-                        ref.watch(categoriesProvider).value ?? const <GroceryCategory>[];
-                    final knownIds = categories.map((c) => c.id).toSet();
-                    final currentValue =
-                        knownIds.contains(item.categoryId) ? item.categoryId : null;
-                    return DropdownButton<String?>(
-                      value: currentValue,
-                      isExpanded: true,
-                      hint: const Text('Uncategorised'),
-                      items: [
-                        const DropdownMenuItem<String?>(
-                          value: null,
-                          child: Text('Uncategorised'),
-                        ),
-                        ...categories.map((c) => DropdownMenuItem<String?>(
-                              value: c.id,
-                              child: Text(c.name),
-                            )),
-                      ],
-                      onChanged: (val) {
-                        final newId = val ?? 'uncategorised';
-                        if (newId == item.categoryId) return;
-                        ref.read(pantryServiceProvider).updateItem(
-                            householdId, widget.itemId, {'categoryId': newId});
-                        ref.read(categoryOverrideServiceProvider).saveOverride(
-                              householdId: householdId,
-                              itemName: item.name,
-                              categoryId: newId,
-                            );
-                      },
-                    );
-                  }),
                 ],
               ),
             ),
