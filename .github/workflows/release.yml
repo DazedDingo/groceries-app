@@ -47,13 +47,12 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
-      # Gradle already renames the APK to groceries-v<version>-release.apk via
-      # the applicationVariants block in android/app/build.gradle.kts.
-      # Flatten that to the user-facing name (no build-type suffix) before
-      # attaching to the release.
+      # Flutter always copies the signed APK to flutter-apk/app-release.apk
+      # regardless of Gradle's applicationVariants output name. Rename it to
+      # the versioned user-facing filename before attaching to the release.
       - name: Stage release artifact
         run: |
-          cp build/app/outputs/flutter-apk/groceries-v${{ steps.version.outputs.version }}-release.apk \
+          cp build/app/outputs/flutter-apk/app-release.apk \
              build/app/outputs/flutter-apk/Groceries-v${{ steps.version.outputs.version }}.apk
 
       - name: Create GitHub Release
