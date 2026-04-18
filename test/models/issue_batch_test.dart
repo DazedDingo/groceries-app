@@ -110,5 +110,54 @@ void main() {
         30,
       );
     });
+
+    test('parses cancelled status', () async {
+      final doc = await _write({
+        'uid': 'u1',
+        'items': [],
+        'createdAt': Timestamp.fromMillisecondsSinceEpoch(0),
+        'dispatchAt': Timestamp.fromMillisecondsSinceEpoch(0),
+        'status': 'cancelled',
+      });
+      expect(IssueBatch.fromDoc(doc).status, IssueBatchStatus.cancelled);
+    });
+
+    test('item with no submittedAt yields null DateTime — no crash', () async {
+      final doc = await _write({
+        'uid': 'u1',
+        'items': [
+          {'title': 'x', 'description': 'y'},
+        ],
+        'createdAt': Timestamp.fromMillisecondsSinceEpoch(0),
+        'dispatchAt': Timestamp.fromMillisecondsSinceEpoch(0),
+        'status': 'pending',
+      });
+      final batch = IssueBatch.fromDoc(doc);
+      expect(batch.items.first.submittedAt, isNull);
+    });
+
+    test('missing dispatchResult → null issueNumber + url', () async {
+      final doc = await _write({
+        'uid': 'u1',
+        'items': [],
+        'createdAt': Timestamp.fromMillisecondsSinceEpoch(0),
+        'dispatchAt': Timestamp.fromMillisecondsSinceEpoch(0),
+        'status': 'dispatched',
+      });
+      final batch = IssueBatch.fromDoc(doc);
+      expect(batch.status, IssueBatchStatus.dispatched);
+      expect(batch.dispatchedIssueNumber, isNull);
+      expect(batch.dispatchedUrl, isNull);
+    });
+
+    test('items list defaults to empty when field absent', () async {
+      final doc = await _write({
+        'uid': 'u1',
+        'createdAt': Timestamp.fromMillisecondsSinceEpoch(0),
+        'dispatchAt': Timestamp.fromMillisecondsSinceEpoch(0),
+        'status': 'pending',
+      });
+      expect(IssueBatch.fromDoc(doc).items, isEmpty);
+    });
   });
 }

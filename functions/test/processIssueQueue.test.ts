@@ -163,4 +163,54 @@ describe('processIssueQueue', () => {
     const { body } = poster.mock.calls[0][0];
     expect(body).toContain('_(no description)_');
   });
+
+  test('mixed success + failure in a single drain tick', async () => {
+    const ok = makeDoc({ id: 'ok' });
+    const bad = makeDoc({ id: 'bad' });
+    const poster = jest
+      .fn()
+      .mockResolvedValueOnce({ number: 1, url: 'u1' })
+      .mockRejectedValueOnce(new Error('500'));
+
+    const result = await processIssueQueue(poster, makeDb([ok, bad]));
+
+    expect(result).toEqual({ scanned: 2, dispatched: 1, errors: 1 });
+    expect(ok.ref.update).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'dispatched' }),
+    );
+    expect(bad.ref.update).toHaveBeenCalledWith(
+      expect.objectContaining({ lastError: '500' }),
+    );
+  });
+
+  test('batch with missing items array still dispatches (empty placeholder)', async () => {
+    const doc = makeDoc({ id: 'nomitems' });
+    doc.data = (() => ({
+      uid: 'u1',
+      submitter: 'x',
+      status: 'pending',
+      dispatchAt: { toMillis: () => 0 },
+    })) as any;
+    const poster = jest.fn().mockResolvedValue({ number: 9, url: 'u' });
+
+    const result = await processIssueQueue(poster, makeDb([doc]));
+
+    expect(result.dispatched).toBe(1);
+    expect(poster.mock.calls[0][0].body).toContain('empty batch');
+  });
+
+  test('falls back to uid when submitter field is missing', async () => {
+    const doc = makeDoc({ id: 'nousername' });
+    doc.data = (() => ({
+      uid: 'user-uid-abc',
+      status: 'pending',
+      items: [{ title: 'x', description: 'y', submittedAt: { toMillis: () => 0 } }],
+      dispatchAt: { toMillis: () => 0 },
+    })) as any;
+    const poster = jest.fn().mockResolvedValue({ number: 1, url: 'u' });
+
+    await processIssueQueue(poster, makeDb([doc]));
+
+    expect(poster.mock.calls[0][0].body).toContain('**user-uid-abc**');
+  });
 });
