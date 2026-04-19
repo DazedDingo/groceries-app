@@ -309,7 +309,9 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
     );
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: _selecting
             ? Text('${_selectedIds.length} selected')
             : const Text('Pantry'),
@@ -571,7 +573,10 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
   void _showAddDialog(BuildContext context, WidgetRef ref, String householdId,
       List<GroceryCategory> categories) {
     final nameCtrl = TextEditingController();
+    final currentCtrl = TextEditingController(text: '0');
     final optCtrl = TextEditingController(text: '1');
+    final unitAmountCtrl = TextEditingController();
+    final unitCtrl = TextEditingController();
     GroceryCategory? selectedCategory;
     PantryLocation? selectedLocation;
 
@@ -580,72 +585,125 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setState) => AlertDialog(
           title: const Text('Add pantry item'),
-          content: Column(mainAxisSize: MainAxisSize.min, children: [
-            TextField(
-              controller: nameCtrl,
-              decoration: const InputDecoration(labelText: 'Item name'),
-              onChanged: (val) {
-                final guess = guessCategory(val, categories);
-                if (guess != null && guess != selectedCategory) {
-                  setState(() => selectedCategory = guess);
-                }
-              },
-            ),
-            const SizedBox(height: 8),
-            InputDecorator(
-              decoration: const InputDecoration(labelText: 'Category'),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<GroceryCategory>(
-                  value: selectedCategory,
-                  isExpanded: true,
-                  hint: const Text('Uncategorised'),
-                  items: categories
-                      .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
-                      .toList(),
-                  onChanged: (c) => setState(() => selectedCategory = c),
+          content: SingleChildScrollView(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(labelText: 'Item name'),
+                onChanged: (val) {
+                  final guess = guessCategory(val, categories);
+                  if (guess != null && guess != selectedCategory) {
+                    setState(() => selectedCategory = guess);
+                  }
+                },
+              ),
+              const SizedBox(height: 8),
+              InputDecorator(
+                decoration: const InputDecoration(labelText: 'Category'),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<GroceryCategory>(
+                    value: selectedCategory,
+                    isExpanded: true,
+                    hint: const Text('Uncategorised'),
+                    items: categories
+                        .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
+                        .toList(),
+                    onChanged: (c) => setState(() => selectedCategory = c),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            InputDecorator(
-              decoration: const InputDecoration(labelText: 'Location'),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<PantryLocation?>(
-                  value: selectedLocation,
-                  isExpanded: true,
-                  hint: const Text('Not set'),
-                  items: [
-                    const DropdownMenuItem<PantryLocation?>(
-                        value: null, child: Text('Not set')),
-                    ...PantryLocation.values.map((loc) => DropdownMenuItem(
-                          value: loc,
-                          child: Text(loc.label),
-                        )),
-                  ],
-                  onChanged: (loc) => setState(() => selectedLocation = loc),
+              const SizedBox(height: 8),
+              InputDecorator(
+                decoration: const InputDecoration(labelText: 'Location'),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<PantryLocation?>(
+                    value: selectedLocation,
+                    isExpanded: true,
+                    hint: const Text('Not set'),
+                    items: [
+                      const DropdownMenuItem<PantryLocation?>(
+                          value: null, child: Text('Not set')),
+                      ...PantryLocation.values.map((loc) => DropdownMenuItem(
+                            value: loc,
+                            child: Text(loc.label),
+                          )),
+                    ],
+                    onChanged: (loc) => setState(() => selectedLocation = loc),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: optCtrl,
-              decoration: const InputDecoration(labelText: 'Optimal quantity'),
-              keyboardType: TextInputType.number,
-            ),
-          ]),
+              const SizedBox(height: 12),
+              Row(children: [
+                Expanded(
+                  child: TextField(
+                    controller: currentCtrl,
+                    decoration: const InputDecoration(labelText: 'Current'),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: optCtrl,
+                    decoration: const InputDecoration(labelText: 'Optimal'),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  ),
+                ),
+              ]),
+              const SizedBox(height: 12),
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                SizedBox(
+                  width: 80,
+                  child: TextField(
+                    controller: unitAmountCtrl,
+                    decoration: const InputDecoration(labelText: 'Per'),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextField(
+                    controller: unitCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Unit',
+                      hintText: 'g, ml, oz…',
+                    ),
+                  ),
+                ),
+              ]),
+              const SizedBox(height: 4),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Size of one container. Separate from the counts above.',
+                  style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+              ),
+            ]),
+          ),
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
             FilledButton(
               onPressed: () {
                 final name = nameCtrl.text.trim();
                 if (name.isEmpty) return;
+                final unitStr = unitCtrl.text.trim();
                 ref.read(pantryServiceProvider).addItem(
                   householdId: householdId,
                   name: name,
                   categoryId: selectedCategory?.id ?? 'uncategorised',
                   preferredStores: [],
                   optimalQuantity: int.tryParse(optCtrl.text) ?? 1,
-                  currentQuantity: 0,
+                  currentQuantity: int.tryParse(currentCtrl.text) ?? 0,
+                  unitAmount: double.tryParse(unitAmountCtrl.text.trim()),
+                  unit: unitStr.isEmpty ? null : unitStr,
                   location: selectedLocation?.id,
                 );
                 Navigator.pop(ctx);

@@ -168,7 +168,7 @@ class ScaffoldWithNavBar extends ConsumerWidget {
     final itemCount = ref.watch(itemsProvider).value?.length ?? 0;
 
     return Scaffold(
-      body: child,
+      body: _TabBackground(index: selectedIndex, child: child),
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
         destinations: [
@@ -190,6 +190,42 @@ class ScaffoldWithNavBar extends ConsumerWidget {
           context.go(routes[i]);
         },
       ),
+    );
+  }
+}
+
+/// Subtle, theme-aware gradient tint that distinguishes each tab without
+/// fighting content. Picks a role color from the active ColorScheme and
+/// blends it into the surface so the list / pantry / recipes / plan / settings
+/// tabs feel visually distinct even on screens that share widgets.
+class _TabBackground extends StatelessWidget {
+  final int index;
+  final Widget child;
+  const _TabBackground({required this.index, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tint = switch (index) {
+      0 => cs.primary,     // List
+      1 => cs.tertiary,    // Pantry
+      2 => cs.secondary,   // Recipes
+      3 => cs.primary,     // Plan
+      _ => cs.outline,     // Settings
+    };
+    final alpha = Theme.of(context).brightness == Brightness.dark ? 0.18 : 0.10;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color.alphaBlend(tint.withValues(alpha: alpha), cs.surface),
+            cs.surface,
+          ],
+        ),
+      ),
+      child: child,
     );
   }
 }

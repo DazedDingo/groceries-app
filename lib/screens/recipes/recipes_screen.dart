@@ -108,7 +108,9 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
     final householdId = ref.watch(householdIdProvider).value ?? '';
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: _selecting
             ? Text('${_selectedIds.length} selected')
             : const Text('Recipes'),

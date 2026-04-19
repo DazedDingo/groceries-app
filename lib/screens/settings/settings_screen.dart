@@ -30,7 +30,11 @@ class SettingsScreen extends ConsumerWidget {
     final householdName = ref.watch(householdNameProvider).value ?? '';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: const Text('Settings'),
+      ),
       body: ListView(
         children: [
           // --- Profile & Household ---

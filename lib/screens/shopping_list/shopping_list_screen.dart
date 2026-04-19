@@ -941,7 +941,9 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       });
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: _selecting
             ? Text('${_selectedIds.length} selected')
             : const Text('Shopping List'),

@@ -29,7 +29,9 @@ class MealPlanScreen extends ConsumerWidget {
     final days = List.generate(7, (i) => weekStart.add(Duration(days: i)));
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: const Text('Meal Plan'),
         actions: [
           const HelpButton(
