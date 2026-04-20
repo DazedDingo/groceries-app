@@ -12,6 +12,8 @@ import '../../models/item.dart';
 import '../../models/category.dart';
 import '../../models/pantry_item.dart';
 import '../../services/category_guesser.dart';
+import '../../services/pantry_grouper.dart';
+import '../../services/pantry_service.dart';
 import '../../services/running_low_promoter.dart';
 import '../../services/text_item_parser.dart';
 import '../shared/bulk_add_dialog.dart';
@@ -219,8 +221,10 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
   Widget build(BuildContext context) {
     final pantry = ref.watch(filteredPantryProvider);
     final selectedCat = ref.watch(pantrySelectedCategoryProvider);
+    final grouping = ref.watch(pantryGroupingProvider);
     final householdId = ref.watch(householdIdProvider).value ?? '';
     final categories = ref.watch(categoriesProvider).value ?? [];
+    final customLocations = ref.watch(customLocationsProvider).value ?? const <String>[];
     final pantryService = ref.watch(pantryServiceProvider);
     final itemsService = ref.watch(itemsServiceProvider);
     final items = ref.watch(itemsProvider).value ?? const <ShoppingItem>[];
@@ -361,6 +365,35 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<PantryGrouping>(
+                segments: const [
+                  ButtonSegment(
+                    value: PantryGrouping.status,
+                    label: Text('Status'),
+                    icon: Icon(Icons.flag_outlined),
+                  ),
+                  ButtonSegment(
+                    value: PantryGrouping.category,
+                    label: Text('Category'),
+                    icon: Icon(Icons.category_outlined),
+                  ),
+                  ButtonSegment(
+                    value: PantryGrouping.location,
+                    label: Text('Location'),
+                    icon: Icon(Icons.place_outlined),
+                  ),
+                ],
+                selected: {grouping},
+                onSelectionChanged: (s) =>
+                    ref.read(pantryGroupingProvider.notifier).set(s.first),
+                showSelectedIcon: false,
+              ),
+            ),
+          ),
           if (categories.isNotEmpty)
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -396,112 +429,21 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
                   )
                 : ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      if (expired.isNotEmpty) ...[
-                        Container(
-                          margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.errorContainer,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.warning_amber, color: Theme.of(context).colorScheme.onErrorContainer),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  '${expired.length} expired item${expired.length == 1 ? '' : 's'} — consider removing',
-                                  style: TextStyle(color: Theme.of(context).colorScheme.onErrorContainer),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () async {
-                                  final confirm = await showDialog<bool>(
-                                    context: context,
-                                    builder: (ctx) => AlertDialog(
-                                      title: const Text('Clear expired items?'),
-                                      content: Text('This will remove ${expired.length} expired item${expired.length == 1 ? '' : 's'} from your pantry.'),
-                                      actions: [
-                                        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-                                        FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Clear')),
-                                      ],
-                                    ),
-                                  );
-                                  if (confirm == true) {
-                                    pantryService.clearExpired(
-                                      householdId,
-                                      expired.map((e) => e.id).toList(),
-                                    );
-                                  }
-                                },
-                                child: Text('Clear all',
-                                  style: TextStyle(color: Theme.of(context).colorScheme.onErrorContainer)),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-                          child: Text('Expired',
-                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                    color: Theme.of(context).colorScheme.error,
-                                  )),
-                        ),
-                        ...expired.map(buildTile),
-                        const Divider(),
-                      ],
-                      if (expiringSoon.isNotEmpty) ...[
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-                          child: Text('Expiring soon',
-                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                    color: Colors.orange,
-                                  )),
-                        ),
-                        ...expiringSoon.map(buildTile),
-                        const Divider(),
-                      ],
-                      if (stale.isNotEmpty) ...[
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                          child: Text('Sitting unused',
-                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                    color: Colors.brown,
-                                  )),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
-                          child: Text(
-                            'In your pantry 60+ days — use it or bin it.',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                ),
-                          ),
-                        ),
-                        ...stale.map(buildTile),
-                        const Divider(),
-                      ],
-                      if (needsRestock.isNotEmpty) ...[
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                          child: Text('Needs restocking',
-                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                    color: Theme.of(context).colorScheme.error,
-                                  )),
-                        ),
-                        ...needsRestock.map(buildTile),
-                        const Divider(),
-                      ],
-                      if (stocked.isNotEmpty) ...[
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-                          child: Text('Stocked',
-                              style: Theme.of(context).textTheme.labelLarge),
-                        ),
-                        ...stocked.map(buildTile),
-                      ],
-                    ],
+                    children: _buildListChildren(
+                      context: context,
+                      grouping: grouping,
+                      pantry: pantry,
+                      categories: categories,
+                      customLocations: customLocations,
+                      expired: expired,
+                      expiringSoon: expiringSoon,
+                      stale: stale,
+                      needsRestock: needsRestock,
+                      stocked: stocked,
+                      householdId: householdId,
+                      pantryService: pantryService,
+                      buildTile: buildTile,
+                    ),
                   ),
             ),
           ),
@@ -531,6 +473,144 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
               child: const Icon(Icons.add),
             ),
     );
+  }
+
+  /// Builds the children of the pantry list's `ListView`. Branches on the
+  /// grouping mode: Status mirrors the original layout; Category / Location
+  /// replace the status buckets with category- or location-headed sections
+  /// (expired items still float to the top inside each group via
+  /// `pantry_grouper.dart`).
+  List<Widget> _buildListChildren({
+    required BuildContext context,
+    required PantryGrouping grouping,
+    required List<PantryItem> pantry,
+    required List<GroceryCategory> categories,
+    required List<String> customLocations,
+    required List<PantryItem> expired,
+    required List<PantryItem> expiringSoon,
+    required List<PantryItem> stale,
+    required List<PantryItem> needsRestock,
+    required List<PantryItem> stocked,
+    required String householdId,
+    required PantryService pantryService,
+    required Widget Function(PantryItem) buildTile,
+  }) {
+    final theme = Theme.of(context);
+
+    Widget sectionHeader(String text, {Color? color, String? subtext}) {
+      final color0 = color ?? theme.textTheme.labelLarge?.color;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: Text(text,
+                style: theme.textTheme.labelLarge?.copyWith(color: color0)),
+          ),
+          if (subtext != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+              child: Text(
+                subtext,
+                style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+              ),
+            ),
+        ],
+      );
+    }
+
+    Widget expiredBanner() => Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.errorContainer,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.warning_amber, color: theme.colorScheme.onErrorContainer),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              '${expired.length} expired item${expired.length == 1 ? '' : 's'} — consider removing',
+              style: TextStyle(color: theme.colorScheme.onErrorContainer),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Clear expired items?'),
+                  content: Text('This will remove ${expired.length} expired item${expired.length == 1 ? '' : 's'} from your pantry.'),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+                    FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Clear')),
+                  ],
+                ),
+              );
+              if (confirm == true) {
+                pantryService.clearExpired(
+                  householdId,
+                  expired.map((e) => e.id).toList(),
+                );
+              }
+            },
+            child: Text('Clear all',
+                style: TextStyle(color: theme.colorScheme.onErrorContainer)),
+          ),
+        ],
+      ),
+    );
+
+    if (grouping == PantryGrouping.status) {
+      return [
+        if (expired.isNotEmpty) ...[
+          expiredBanner(),
+          sectionHeader('Expired', color: theme.colorScheme.error),
+          ...expired.map(buildTile),
+          const Divider(),
+        ],
+        if (expiringSoon.isNotEmpty) ...[
+          sectionHeader('Expiring soon', color: Colors.orange),
+          ...expiringSoon.map(buildTile),
+          const Divider(),
+        ],
+        if (stale.isNotEmpty) ...[
+          sectionHeader(
+            'Sitting unused',
+            color: Colors.brown,
+            subtext: 'In your pantry 60+ days — use it or bin it.',
+          ),
+          ...stale.map(buildTile),
+          const Divider(),
+        ],
+        if (needsRestock.isNotEmpty) ...[
+          sectionHeader('Needs restocking', color: theme.colorScheme.error),
+          ...needsRestock.map(buildTile),
+          const Divider(),
+        ],
+        if (stocked.isNotEmpty) ...[
+          sectionHeader('Stocked'),
+          ...stocked.map(buildTile),
+        ],
+      ];
+    }
+
+    final groups = grouping == PantryGrouping.category
+        ? groupByCategory(pantry, categories)
+        : groupByLocation(pantry, customLocations);
+
+    return [
+      if (expired.isNotEmpty) expiredBanner(),
+      for (final g in groups) ...[
+        sectionHeader(g.label),
+        ...g.items.map(buildTile),
+        const Divider(),
+      ],
+    ];
   }
 
   void _showBulkAddDialog(BuildContext context, WidgetRef ref,
