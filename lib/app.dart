@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'main.dart' show pendingInviteToken;
 import 'theme/app_theme.dart';
+import 'providers/auth_provider.dart';
+import 'providers/household_provider.dart';
 import 'providers/items_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/household/setup_screen.dart';
@@ -158,6 +160,21 @@ class ScaffoldWithNavBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Register the device's FCM token under the user's member doc as soon as
+    // both the auth state and household id are known. Runs once per change of
+    // either, which is fine — writing the same token back is a no-op.
+    ref.listen(householdIdProvider, (_, next) {
+      final householdId = next.value;
+      final uid = ref.read(authStateProvider).value?.uid;
+      if (householdId != null && householdId.isNotEmpty && uid != null) {
+        // Fire-and-forget; failures are acceptable (permission denied, etc.)
+        // and we'll retry on the next app launch.
+        ref.read(notificationServiceProvider)
+            .registerToken(householdId, uid)
+            .catchError((_) {});
+      }
+    });
+
     final location = GoRouterState.of(context).uri.toString();
     int selectedIndex = 0;
     if (location.startsWith('/pantry')) selectedIndex = 1;

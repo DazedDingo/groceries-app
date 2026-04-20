@@ -9,11 +9,13 @@ import 'package:groceries_app/providers/auth_provider.dart';
 import 'package:groceries_app/providers/household_key_notifier.dart';
 import 'package:groceries_app/providers/household_provider.dart';
 import 'package:groceries_app/providers/webhook_status_provider.dart';
-import 'package:groceries_app/screens/settings/settings_screen.dart';
+import 'package:groceries_app/screens/settings/settings_screen.dart'
+    show SettingsScreen, notificationServiceProvider, restockReminderServiceProvider;
 import 'package:groceries_app/services/auth_service.dart';
 import 'package:groceries_app/services/household_config_service.dart';
 import 'package:groceries_app/services/household_service.dart';
 import 'package:groceries_app/services/notification_service.dart';
+import 'package:groceries_app/services/restock_reminder_service.dart';
 import 'package:groceries_app/theme/app_theme.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -109,6 +111,8 @@ Widget _wrap({required FakeFirebaseFirestore db, String householdId = 'hh1'}) {
           .overrideWithValue(HouseholdConfigService(db: db)),
       notificationServiceProvider
           .overrideWithValue(_FakeNotificationService()),
+      restockReminderServiceProvider
+          .overrideWithValue(RestockReminderService(db: db)),
       // Override so the IFTTT status tile isn't stuck on the spinner forever
       // (the real provider talks to the live FirebaseFirestore singleton).
       webhookStatusProvider.overrideWith(

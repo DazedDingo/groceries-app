@@ -1,27 +1,25 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class NotificationService {
-  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  final FirebaseMessaging _fcm;
   final FirebaseFirestore _db;
-  NotificationService({FirebaseFirestore? db}) : _db = db ?? FirebaseFirestore.instance;
+  NotificationService({FirebaseFirestore? db, FirebaseMessaging? fcm})
+      : _db = db ?? FirebaseFirestore.instance,
+        _fcm = fcm ?? FirebaseMessaging.instance;
 
-  Future<void> init(String householdId, String uid, GlobalKey<NavigatorState> navigatorKey) async {
+  /// Requests notification permission (no-op once granted) and persists the
+  /// current FCM token under the caller's member doc so cloud functions can
+  /// push to every device registered to the household.
+  Future<void> registerToken(String householdId, String uid) async {
     await _fcm.requestPermission();
     final token = await _fcm.getToken();
     if (token != null) {
-      await _db.doc('households/$householdId/members/$uid').update({'fcmToken': token});
+      await _db
+          .doc('households/$householdId/members/$uid')
+          .update({'fcmToken': token});
     }
-
-    FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      final pantryItemId = message.data['pantryItemId'];
-      if (pantryItemId != null) {
-        navigatorKey.currentContext?.go('/pantry/$pantryItemId');
-      }
-    });
   }
 
   Future<String?> getWebhookToken(String householdId, String uid) async {

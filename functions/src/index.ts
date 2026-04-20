@@ -6,6 +6,7 @@ import * as logger from 'firebase-functions/logger';
 import { handleIftttWebhook } from './addToList.js';
 import { syncGoogleTasks } from './syncGoogleTasks.js';
 import { nudgeRestock } from './nudgeRestock.js';
+import { sendRestockReminders } from './restockReminder.js';
 import { processIssueQueue, makeGitHubPoster } from './processIssueQueue.js';
 export { submitIssue } from './submitIssue.js';
 
@@ -47,6 +48,17 @@ export const restockNudge = onSchedule('every 6 hours', async () => {
   const result = await nudgeRestock();
   if (result.nudged > 0) {
     logger.info('Restock nudge', result);
+  }
+});
+
+// "Grocery shopping today?" push reminder. Runs hourly so each household
+// gets a delivery within an hour of its preferred local hour. The function
+// itself enforces cadence (1/2/3/7 days) and per-household enable flag; this
+// schedule just wakes it up often enough to hit user-configured hours.
+export const restockReminder = onSchedule('every 60 minutes', async () => {
+  const result = await sendRestockReminders();
+  if (result.sent > 0 || result.errors > 0) {
+    logger.info('Restock reminder', result);
   }
 });
 

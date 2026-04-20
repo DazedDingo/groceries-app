@@ -13,11 +13,24 @@ import '../../providers/webhook_status_provider.dart';
 import '../../services/time_ago.dart';
 import '../../services/wallet_launcher.dart';
 import '../../services/notification_service.dart';
+import '../../services/restock_reminder_service.dart';
 import '../../services/unit_converter.dart';
 import '../../theme/app_theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 final notificationServiceProvider = Provider<NotificationService>((ref) => NotificationService());
+
+final restockReminderServiceProvider =
+    Provider<RestockReminderService>((ref) => RestockReminderService());
+
+final restockReminderConfigProvider =
+    StreamProvider<RestockReminderConfig>((ref) {
+  final householdId = ref.watch(householdIdProvider).value;
+  if (householdId == null || householdId.isEmpty) {
+    return Stream.value(RestockReminderConfig.defaults());
+  }
+  return ref.watch(restockReminderServiceProvider).configStream(householdId);
+});
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -106,6 +119,10 @@ class SettingsScreen extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/settings/locations'),
           ),
+          const Divider(),
+
+          // --- Shopping reminders ---
+          _RestockReminderTile(),
           const Divider(),
 
           // --- Household ---
@@ -558,6 +575,106 @@ class _WebhookStatusTile extends ConsumerWidget {
         title: Text('IFTTT status'),
         subtitle: Text('Unavailable'),
       ),
+    );
+  }
+}
+
+/// "Grocery shopping today?" reminder preferences. Collapses to a one-line
+/// status ("Off" / "Every 2d at 9:00") and expands to the enable switch,
+/// cadence dropdown, and a time picker. The cadence dropdown disables its
+/// buttons while the stream is loading so the user never toggles a stale
+/// value that would immediately be overwritten.
+class _RestockReminderTile extends ConsumerWidget {
+  static const _cadenceOptions = [1, 2, 3, 7];
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final configAsync = ref.watch(restockReminderConfigProvider);
+    final householdId = ref.watch(householdIdProvider).value ?? '';
+    final service = ref.watch(restockReminderServiceProvider);
+
+    final config = configAsync.value ?? RestockReminderConfig.defaults();
+    final canEdit = configAsync.hasValue && householdId.isNotEmpty;
+
+    String cadenceLabel(int d) => d == 1 ? 'Daily' : d == 7 ? 'Weekly' : 'Every $d days';
+    String hourLabel(int h) => '${h.toString().padLeft(2, '0')}:00';
+    final statusLine = config.enabled
+        ? '${cadenceLabel(config.cadenceDays)} at ${hourLabel(config.preferredHour)}'
+        : 'Off';
+
+    return ExpansionTile(
+      leading: const Icon(Icons.notifications_active_outlined),
+      title: const Text('Shopping reminders'),
+      subtitle: Text(statusLine),
+      children: [
+        SwitchListTile(
+          title: const Text('Push notification when items run low'),
+          subtitle: const Text(
+            'We\'ll list what\'s below optimal in your pantry.',
+          ),
+          value: config.enabled,
+          onChanged: !canEdit
+              ? null
+              : (v) async {
+                  await service.save(
+                    householdId,
+                    config.copyWith(
+                      enabled: v,
+                      timezoneOffsetMinutes:
+                          DateTime.now().timeZoneOffset.inMinutes,
+                    ),
+                  );
+                },
+        ),
+        ListTile(
+          title: const Text('Cadence'),
+          subtitle: Text(cadenceLabel(config.cadenceDays)),
+          trailing: DropdownButton<int>(
+            value: _cadenceOptions.contains(config.cadenceDays)
+                ? config.cadenceDays
+                : 2,
+            items: _cadenceOptions
+                .map((d) => DropdownMenuItem(
+                      value: d,
+                      child: Text(cadenceLabel(d)),
+                    ))
+                .toList(),
+            onChanged: !canEdit
+                ? null
+                : (d) async {
+                    if (d == null) return;
+                    await service.save(
+                      householdId,
+                      config.copyWith(cadenceDays: d),
+                    );
+                  },
+          ),
+        ),
+        ListTile(
+          title: const Text('Preferred time'),
+          subtitle: Text('Reminder fires within an hour of ${hourLabel(config.preferredHour)}'),
+          trailing: const Icon(Icons.access_time),
+          enabled: canEdit,
+          onTap: !canEdit
+              ? null
+              : () async {
+                  final picked = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay(hour: config.preferredHour, minute: 0),
+                    helpText: 'Shopping reminder time',
+                  );
+                  if (picked == null) return;
+                  await service.save(
+                    householdId,
+                    config.copyWith(
+                      preferredHour: picked.hour,
+                      timezoneOffsetMinutes:
+                          DateTime.now().timeZoneOffset.inMinutes,
+                    ),
+                  );
+                },
+        ),
+      ],
     );
   }
 }
