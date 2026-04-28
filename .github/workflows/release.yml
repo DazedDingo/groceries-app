@@ -55,6 +55,26 @@ jobs:
           cp build/app/outputs/flutter-apk/app-release.apk \
              build/app/outputs/flutter-apk/Groceries-v${{ steps.version.outputs.version }}.apk
 
+      - name: Generate human-readable release notes
+        id: notes
+        # Replaces softprops's `generate_release_notes: true` (which produces
+        # a "Full Changelog: compare/v...v" link). The python script reads
+        # `git log` between the previous tag and HEAD, drops internal
+        # commit types (docs/chore/test/ci/build/refactor/style), and emits
+        # plain English bullets. Per-commit `Release-note:` and
+        # `Release-skip:` overrides in the body are honoured. See watchnext
+        # for the reference implementation.
+        run: |
+          git fetch --tags --depth=50 origin
+          NOTES=$(python3 .github/scripts/release_notes.py)
+          {
+            echo "body<<__RELEASE_NOTES_EOF__"
+            echo "$NOTES"
+            echo "__RELEASE_NOTES_EOF__"
+          } >> "$GITHUB_OUTPUT"
+          echo "--- Release notes preview ---"
+          echo "$NOTES"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -62,4 +82,15 @@ jobs:
           name: ${{ steps.version.outputs.name }}
           files: build/app/outputs/flutter-apk/Groceries-v${{ steps.version.outputs.version }}.apk
           fail_on_unmatched_files: true
-          generate_release_notes: true
+          body: |
+            ## Install
+
+            Download **Groceries-v${{ steps.version.outputs.version }}.apk** from the Assets below and open it on your Android device. First-time install? You may need to allow your browser to install apps from unknown sources.
+
+            > Already have Groceries? Install the new APK straight over the top — your sign-in, household, and lists are preserved.
+
+            ---
+
+            ### What's new
+
+            ${{ steps.notes.outputs.body }}
