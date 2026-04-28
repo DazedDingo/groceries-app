@@ -12,12 +12,14 @@ import '../../models/item.dart';
 import '../../models/category.dart';
 import '../../models/pantry_item.dart';
 import '../../services/category_guesser.dart';
+import '../../services/pantry_barcode_matcher.dart';
 import '../../services/pantry_grouper.dart';
 import '../../services/pantry_service.dart';
 import '../../services/running_low_promoter.dart';
 import '../../services/text_item_parser.dart';
 import '../shared/bulk_add_dialog.dart';
 import '../shared/empty_state.dart';
+import '../shopping_list/widgets/barcode_scanner_dialog.dart';
 import 'bulk_voice_screen.dart';
 import 'widgets/pantry_item_tile.dart';
 
@@ -143,6 +145,87 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
     await ref.read(pantryServiceProvider).clearRunningLow(
       householdId: householdId, itemId: itemId,
     );
+  }
+
+  Future<void> _scanBarcodeForPantry(
+    String householdId,
+    List<GroceryCategory> categories,
+    List<PantryItem> pantry,
+  ) async {
+    final productName = await Navigator.of(context).push<String>(
+      MaterialPageRoute(builder: (_) => const BarcodeScannerDialog()),
+    );
+    if (productName == null || !mounted) return;
+
+    final match = findPantryMatch(productName, pantry);
+    final pantryService = ref.read(pantryServiceProvider);
+
+    Future<void> incrementAndToast(PantryItem p) async {
+      final priorCurrent = p.currentQuantity;
+      await pantryService.incrementQuantity(
+        householdId: householdId, itemId: p.id, current: priorCurrent,
+      );
+      if (!mounted) return;
+      HapticFeedback.selectionClick();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Added 1 to "${p.name}" — now ${priorCurrent + 1}'),
+          duration: const Duration(seconds: 3),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () => pantryService.decrementQuantity(
+              householdId: householdId,
+              itemId: p.id,
+              current: priorCurrent + 1,
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (match.exact != null) {
+      await incrementAndToast(match.exact!);
+      return;
+    }
+
+    if (match.fuzzy.isNotEmpty) {
+      final candidate = match.fuzzy.first;
+      final choice = await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Similar item in pantry'),
+          content: Text(
+            '"$productName" looks like "${candidate.name}" '
+            '(${candidate.currentQuantity}/${candidate.optimalQuantity}). '
+            'Stock the existing item or add as new?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, 'cancel'),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, 'new'),
+              child: const Text('Add as new'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, 'merge'),
+              child: Text('Stock "${candidate.name}"'),
+            ),
+          ],
+        ),
+      );
+      if (!mounted) return;
+      if (choice == 'merge') {
+        await incrementAndToast(candidate);
+        return;
+      }
+      if (choice != 'new') return;
+    }
+
+    if (!mounted) return;
+    _showAddDialog(context, ref, householdId, categories,
+        prefilledName: productName);
   }
 
   void _maybePromoteRunningLow({
@@ -346,6 +429,17 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
                     HelpSection(icon: Icons.select_all, title: 'Bulk delete',
                         body: 'Long-press any item to enter selection mode, then tap multiple items and use "Delete" to remove them in one go.'),
                   ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.qr_code_scanner),
+                  tooltip: 'Scan barcode',
+                  // Match against full pantry, not the filtered view, so the
+                  // active category filter doesn't hide a duplicate.
+                  onPressed: () => _scanBarcodeForPantry(
+                    householdId,
+                    categories,
+                    ref.read(pantryProvider).value ?? const <PantryItem>[],
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.mic),
@@ -651,13 +745,16 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
   }
 
   void _showAddDialog(BuildContext context, WidgetRef ref, String householdId,
-      List<GroceryCategory> categories) {
-    final nameCtrl = TextEditingController();
-    final currentCtrl = TextEditingController(text: '0');
+      List<GroceryCategory> categories, {String? prefilledName}) {
+    final nameCtrl = TextEditingController(text: prefilledName ?? '');
+    // Scanned items typically arrive with one in hand; manual adds default to 0.
+    final currentCtrl = TextEditingController(text: prefilledName == null ? '0' : '1');
     final optCtrl = TextEditingController(text: '1');
     final unitAmountCtrl = TextEditingController();
     final unitCtrl = TextEditingController();
-    GroceryCategory? selectedCategory;
+    GroceryCategory? selectedCategory = prefilledName == null
+        ? null
+        : guessCategory(prefilledName, categories);
     PantryLocation? selectedLocation;
 
     showDialog(

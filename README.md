@@ -12,6 +12,7 @@ A shared household grocery app built with Flutter and Firebase. Create a househo
 
 ### Pantry
 - Track what's at home with quantities and units
+- **Scan a barcode to add to pantry** — exact-name matches auto-increment with undo, fuzzy hits prompt "stock existing or add new?", and a fresh product opens an add dialog prefilled with the OpenFoodFacts product name and a guessed category
 - **Running low** button on each item — queues it to the shopping list 2 days later (with undo) so accidental taps are recoverable; promotion happens on the next pantry-screen open, no server job required
 - Smarter **shelf-life guessing** — per-item-name defaults (milk 7d, bacon 7d, sweet potato 21d) beat category defaults, and once an item has 3+ `bought` events the household's median days-between-purchases becomes the real-world shelf life
 - Automatic restock nudges via push notifications (Cloud Function)
