@@ -37,59 +37,85 @@ final _router = GoRouter(
         inviteToken: state.uri.queryParameters['token'],
       ),
     ),
-    ShellRoute(
-      builder: (context, state, child) => ScaffoldWithNavBar(child: child),
-      routes: [
-        GoRoute(
-          path: '/list',
-          builder: (_, __) => const ShoppingListScreen(),
-          routes: [
-            GoRoute(path: 'history', builder: (_, __) => const HistoryScreen()),
-            GoRoute(path: 'templates', builder: (_, __) => const TemplatesScreen()),
-            GoRoute(path: 'bulk-voice', builder: (_, __) => const BulkVoiceScreen()),
-          ],
-        ),
-        GoRoute(path: '/pantry', builder: (_, __) => const PantryScreen()),
-        GoRoute(path: '/pantry/bulk-voice', builder: (_, __) => const PantryBulkVoiceScreen()),
-        GoRoute(
-          path: '/pantry/:itemId',
-          builder: (_, state) => PantryItemDetailScreen(itemId: state.pathParameters['itemId']!),
-        ),
-        GoRoute(
-          path: '/recipes',
-          builder: (_, __) => const RecipesScreen(),
-          routes: [
-            GoRoute(
-              path: 'new',
-              builder: (_, state) => AddRecipeScreen(
-                autoImport: state.uri.queryParameters['import'] == 'true',
+    // StatefulShellRoute keeps each tab's Navigator alive across bottom-nav
+    // switches, so screen-local flags (e.g. _restockChecked, _expiryChecked,
+    // _promotedThisSession, _sawNonEmptyList) and scroll positions don't
+    // reset when the user moves to another tab and back.
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) =>
+          ScaffoldWithNavBar(navigationShell: navigationShell),
+      branches: [
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/list',
+            builder: (_, __) => const ShoppingListScreen(),
+            routes: [
+              GoRoute(path: 'history', builder: (_, __) => const HistoryScreen()),
+              GoRoute(path: 'templates', builder: (_, __) => const TemplatesScreen()),
+              GoRoute(path: 'bulk-voice', builder: (_, __) => const BulkVoiceScreen()),
+            ],
+          ),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/pantry',
+            builder: (_, __) => const PantryScreen(),
+            routes: [
+              GoRoute(path: 'bulk-voice', builder: (_, __) => const PantryBulkVoiceScreen()),
+              GoRoute(
+                path: ':itemId',
+                builder: (_, state) =>
+                    PantryItemDetailScreen(itemId: state.pathParameters['itemId']!),
               ),
-            ),
-            GoRoute(
-              path: 'discover',
-              builder: (_, __) => const DiscoverRecipesScreen(),
-            ),
-            GoRoute(
-              path: ':recipeId',
-              builder: (_, state) => RecipeDetailScreen(
-                recipeId: state.pathParameters['recipeId']!,
-              ),
-              routes: [
-                GoRoute(
-                  path: 'edit',
-                  builder: (_, state) => AddRecipeScreen(
-                    recipeId: state.pathParameters['recipeId'],
-                  ),
+            ],
+          ),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/recipes',
+            builder: (_, __) => const RecipesScreen(),
+            routes: [
+              GoRoute(
+                path: 'new',
+                builder: (_, state) => AddRecipeScreen(
+                  autoImport: state.uri.queryParameters['import'] == 'true',
                 ),
-              ],
-            ),
-          ],
-        ),
-        GoRoute(path: '/plan', builder: (_, __) => const MealPlanScreen()),
-        GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
-        GoRoute(path: '/settings/categories', builder: (_, __) => const ManageCategoriesScreen()),
-        GoRoute(path: '/settings/locations', builder: (_, __) => const ManageLocationsScreen()),
-        GoRoute(path: '/settings/report-issue', builder: (_, __) => const ReportIssueScreen()),
+              ),
+              GoRoute(
+                path: 'discover',
+                builder: (_, __) => const DiscoverRecipesScreen(),
+              ),
+              GoRoute(
+                path: ':recipeId',
+                builder: (_, state) => RecipeDetailScreen(
+                  recipeId: state.pathParameters['recipeId']!,
+                ),
+                routes: [
+                  GoRoute(
+                    path: 'edit',
+                    builder: (_, state) => AddRecipeScreen(
+                      recipeId: state.pathParameters['recipeId'],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(path: '/plan', builder: (_, __) => const MealPlanScreen()),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/settings',
+            builder: (_, __) => const SettingsScreen(),
+            routes: [
+              GoRoute(path: 'categories', builder: (_, __) => const ManageCategoriesScreen()),
+              GoRoute(path: 'locations', builder: (_, __) => const ManageLocationsScreen()),
+              GoRoute(path: 'report-issue', builder: (_, __) => const ReportIssueScreen()),
+            ],
+          ),
+        ]),
       ],
     ),
   ],
@@ -155,8 +181,8 @@ class _GroceriesAppState extends ConsumerState<GroceriesApp> {
 }
 
 class ScaffoldWithNavBar extends ConsumerWidget {
-  final Widget child;
-  const ScaffoldWithNavBar({super.key, required this.child});
+  final StatefulNavigationShell navigationShell;
+  const ScaffoldWithNavBar({super.key, required this.navigationShell});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -175,17 +201,11 @@ class ScaffoldWithNavBar extends ConsumerWidget {
       }
     });
 
-    final location = GoRouterState.of(context).uri.toString();
-    int selectedIndex = 0;
-    if (location.startsWith('/pantry')) selectedIndex = 1;
-    if (location.startsWith('/recipes')) selectedIndex = 2;
-    if (location.startsWith('/plan')) selectedIndex = 3;
-    if (location.startsWith('/settings')) selectedIndex = 4;
-
+    final selectedIndex = navigationShell.currentIndex;
     final itemCount = ref.watch(itemsProvider).value?.length ?? 0;
 
     return Scaffold(
-      body: _TabBackground(index: selectedIndex, child: child),
+      body: _TabBackground(index: selectedIndex, child: navigationShell),
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
         destinations: [
@@ -202,10 +222,12 @@ class ScaffoldWithNavBar extends ConsumerWidget {
           const NavigationDestination(icon: Icon(Icons.calendar_month), label: 'Plan'),
           const NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
         ],
-        onDestinationSelected: (i) {
-          const routes = ['/list', '/pantry', '/recipes', '/plan', '/settings'];
-          context.go(routes[i]);
-        },
+        // initialLocation: true means tapping the active tab pops back to its
+        // root — matches the iOS-style expectation when retapping a tab.
+        onDestinationSelected: (i) => navigationShell.goBranch(
+          i,
+          initialLocation: i == selectedIndex,
+        ),
       ),
     );
   }
