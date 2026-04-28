@@ -3,6 +3,16 @@ name: release
 on:
   push:
     branches: [master]
+    # Skip release builds for doc-only / CI-only / .gitignore changes —
+    # those don't ship a new APK and re-tagging an existing release is
+    # surprising. Match watchnext + trail conventions.
+    paths-ignore:
+      - '**/*.md'
+      - '.github/**'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
+  workflow_dispatch:
 
 jobs:
   build-and-release:
