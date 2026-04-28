@@ -1030,7 +1030,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
               children: [
                 if (priorityItems.isNotEmpty) ...[
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 2),
                     child: Row(
                       children: [
                         const Icon(Icons.star, size: 16, color: Colors.amber),
@@ -1092,7 +1092,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                 );
                 return [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 2),
                     child: Row(
                       children: [
                         Container(

@@ -50,37 +50,44 @@ class _ItemTileState extends State<ItemTile> {
     final theme = Theme.of(context);
     final qtyLabel = formatQuantityUnit(item.quantity, item.unit, widget.unitSystem);
 
+    final hasNote = item.note != null && item.note!.isNotEmpty;
+    final hasRecipe = item.recipeSource != null;
+    final metaLine = qtyLabel.isEmpty
+        ? item.addedBy.displayName
+        : '${item.addedBy.displayName} · $qtyLabel';
+
     final tile = ListTile(
       onTap: widget.onTap,
       onLongPress: widget.onLongPress,
       selected: widget.isSelected,
+      dense: true,
+      visualDensity: const VisualDensity(horizontal: 0, vertical: -3),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      minVerticalPadding: 0,
       leading: widget.isSelecting
           ? Checkbox(value: widget.isSelected, onChanged: (_) => widget.onTap())
           : null,
-      title: Text(item.name),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(qtyLabel.isEmpty
-              ? item.addedBy.displayName
-              : '${item.addedBy.displayName} · $qtyLabel'),
-          if (item.note != null && item.note!.isNotEmpty)
-            Text(
-              item.note!,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+      title: Text(item.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+      subtitle: Text.rich(
+        TextSpan(
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          children: [
+            TextSpan(text: metaLine),
+            if (hasNote) TextSpan(text: ' · ${item.note!}'),
+            if (hasRecipe)
+              TextSpan(
+                text: ' · from ${item.recipeSource}',
+                style: TextStyle(
+                  fontStyle: FontStyle.italic,
+                  color: theme.colorScheme.primary,
+                ),
               ),
-            ),
-          if (item.recipeSource != null)
-            Text(
-              'from ${item.recipeSource}',
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontStyle: FontStyle.italic,
-                color: theme.colorScheme.primary,
-              ),
-            ),
-        ],
+          ],
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,

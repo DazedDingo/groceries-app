@@ -114,6 +114,16 @@ void main() {
       expect(haptics, contains('HapticFeedbackType.selectionClick'));
     });
 
+    testWidgets('tile renders dense + compact for higher items-per-page', (tester) async {
+      await tester.pumpWidget(_host(
+        item: _sampleItem(),
+        onCheckOff: () async => CartReceipt(originalItem: _sampleItem()),
+      ));
+      final tile = tester.widget<ListTile>(find.byType(ListTile));
+      expect(tile.dense, isTrue);
+      expect(tile.visualDensity, const VisualDensity(horizontal: 0, vertical: -3));
+    });
+
     testWidgets('selectionClick does NOT fire on delete swipe', (tester) async {
       final haptics = <String>[];
       _captureHaptics(haptics);
