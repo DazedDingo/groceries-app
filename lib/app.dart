@@ -3,13 +3,13 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'main.dart' show pendingInviteToken;
 import 'theme/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/household_provider.dart';
 import 'providers/items_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/household/setup_screen.dart';
+import 'screens/splash/splash_screen.dart';
 import 'screens/shopping_list/shopping_list_screen.dart';
 import 'screens/pantry/pantry_screen.dart';
 import 'screens/pantry/pantry_item_detail_screen.dart';
@@ -28,8 +28,9 @@ import 'screens/recipes/discover_recipes_screen.dart';
 import 'screens/meal_plan/meal_plan_screen.dart';
 
 final _router = GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/splash',
   routes: [
+    GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
     GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
     GoRoute(
       path: '/setup',
@@ -151,13 +152,9 @@ class _GroceriesAppState extends ConsumerState<GroceriesApp> {
       onError: (_) {}, // Silently ignore malformed links
     );
 
-    // Handle cold-start deep link
-    if (pendingInviteToken != null && _tokenPattern.hasMatch(pendingInviteToken!)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _router.go('/setup?token=$pendingInviteToken');
-        pendingInviteToken = null;
-      });
-    }
+    // Cold-start deep link is consumed by the splash screen, which uses
+    // pendingInviteToken to redirect to /setup if present (so the splash
+    // animation still plays before the join flow).
   }
 
   @override
