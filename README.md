@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/icons/app_icon.png" width="128" alt="Groceries app icon"/>
+</p>
+
 # Groceries
 
 A shared household grocery app built with Flutter and Firebase. Create a household, invite family members, and collaborate on shopping lists, pantry tracking, and meal planning — all in real time.
