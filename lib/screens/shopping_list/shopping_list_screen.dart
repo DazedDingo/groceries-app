@@ -14,10 +14,11 @@ import '../../models/pantry_item.dart';
 import 'cart_action.dart';
 import 'widgets/item_tile.dart';
 import 'widgets/filter_bar.dart';
-import 'widgets/voice_fab.dart';
 import 'widgets/add_item_dialog.dart';
 import 'widgets/barcode_scanner_dialog.dart';
 import 'widgets/trip_completion_sheet.dart';
+import '../../widgets/expandable_fab.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 import '../../services/unit_converter.dart';
 import '../../services/category_guesser.dart';
 import '../../services/suggestion_ranker.dart';
@@ -48,6 +49,8 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   Set<String> _knownItemIds = {};
   bool _tripSheetShowing = false;
   bool _sawNonEmptyList = false;
+  final SpeechToText _speech = SpeechToText();
+  bool _listening = false;
 
   static const _kLastTripDatePref = 'lastTripCompletionDate';
   static const _kDismissedExpiryFingerprintPref = 'dismissedExpiryFingerprint';
@@ -165,6 +168,54 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       _selecting = false;
       _selectedIds.clear();
     });
+  }
+
+  Future<void> _voiceAdd(String householdId) async {
+    if (_listening) return;
+    final available = await _speech.initialize();
+    if (!available || !mounted) return;
+    setState(() => _listening = true);
+    _speech.listen(onResult: (result) async {
+      if (!result.finalResult) return;
+      await _speech.stop();
+      if (!mounted) return;
+      setState(() => _listening = false);
+      if (result.recognizedWords.trim().isEmpty) return;
+      await _showVoiceAddDialog(householdId, result.recognizedWords);
+    });
+  }
+
+  Future<void> _showVoiceAddDialog(String householdId, String spokenName) async {
+    final categories = ref.read(categoriesProvider).value ?? [];
+    final overrides = ref.read(categoryOverridesProvider).value ?? {};
+    final guessed = guessCategory(spokenName, categories, overrides);
+    final result = await showDialog<AddItemResult>(
+      context: context,
+      builder: (ctx) => AddItemDialog(
+        initialName: spokenName,
+        categories: categories,
+        initialCategory: guessed,
+        categoryOverrides: overrides,
+      ),
+    );
+    if (result == null || !mounted) return;
+    final user = ref.read(authStateProvider).valueOrNull;
+    await ref.read(itemsServiceProvider).addItem(
+      householdId: householdId,
+      name: result.name,
+      categoryId: result.category?.id ?? 'uncategorised',
+      preferredStores: const [],
+      pantryItemId: null,
+      quantity: result.quantity,
+      unit: result.unit,
+      note: result.note,
+      isRecurring: result.isRecurring,
+      addedBy: AddedBy(
+        uid: user?.uid,
+        displayName: user?.displayName ?? 'Unknown',
+        source: ItemSource.voiceInApp,
+      ),
+    );
   }
 
   Future<void> _showManualAddDialog(String householdId) async {
@@ -970,21 +1021,14 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                     body: 'Items linked to a high-priority pantry item show a star. When they\'re also low on stock they float to the top of the list.'),
               ],
             ),
-            IconButton(
-              icon: const Icon(Icons.playlist_add),
-              onPressed: () => _showBulkAddDialog(householdId),
-              tooltip: 'Bulk add',
-            ),
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert),
               onSelected: (val) {
                 if (val == 'history') context.go('/list/history');
                 if (val == 'templates') context.go('/list/templates');
                 if (val == 'reorder') _showReorderLastTrip(householdId);
-                if (val == 'scan') _scanBarcode(householdId);
               },
               itemBuilder: (_) => const [
-                PopupMenuItem(value: 'scan', child: Text('Scan barcode')),
                 PopupMenuItem(value: 'reorder', child: Text('Reorder last trip')),
                 PopupMenuItem(value: 'templates', child: Text('Templates')),
                 PopupMenuItem(value: 'history', child: Text('History')),
@@ -1197,25 +1241,38 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       ),
       floatingActionButton: _selecting
           ? null
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                FloatingActionButton.small(
-                  heroTag: 'add-manual',
+          : ExpandableFab(
+              actions: [
+                FabAction(
+                  heroTag: 'list-add-manual',
+                  icon: Icons.edit,
+                  label: 'Type an item',
                   onPressed: () => _showManualAddDialog(householdId),
-                  tooltip: 'Add item',
-                  child: const Icon(Icons.add),
                 ),
-                const SizedBox(height: 8),
-                FloatingActionButton.small(
-                  heroTag: 'bulk-voice',
+                FabAction(
+                  heroTag: 'list-add-voice',
+                  icon: _listening ? Icons.mic_off : Icons.mic,
+                  label: 'Quick voice',
+                  onPressed: () => _voiceAdd(householdId),
+                ),
+                FabAction(
+                  heroTag: 'list-add-bulk-voice',
+                  icon: Icons.record_voice_over,
+                  label: 'Bulk voice',
                   onPressed: () => context.push('/list/bulk-voice'),
-                  tooltip: 'Bulk voice add',
-                  child: const Icon(Icons.record_voice_over),
                 ),
-                const SizedBox(height: 8),
-                VoiceFab(householdId: householdId),
+                FabAction(
+                  heroTag: 'list-add-bulk-text',
+                  icon: Icons.playlist_add,
+                  label: 'Bulk paste',
+                  onPressed: () => _showBulkAddDialog(householdId),
+                ),
+                FabAction(
+                  heroTag: 'list-add-scan',
+                  icon: Icons.qr_code_scanner,
+                  label: 'Scan barcode',
+                  onPressed: () => _scanBarcode(householdId),
+                ),
               ],
             ),
     );

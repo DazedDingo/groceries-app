@@ -20,6 +20,7 @@ import '../../services/text_item_parser.dart';
 import '../shared/bulk_add_dialog.dart';
 import '../shared/empty_state.dart';
 import '../shopping_list/widgets/barcode_scanner_dialog.dart';
+import '../../widgets/expandable_fab.dart';
 import 'bulk_voice_screen.dart';
 import 'widgets/pantry_item_tile.dart';
 
@@ -430,31 +431,6 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
                         body: 'Long-press any item to enter selection mode, then tap multiple items and use "Delete" to remove them in one go.'),
                   ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.qr_code_scanner),
-                  tooltip: 'Scan barcode',
-                  // Match against full pantry, not the filtered view, so the
-                  // active category filter doesn't hide a duplicate.
-                  onPressed: () => _scanBarcodeForPantry(
-                    householdId,
-                    categories,
-                    ref.read(pantryProvider).value ?? const <PantryItem>[],
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.mic),
-                  tooltip: 'Bulk voice add',
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => const PantryBulkVoiceScreen(),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.playlist_add),
-                  onPressed: () => _showBulkAddDialog(context, ref, householdId, categories),
-                  tooltip: 'Bulk add',
-                ),
               ],
       ),
       body: Column(
@@ -562,9 +538,43 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
       ),
       floatingActionButton: _selecting
           ? null
-          : FloatingActionButton(
-              onPressed: () => _showAddDialog(context, ref, householdId, categories),
-              child: const Icon(Icons.add),
+          : ExpandableFab(
+              actions: [
+                FabAction(
+                  heroTag: 'pantry-add-manual',
+                  icon: Icons.edit,
+                  label: 'Type an item',
+                  onPressed: () => _showAddDialog(
+                      context, ref, householdId, categories),
+                ),
+                FabAction(
+                  heroTag: 'pantry-add-scan',
+                  icon: Icons.qr_code_scanner,
+                  label: 'Scan barcode',
+                  onPressed: () => _scanBarcodeForPantry(
+                    householdId,
+                    categories,
+                    ref.read(pantryProvider).value ?? const <PantryItem>[],
+                  ),
+                ),
+                FabAction(
+                  heroTag: 'pantry-add-bulk-voice',
+                  icon: Icons.record_voice_over,
+                  label: 'Bulk voice',
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const PantryBulkVoiceScreen(),
+                    ),
+                  ),
+                ),
+                FabAction(
+                  heroTag: 'pantry-add-bulk-text',
+                  icon: Icons.playlist_add,
+                  label: 'Bulk paste',
+                  onPressed: () => _showBulkAddDialog(
+                      context, ref, householdId, categories),
+                ),
+              ],
             ),
     );
   }
