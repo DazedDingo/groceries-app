@@ -5,6 +5,7 @@ A shared household grocery app built with Flutter and Firebase. Create a househo
 ## Features
 
 ### Shopping List
+- One **expandable "+" FAB** holds every add path: type an item, quick voice, bulk voice, bulk paste, and scan a barcode
 - Add items manually or by **voice** (speech-to-text)
 - Items are auto-categorized for aisle-efficient shopping
 - Filter by category, bulk-select to check off or delete
