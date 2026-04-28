@@ -16,9 +16,10 @@ class FabAction {
   });
 }
 
-/// Single primary FAB that fans children upward when tapped. Backdrop scrim
-/// dismisses on tap, ESC-style. Children stagger so the closest one lands
-/// first — feels like an unfolding hand of cards rather than a teleport.
+/// Single primary FAB that fans children upward when tapped. The fanned
+/// children + scrim live in an [OverlayEntry] covering the whole screen,
+/// because the Scaffold's FAB slot is sized to the primary FAB only and
+/// would clip away taps that fall on visually-overflowing children.
 class ExpandableFab extends StatefulWidget {
   final List<FabAction> actions;
   final IconData openIcon;
@@ -41,7 +42,7 @@ class _ExpandableFabState extends State<ExpandableFab>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
   late final Animation<double> _expand;
-  bool _open = false;
+  OverlayEntry? _entry;
 
   @override
   void initState() {
@@ -55,104 +56,135 @@ class _ExpandableFabState extends State<ExpandableFab>
 
   @override
   void dispose() {
+    _entry?.remove();
+    _entry = null;
     _ctrl.dispose();
     super.dispose();
   }
 
+  bool get _open => _entry != null;
+
   void _toggle() {
-    setState(() => _open = !_open);
     if (_open) {
-      _ctrl.forward();
+      _close();
     } else {
-      _ctrl.reverse();
+      _show();
     }
   }
 
-  void _close() {
-    if (!_open) return;
-    setState(() => _open = false);
-    _ctrl.reverse();
+  void _show() {
+    final renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+    final fabPos = renderBox.localToGlobal(Offset.zero);
+    final fabSize = renderBox.size;
+    final screen = MediaQuery.of(context).size;
+    final rightEdge = screen.width - (fabPos.dx + fabSize.width);
+    final bottomEdge = screen.height - (fabPos.dy + fabSize.height);
+
+    _entry = OverlayEntry(
+      builder: (_) => _FabFanOverlay(
+        rightEdge: rightEdge,
+        bottomEdge: bottomEdge,
+        fabHeight: fabSize.height,
+        animation: _expand,
+        actions: widget.actions,
+        onClose: _close,
+      ),
+    );
+    Overlay.of(context, rootOverlay: true).insert(_entry!);
+    _ctrl.forward();
+    setState(() {}); // refresh primary FAB icon
   }
+
+  Future<void> _close() async {
+    if (!_open) return;
+    await _ctrl.reverse();
+    if (!mounted) return;
+    _entry?.remove();
+    _entry = null;
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: _toggle,
+      tooltip: _open ? 'Close' : widget.tooltip,
+      child: AnimatedRotation(
+        turns: _open ? 0.125 : 0,
+        duration: const Duration(milliseconds: 220),
+        child: Icon(_open ? widget.closeIcon : widget.openIcon),
+      ),
+    );
+  }
+}
+
+class _FabFanOverlay extends StatelessWidget {
+  final double rightEdge;
+  final double bottomEdge;
+  final double fabHeight;
+  final Animation<double> animation;
+  final List<FabAction> actions;
+  final VoidCallback onClose;
+
+  const _FabFanOverlay({
+    required this.rightEdge,
+    required this.bottomEdge,
+    required this.fabHeight,
+    required this.animation,
+    required this.actions,
+    required this.onClose,
+  });
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Stack(
-      clipBehavior: Clip.none,
-      alignment: Alignment.bottomRight,
       children: [
-        // Backdrop scrim — only hit-tests when open so it doesn't swallow
-        // gestures behind the page when collapsed.
-        if (_open)
-          Positioned.fill(
-            // Anchor scrim to a much larger area than the FAB itself so
-            // taps anywhere on the screen close the fan. The negative offsets
-            // expand the hit area into the rest of the Scaffold body.
-            left: -2000,
-            top: -2000,
-            child: GestureDetector(
-              onTap: _close,
-              behavior: HitTestBehavior.opaque,
-              child: AnimatedBuilder(
-                animation: _expand,
-                builder: (_, __) => Container(
-                  color: Colors.black.withValues(alpha: 0.35 * _expand.value),
-                ),
+        Positioned.fill(
+          child: GestureDetector(
+            onTap: onClose,
+            behavior: HitTestBehavior.opaque,
+            child: AnimatedBuilder(
+              animation: animation,
+              builder: (_, __) => ColoredBox(
+                color: Colors.black.withValues(alpha: 0.35 * animation.value),
               ),
             ),
           ),
-        ..._buildChildren(scheme),
-        FloatingActionButton(
-          onPressed: _toggle,
-          tooltip: _open ? 'Close' : widget.tooltip,
-          child: AnimatedRotation(
-            turns: _open ? 0.125 : 0,
-            duration: const Duration(milliseconds: 220),
-            child: Icon(_open ? widget.closeIcon : widget.openIcon),
-          ),
         ),
-      ],
-    );
-  }
-
-  List<Widget> _buildChildren(ColorScheme scheme) {
-    const stepPx = 64.0; // spacing between each child FAB
-    const baseOffset = 72.0; // distance above the primary FAB
-    return [
-      for (var i = 0; i < widget.actions.length; i++)
-        AnimatedBuilder(
-          animation: _expand,
-          builder: (_, __) {
-            // Staggered curve: child i animates over [i * 0.05, 1.0] so the
-            // bottom one fully lands before the top one finishes.
-            final stagger = i * 0.05;
-            final progress = ((_expand.value - stagger) / (1.0 - stagger))
-                .clamp(0.0, 1.0);
-            final dy = -(baseOffset + stepPx * i) * progress;
-            return Positioned(
-              right: 4,
-              bottom: 4,
-              child: Transform.translate(
-                offset: Offset(0, dy),
+        for (var i = 0; i < actions.length; i++)
+          AnimatedBuilder(
+            animation: animation,
+            builder: (_, __) {
+              const stepPx = 64.0;
+              const baseOffset = 12.0;
+              final stagger = i * 0.05;
+              final progress = ((animation.value - stagger) / (1.0 - stagger))
+                  .clamp(0.0, 1.0);
+              // Slot baseline: directly above the primary FAB, then stacked.
+              final slotBottom = bottomEdge + fabHeight + baseOffset + stepPx * i;
+              // Slide-up entry: start ~24px lower, settle as progress→1.
+              final entrySlide = (1 - progress) * 24.0;
+              return Positioned(
+                right: rightEdge,
+                bottom: slotBottom - entrySlide,
                 child: Opacity(
                   opacity: progress,
-                  child: IgnorePointer(
-                    ignoring: !_open,
-                    child: _ChildAction(
-                      action: widget.actions[i],
-                      onTap: () {
-                        _close();
-                        widget.actions[i].onPressed();
-                      },
-                      scheme: scheme,
-                    ),
+                  child: _ChildAction(
+                    action: actions[i],
+                    onTap: () {
+                      actions[i].onPressed();
+                      onClose();
+                    },
+                    scheme: scheme,
                   ),
                 ),
-              ),
-            );
-          },
-        ),
-    ];
+              );
+            },
+          ),
+      ],
+    );
   }
 }
 
@@ -176,11 +208,15 @@ class _ChildAction extends StatelessWidget {
           color: scheme.surface,
           elevation: 4,
           borderRadius: BorderRadius.circular(8),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: Text(
-              action.label,
-              style: TextStyle(color: scheme.onSurface, fontSize: 13),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(8),
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              child: Text(
+                action.label,
+                style: TextStyle(color: scheme.onSurface, fontSize: 13),
+              ),
             ),
           ),
         ),
@@ -195,4 +231,3 @@ class _ChildAction extends StatelessWidget {
     );
   }
 }
-
