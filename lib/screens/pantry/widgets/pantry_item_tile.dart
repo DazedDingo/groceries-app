@@ -88,11 +88,6 @@ class PantryItemTile extends StatelessWidget {
             const SizedBox(width: 4),
             const Icon(Icons.star, size: 14, color: Colors.amber),
           ],
-          if (item.runningLowAt != null) ...[
-            const SizedBox(width: 4),
-            Icon(Icons.trending_down,
-                size: 14, color: scheme.onSecondaryContainer),
-          ],
           if (item.location != null) ...[
             const SizedBox(width: 4),
             Icon(_iconForLocation(item.location),
@@ -111,17 +106,26 @@ class PantryItemTile extends StatelessWidget {
       ),
       trailing: isSelecting
           ? null
-          : IconButton(
-              icon: const Icon(Icons.add, size: 18),
-              tooltip: 'Add one',
-              onPressed: onIncrement,
-              visualDensity:
-                  const VisualDensity(horizontal: -2, vertical: -2),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(
-                minWidth: 32,
-                minHeight: 32,
-              ),
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _RunningLowToggle(
+                  flagged: item.runningLowAt != null,
+                  onMark: onMarkRunningLow,
+                  onClear: onClearRunningLow,
+                ),
+                _CompactIconButton(
+                  icon: Icons.remove,
+                  tooltip: 'Use one',
+                  onPressed:
+                      item.currentQuantity > 0 ? onDecrement : null,
+                ),
+                _CompactIconButton(
+                  icon: Icons.add,
+                  tooltip: 'Add one',
+                  onPressed: onIncrement,
+                ),
+              ],
             ),
       ),
     );
@@ -141,6 +145,65 @@ class PantryItemTile extends StatelessWidget {
       case null:
         return Icons.place_outlined;
     }
+  }
+}
+
+/// Tight 32×32 icon button used three times in the trailing row. The
+/// stock IconButton's default 48×48 hit-target was the bulk of the
+/// pre-compaction tile height; these constraints keep tap reliability
+/// while letting three buttons line up under a 100 px-wide trailing
+/// slot on a 360 dp phone.
+class _CompactIconButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback? onPressed;
+  final Color? color;
+  const _CompactIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(icon, size: 18, color: color),
+      tooltip: tooltip,
+      onPressed: onPressed,
+      visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+    );
+  }
+}
+
+/// Two-state running-low toggle for the pantry tile's trailing row.
+/// Outline + neutral when not flagged (tap → mark); filled-secondary
+/// + tinted when flagged (tap → clear). Same 32×32 footprint as the
+/// inc/dec siblings so the trailing row stays uniform; the colour
+/// flip is what communicates "this is queued to land on the list".
+class _RunningLowToggle extends StatelessWidget {
+  final bool flagged;
+  final VoidCallback onMark;
+  final VoidCallback onClear;
+  const _RunningLowToggle({
+    required this.flagged,
+    required this.onMark,
+    required this.onClear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return _CompactIconButton(
+      icon: Icons.trending_down,
+      tooltip: flagged
+          ? 'Cancel running-low'
+          : 'Running low — adds to list in 2 days',
+      color: flagged ? scheme.onSecondaryContainer : null,
+      onPressed: flagged ? onClear : onMark,
+    );
   }
 }
 
