@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
 import '../../../models/pantry_item.dart';
-import '../../../services/running_low_promoter.dart';
 
+/// Single-line, dense pantry row.
+///
+/// Earlier revisions used a ListTile with title + subtitle + button row +
+/// inc/dec trailing — three visual rows per item, ~88 px each. That made
+/// a typical pantry of 30+ items feel like a long scroll. Compacted to a
+/// single-line tile (~40 px): name, status icons, qty, and a single +
+/// button for the most common interaction. The detail screen still has
+/// the full set of actions (decrement, mark running-low, add to list,
+/// per-container info, location picker) — tap the row to open it.
 class PantryItemTile extends StatelessWidget {
   final PantryItem item;
+
+  /// Kept on the API for parity with the screen call site, but no longer
+  /// rendered — the pantry screen already groups by category, so a
+  /// per-row chip was duplicating context.
   final String categoryName;
+
   final VoidCallback onDecrement;
   final VoidCallback onIncrement;
   final VoidCallback onAddToList;
@@ -16,8 +29,11 @@ class PantryItemTile extends StatelessWidget {
   final bool isSelected;
 
   const PantryItemTile({
-    super.key, required this.item, required this.categoryName,
-    required this.onDecrement, required this.onIncrement,
+    super.key,
+    required this.item,
+    required this.categoryName,
+    required this.onDecrement,
+    required this.onIncrement,
     required this.onAddToList,
     required this.onMarkRunningLow,
     required this.onClearRunningLow,
@@ -30,127 +46,85 @@ class PantryItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return ListTile(
+    final theme = Theme.of(context);
+    final qtyColor =
+        item.isBelowOptimal ? scheme.error : scheme.onSurfaceVariant;
+    // Hairline bottom border so consecutive dense tiles don't blur into
+    // a single visual blob. outlineVariant is Material 3's spec-defined
+    // hue for "minimal-prominence dividers" — it reads as a separator
+    // without competing with the section-header text above each block.
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: scheme.outlineVariant.withValues(alpha: 0.6),
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: ListTile(
       onTap: onTap,
       onLongPress: onLongPress,
       selected: isSelected,
+      dense: true,
+      visualDensity: const VisualDensity(horizontal: -3, vertical: -3),
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+      minVerticalPadding: 0,
       leading: isSelecting
           ? Checkbox(value: isSelected, onChanged: (_) => onTap())
           : null,
       title: Row(
         children: [
-          Expanded(child: Text(item.name)),
-          const SizedBox(width: 8),
-          Chip(
-            label: Text(categoryName,
-                style: Theme.of(context).textTheme.labelSmall),
-            padding: EdgeInsets.zero,
-            visualDensity: VisualDensity.compact,
+          Expanded(
+            child: Text(
+              item.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodyMedium,
+            ),
           ),
           if (item.isHighPriority) ...[
-            const SizedBox(width: 6),
-            const Icon(Icons.star, size: 16, color: Colors.amber),
+            const SizedBox(width: 4),
+            const Icon(Icons.star, size: 14, color: Colors.amber),
           ],
-          if (item.isBelowOptimal) ...[
-            const SizedBox(width: 6),
-            Icon(Icons.warning_amber, size: 16, color: scheme.error),
+          if (item.runningLowAt != null) ...[
+            const SizedBox(width: 4),
+            Icon(Icons.trending_down,
+                size: 14, color: scheme.onSecondaryContainer),
           ],
-        ],
-      ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text('${item.currentQuantity} / ${item.optimalQuantity} optimal'),
-              if (_formatPerContainer(item).isNotEmpty) ...[
-                const SizedBox(width: 6),
-                Text('· ${_formatPerContainer(item)}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: scheme.onSurfaceVariant,
-                        )),
-              ],
-              if (item.location != null) ...[
-                const SizedBox(width: 8),
-                Icon(_iconForLocation(item.location),
-                    size: 12, color: scheme.onSurfaceVariant),
-                const SizedBox(width: 2),
-                Text(_labelForLocation(item.location),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: scheme.onSurfaceVariant,
-                        )),
-              ],
-            ],
-          ),
-          Wrap(
-            spacing: 8,
-            children: [
-              if (item.isBelowOptimal)
-                TextButton.icon(
-                  onPressed: onAddToList,
-                  icon: const Icon(Icons.add_shopping_cart, size: 16),
-                  label: const Text('Add to list'),
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    visualDensity: VisualDensity.compact,
-                  ),
-                ),
-              if (item.runningLowAt == null)
-                Tooltip(
-                  message:
-                      'Adds to list in 2 days and drops this count by 1',
-                  child: TextButton.icon(
-                    onPressed: onMarkRunningLow,
-                    icon: const Icon(Icons.trending_down, size: 16),
-                    label: const Text('Running low'),
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ),
-                )
-              else
-                _RunningLowChip(
-                  flaggedAt: item.runningLowAt!,
-                  onClear: onClearRunningLow,
-                ),
-            ],
+          if (item.location != null) ...[
+            const SizedBox(width: 4),
+            Icon(_iconForLocation(item.location),
+                size: 14, color: scheme.onSurfaceVariant),
+          ],
+          const SizedBox(width: 8),
+          Text(
+            '${item.currentQuantity}/${item.optimalQuantity}',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: qtyColor,
+              fontWeight:
+                  item.isBelowOptimal ? FontWeight.w700 : FontWeight.w500,
+            ),
           ),
         ],
       ),
       trailing: isSelecting
           ? null
-          : Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.remove),
-                  onPressed: onDecrement,
-                  visualDensity: VisualDensity.compact,
-                ),
-                Text('${item.currentQuantity}', style: const TextStyle(fontSize: 16)),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: onIncrement,
-                  visualDensity: VisualDensity.compact,
-                ),
-              ],
+          : IconButton(
+              icon: const Icon(Icons.add, size: 18),
+              tooltip: 'Add one',
+              onPressed: onIncrement,
+              visualDensity:
+                  const VisualDensity(horizontal: -2, vertical: -2),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(
+                minWidth: 32,
+                minHeight: 32,
+              ),
             ),
+      ),
     );
-  }
-
-  String _formatPerContainer(PantryItem p) {
-    final amt = p.unitAmount;
-    final u = p.unit?.trim();
-    if (amt != null && amt > 0 && u != null && u.isNotEmpty) {
-      final n = amt == amt.roundToDouble() ? amt.toInt().toString() : amt.toString();
-      return '$n$u';
-    }
-    if (amt != null && amt > 0) {
-      return amt == amt.roundToDouble() ? amt.toInt().toString() : amt.toString();
-    }
-    if (u != null && u.isNotEmpty) return u;
-    return '';
   }
 
   IconData _iconForLocation(String? location) {
@@ -168,35 +142,5 @@ class PantryItemTile extends StatelessWidget {
         return Icons.place_outlined;
     }
   }
-
-  String _labelForLocation(String? location) {
-    if (location == null) return '';
-    return PantryLocation.fromId(location)?.label ?? location;
-  }
 }
 
-class _RunningLowChip extends StatelessWidget {
-  final DateTime flaggedAt;
-  final VoidCallback onClear;
-  const _RunningLowChip({required this.flaggedAt, required this.onClear});
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final dueAt = flaggedAt.add(runningLowDelay);
-    final daysLeft = dueAt.difference(DateTime.now()).inDays;
-    final label = daysLeft <= 0
-        ? 'Running low — adding next open'
-        : 'Running low — adds in ${daysLeft + 1}d';
-    return InputChip(
-      avatar: Icon(Icons.trending_down, size: 14, color: scheme.onSecondaryContainer),
-      label: Text(label, style: Theme.of(context).textTheme.labelSmall),
-      onDeleted: onClear,
-      deleteIcon: const Icon(Icons.close, size: 14),
-      deleteButtonTooltipMessage: 'Cancel running-low',
-      backgroundColor: scheme.secondaryContainer,
-      visualDensity: VisualDensity.compact,
-      padding: EdgeInsets.zero,
-    );
-  }
-}
