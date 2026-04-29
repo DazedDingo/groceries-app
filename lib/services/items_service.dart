@@ -24,7 +24,11 @@ class ItemsService {
         .map((s) => s.docs.map(HistoryEntry.fromFirestore).toList());
   }
 
-  Future<void> addItem({
+  /// Returns the new shopping-item doc id so callers can drive an
+  /// Undo flow (the auto-add-on-below-optimal path in pantry_screen
+  /// uses this for the snackbar's deleteItem). Existing callers that
+  /// don't care about the id can ignore the return.
+  Future<String> addItem({
     required String householdId,
     required String name,
     required String categoryId,
@@ -54,6 +58,7 @@ class ItemsService {
       byName: addedBy.displayName,
     ));
     await batch.commit();
+    return itemRef.id;
   }
 
   /// Atomic running-low promotion: inserts the shopping item + history entry

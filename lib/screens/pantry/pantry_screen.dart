@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -110,6 +111,67 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
         );
       }
     }
+  }
+
+  /// Decrement and, if the decrement just dropped the item from at-optimal
+  /// to below-optimal AND the item isn't already on the shopping list,
+  /// auto-add it. The cross-threshold check (priorCurrent == optimalQty)
+  /// fires the auto-add exactly once per "trip through the threshold" —
+  /// further decrements while still below optimal don't re-add, and a
+  /// manual remove from the list isn't undone on the next decrement.
+  /// Recovery: the snackbar's Undo deletes the just-added shopping item.
+  Future<void> _decrementWithAutoAdd({
+    required String householdId,
+    required PantryItem item,
+    required List<ShoppingItem> shoppingList,
+    required AddedBy addedBy,
+  }) async {
+    final priorCurrent = item.currentQuantity;
+    final pantryService = ref.read(pantryServiceProvider);
+    await pantryService.decrementQuantity(
+      householdId: householdId, itemId: item.id, current: priorCurrent,
+    );
+    final crossedThreshold = priorCurrent == item.optimalQuantity;
+    if (!crossedThreshold) return;
+    final alreadyOnList =
+        shoppingList.any((s) => s.pantryItemId == item.id);
+    if (alreadyOnList) return;
+
+    final qty =
+        (item.optimalQuantity - (priorCurrent - 1)).clamp(1, 999).toInt();
+    final itemsService = ref.read(itemsServiceProvider);
+    final shoppingId = await itemsService.addItem(
+      householdId: householdId,
+      name: item.name,
+      categoryId: item.categoryId,
+      preferredStores: item.preferredStores,
+      pantryItemId: item.id,
+      quantity: qty,
+      unit: item.unit,
+      addedBy: addedBy,
+    );
+    if (!mounted) return;
+    HapticFeedback.selectionClick();
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text('Added "${item.name}" to your list (below optimal).'),
+        duration: const Duration(seconds: 4),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {
+            // Best-effort raw delete: if a partner already checked the
+            // item off, the doc is gone and `delete()` no-ops. Going
+            // through `deleteItem` would write a history "deleted" row
+            // that's noise on an undo path.
+            FirebaseFirestore.instance
+                .doc('households/$householdId/items/$shoppingId')
+                .delete();
+          },
+        ),
+      ),
+    );
   }
 
   Future<void> _markRunningLow(
@@ -372,8 +434,12 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
       isSelecting: _selecting,
       isSelected: _selectedIds.contains(item.id),
       onLongPress: () => _enterSelecting(item.id),
-      onDecrement: () => pantryService.decrementQuantity(
-          householdId: householdId, itemId: item.id, current: item.currentQuantity),
+      onDecrement: () => _decrementWithAutoAdd(
+        householdId: householdId,
+        item: item,
+        shoppingList: items,
+        addedBy: addedBy,
+      ),
       onIncrement: () => pantryService.incrementQuantity(
           householdId: householdId, itemId: item.id, current: item.currentQuantity),
       onAddToList: () => itemsService.addItem(
