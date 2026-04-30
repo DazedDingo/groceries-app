@@ -12,6 +12,7 @@ import '../../providers/categories_provider.dart';
 import '../../models/item.dart';
 import '../../models/category.dart';
 import '../../models/pantry_item.dart';
+import '../../services/below_optimal_promoter.dart';
 import '../../services/category_guesser.dart';
 import '../../services/pantry_barcode_matcher.dart';
 import '../../services/pantry_grouper.dart';
@@ -114,12 +115,13 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
   }
 
   /// Decrement and, if the decrement just dropped the item from at-optimal
-  /// to below-optimal AND the item isn't already on the shopping list,
-  /// auto-add it. The cross-threshold check (priorCurrent == optimalQty)
-  /// fires the auto-add exactly once per "trip through the threshold" —
-  /// further decrements while still below optimal don't re-add, and a
-  /// manual remove from the list isn't undone on the next decrement.
-  /// Recovery: the snackbar's Undo deletes the just-added shopping item.
+  /// to below-optimal, decide via [decideBelowOptimalAutoAdd] whether to
+  /// auto-add (firing once per "trip through the threshold"; further
+  /// decrements while still below optimal don't re-add). When the helper
+  /// says skip-because-already-on-list we still surface a snackbar so the
+  /// user knows the threshold was noticed — silent skips read as a broken
+  /// feature when the user expects a list entry.
+  /// Recovery: the auto-add snackbar's Undo deletes the just-added item.
   Future<void> _decrementWithAutoAdd({
     required String householdId,
     required PantryItem item,
@@ -131,14 +133,29 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
     await pantryService.decrementQuantity(
       householdId: householdId, itemId: item.id, current: priorCurrent,
     );
-    final crossedThreshold = priorCurrent == item.optimalQuantity;
-    if (!crossedThreshold) return;
-    final alreadyOnList =
-        shoppingList.any((s) => s.pantryItemId == item.id);
-    if (alreadyOnList) return;
+    final decision = decideBelowOptimalAutoAdd(
+      item: item,
+      priorCurrent: priorCurrent,
+      shoppingList: shoppingList,
+    );
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
 
-    final qty =
-        (item.optimalQuantity - (priorCurrent - 1)).clamp(1, 999).toInt();
+    if (!decision.shouldAdd) {
+      // Only surface the "did nothing" toast when the user actually
+      // crossed the threshold — every other decrement should stay quiet.
+      final crossed = priorCurrent >= item.optimalQuantity &&
+          (priorCurrent - 1) < item.optimalQuantity;
+      if (crossed && decision.reasonSkipped == 'already on list') {
+        messenger.hideCurrentSnackBar();
+        messenger.showSnackBar(SnackBar(
+          content: Text('"${item.name}" is already on your shopping list.'),
+          duration: const Duration(seconds: 3),
+        ));
+      }
+      return;
+    }
+
     final itemsService = ref.read(itemsServiceProvider);
     final shoppingId = await itemsService.addItem(
       householdId: householdId,
@@ -146,13 +163,12 @@ class _PantryScreenState extends ConsumerState<PantryScreen> {
       categoryId: item.categoryId,
       preferredStores: item.preferredStores,
       pantryItemId: item.id,
-      quantity: qty,
+      quantity: decision.qtyToAdd,
       unit: item.unit,
       addedBy: addedBy,
     );
     if (!mounted) return;
     HapticFeedback.selectionClick();
-    final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
     messenger.showSnackBar(
       SnackBar(
