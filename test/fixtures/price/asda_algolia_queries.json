@@ -1,0 +1,3591 @@
+{
+ "milk": {
+  "results": [
+   {
+    "index": "ASDA_PRODUCTS",
+    "nbHits": 161,
+    "hits": [
+     {
+      "ID": "23423",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "538241",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "British Milk Semi Skimmed 2 Pints",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "20411985",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Dropped",
+        "PRICE": 1.2,
+        "WASPRICE": 1.2,
+        "PRICEPERUOM": 1.06195,
+        "PRICEPERUOMFORMATTED": "\u00a31.06/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215660378320",
+       "CAT_NAME": "Chilled Food",
+       "DEPT_ID": "1215339432024",
+       "DEPT_NAME": "Milk, Butter, Cream & Eggs",
+       "AISLE_ID": "1215339434886",
+       "AISLE_NAME": "Fresh Milk",
+       "SHELF_ID": "1215339438036",
+       "SHELF_NAME": "Semi Skimmed Milk"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.3486,
+      "RATING_COUNT": 284.0,
+      "PACK_SIZE": "2 PINT",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 24,
+      "objectID": "538241"
+     },
+     {
+      "ID": "23421",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "538239",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "British Whole Milk 2 Pints",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "20411992",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Dropped",
+        "PRICE": 1.2,
+        "WASPRICE": 1.2,
+        "PRICEPERUOM": 1.06195,
+        "PRICEPERUOMFORMATTED": "\u00a31.06/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215660378320",
+       "CAT_NAME": "Chilled Food",
+       "DEPT_ID": "1215339432024",
+       "DEPT_NAME": "Milk, Butter, Cream & Eggs",
+       "AISLE_ID": "1215339434886",
+       "AISLE_NAME": "Fresh Milk",
+       "SHELF_ID": "1215339437949",
+       "SHELF_NAME": "Whole Milk"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.0949,
+      "RATING_COUNT": 137.0,
+      "PACK_SIZE": "2 PINT",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "538239"
+     },
+     {
+      "ID": "23422",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "538240",
+      "START_DATE": 1688558400.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "British Milk Skimmed 2 Pints",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "20411978",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Dropped",
+        "PRICE": 1.2,
+        "WASPRICE": 1.2,
+        "PRICEPERUOM": 1.06195,
+        "PRICEPERUOMFORMATTED": "\u00a31.06/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215660378320",
+       "CAT_NAME": "Chilled Food",
+       "DEPT_ID": "1215339432024",
+       "DEPT_NAME": "Milk, Butter, Cream & Eggs",
+       "AISLE_ID": "1215339434886",
+       "AISLE_NAME": "Fresh Milk",
+       "SHELF_ID": "1215339442122",
+       "SHELF_NAME": "Skimmed & 1% Fat Milk"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 3.9832,
+      "RATING_COUNT": 119.0,
+      "PACK_SIZE": "2 PINT",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "538240"
+     },
+     {
+      "ID": "32088739",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "2041527",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Arla  Filtered Fresh Semi Skimmed Milk 1L Fresher for Longer",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5000181024029",
+      "BRAND": "Cravendale",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 1.4,
+        "WASPRICE": 1.64,
+        "PRICEPERUOM": 1.4,
+        "PRICEPERUOMFORMATTED": "\u00a31.40/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215660378320",
+       "CAT_NAME": "Chilled Food",
+       "DEPT_ID": "1215339432024",
+       "DEPT_NAME": "Milk, Butter, Cream & Eggs",
+       "AISLE_ID": "1215339434886",
+       "AISLE_NAME": "Fresh Milk",
+       "SHELF_ID": "1215339438036",
+       "SHELF_NAME": "Semi Skimmed Milk"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.6791,
+      "RATING_COUNT": 296.0,
+      "PACK_SIZE": "1L",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "2041527"
+     },
+     {
+      "ID": "910000392661",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "3516819",
+      "START_DATE": 1639656000.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Long Life Semi Skimmed Milk 6 x 1 Litre",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5051413682289",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Dropped",
+        "PRICE": 6.0,
+        "WASPRICE": 6.14,
+        "PRICEPERUOM": 1.0,
+        "PRICEPERUOMFORMATTED": "\u00a31.00/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215660378320",
+       "CAT_NAME": "Chilled Food",
+       "DEPT_ID": "1215339432024",
+       "DEPT_NAME": "Milk, Butter, Cream & Eggs",
+       "AISLE_ID": "1215339434934",
+       "AISLE_NAME": "Long Life Milk",
+       "SHELF_ID": "1215685671288",
+       "SHELF_NAME": "Long Life Milk"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.6089,
+      "RATING_COUNT": 248.0,
+      "PACK_SIZE": "6X1L",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "3516819"
+     },
+     {
+      "ID": "20525",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "169736",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Long Life Semi Skimmed Milk 1 Litre",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "0000020335632",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 1.34,
+        "PRICEPERUOM": 1.34,
+        "PRICEPERUOMFORMATTED": "\u00a31.34/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215660378320",
+       "CAT_NAME": "Chilled Food",
+       "DEPT_ID": "1215339432024",
+       "DEPT_NAME": "Milk, Butter, Cream & Eggs",
+       "AISLE_ID": "1215339434934",
+       "AISLE_NAME": "Long Life Milk",
+       "SHELF_ID": "1215685671288",
+       "SHELF_NAME": "Long Life Milk"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.7326,
+      "RATING_COUNT": 187.0,
+      "PACK_SIZE": "1L",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "169736"
+     }
+    ]
+   }
+  ]
+ },
+ "basmati rice": {
+  "results": [
+   {
+    "index": "ASDA_PRODUCTS",
+    "nbHits": 63,
+    "hits": [
+     {
+      "ID": "56724309",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "2265444",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Microwave Pure Basmati Rice 250g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5011157888101",
+      "BRAND": "Tilda",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 1.0,
+        "PRICEPERUOM": 4.0,
+        "PRICEPERUOMFORMATTED": "\u00a34.00/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215337189669",
+       "DEPT_NAME": "Rice, Pasta & Noodles",
+       "AISLE_ID": "1215685011119",
+       "AISLE_NAME": "Microwavable Rice & Grains",
+       "SHELF_ID": "1215685011122",
+       "SHELF_NAME": "Long Grain & Basmati Microwave Rice"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.6667,
+      "RATING_COUNT": 81.0,
+      "PACK_SIZE": "250G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "2265444"
+     },
+     {
+      "ID": "419021",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "584370",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Boil in the Bag Basmati White Rice 4 x 125g (500g)",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "21157066",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 2.06,
+        "PRICEPERUOM": 4.12,
+        "PRICEPERUOMFORMATTED": "\u00a34.12/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215337189669",
+       "DEPT_NAME": "Rice, Pasta & Noodles",
+       "AISLE_ID": "1215337189751",
+       "AISLE_NAME": "Dry Rice, Noodles & Grains",
+       "SHELF_ID": "1215337191562",
+       "SHELF_NAME": "Long Grain & Basmati Rice"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.6923,
+      "RATING_COUNT": 78.0,
+      "PACK_SIZE": "500G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "584370"
+     },
+     {
+      "ID": "79275402",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "2607311",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Basmati Brown Rice 1kg",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5050854976223",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 3.46,
+        "PRICEPERUOM": 3.46,
+        "PRICEPERUOMFORMATTED": "\u00a33.46/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215337189669",
+       "DEPT_NAME": "Rice, Pasta & Noodles",
+       "AISLE_ID": "1215337189751",
+       "AISLE_NAME": "Dry Rice, Noodles & Grains",
+       "SHELF_ID": "1215337191562",
+       "SHELF_NAME": "Long Grain & Basmati Rice"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.0182,
+      "RATING_COUNT": 55.0,
+      "PACK_SIZE": "1KG",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "2607311"
+     },
+     {
+      "ID": "910000258504",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "3206593",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Pure Original Basmati Rice 500g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5011157630113",
+      "BRAND": "Tilda",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 2.0,
+        "WASPRICE": 3.0,
+        "PRICEPERUOM": 4.0,
+        "PRICEPERUOMFORMATTED": "\u00a34.00/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215337189669",
+       "DEPT_NAME": "Rice, Pasta & Noodles",
+       "AISLE_ID": "1215337189751",
+       "AISLE_NAME": "Dry Rice, Noodles & Grains",
+       "SHELF_ID": "1215337191562",
+       "SHELF_NAME": "Long Grain & Basmati Rice"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.6724,
+      "RATING_COUNT": 58.0,
+      "PACK_SIZE": "500G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "3206593"
+     },
+     {
+      "ID": "1000383151170",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "7548537",
+      "START_DATE": 1673265600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Bens Original Basmati Microwave Rice 220g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5010034013681",
+      "BRAND": "Ben's Original",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 0.97,
+        "PRICEPERUOM": 4.40909,
+        "PRICEPERUOMFORMATTED": "\u00a34.41/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215337189669",
+       "DEPT_NAME": "Rice, Pasta & Noodles",
+       "AISLE_ID": "1215685011119",
+       "AISLE_NAME": "Microwavable Rice & Grains",
+       "SHELF_ID": "1215685011122",
+       "SHELF_NAME": "Long Grain & Basmati Microwave Rice"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.7538,
+      "RATING_COUNT": 130.0,
+      "PROMOS": {
+       "EN": [
+        {
+         "ID": "10001248686",
+         "NAME": "Any 2 for \u00a31.80",
+         "END_DATE": 1793750399.0,
+         "START_DATE": 1791331200.0,
+         "TYPE": 15,
+         "PERFECTLINKSAVEPRICEPERUOM": "\u00a34.09/KG"
+        }
+       ]
+      },
+      "PACK_SIZE": "220G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "7548537"
+     },
+     {
+      "ID": "910002524788",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "5498611",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Basmati Micro Rice 250g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5054781024828",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 0.69,
+        "PRICEPERUOM": 2.76,
+        "PRICEPERUOMFORMATTED": "\u00a32.76/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215337189669",
+       "DEPT_NAME": "Rice, Pasta & Noodles",
+       "AISLE_ID": "1215685011119",
+       "AISLE_NAME": "Microwavable Rice & Grains",
+       "SHELF_ID": "1215685011122",
+       "SHELF_NAME": "Long Grain & Basmati Microwave Rice"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.085,
+      "RATING_COUNT": 200.0,
+      "PROMOS": {
+       "EN": [
+        {
+         "ID": "10001248572",
+         "NAME": "Any 3 for \u00a31.80",
+         "END_DATE": 1793750399.0,
+         "START_DATE": 1791331200.0,
+         "TYPE": 15,
+         "PERFECTLINKSAVEPRICEPERUOM": "\u00a32.40/KG"
+        }
+       ]
+      },
+      "PACK_SIZE": "250G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "5498611"
+     }
+    ]
+   }
+  ]
+ },
+ "toilet roll": {
+  "results": [
+   {
+    "index": "ASDA_PRODUCTS",
+    "nbHits": 49,
+    "hits": [
+     {
+      "ID": "SKU100574923",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9398859",
+      "START_DATE": 1788706800.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Skin Protect Toilet Tissue Standard Rolls 8 Rolls",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": false,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5029053587479",
+      "BRAND": "Andrex",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "New",
+      "LABEL_START_DATE": 1787529600.0,
+      "LABEL_END_DATE": 1795305600.0,
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 10.0,
+        "PRICEPERUOM": 1.25,
+        "PRICEPERUOMFORMATTED": "\u00a31.25/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215686354551",
+       "DEPT_NAME": "Toilet Roll",
+       "AISLE_ID": "1215686354557",
+       "AISLE_NAME": "Medium Pack Toilet Rolls (8-12 Rolls)",
+       "SHELF_ID": "1215686354565",
+       "SHELF_NAME": "All Medium Pack Toilet Rolls (8-12 Rolls)"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8316,
+      "RATING_COUNT": 95.0,
+      "PACK_SIZE": "8PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9398859"
+     },
+     {
+      "ID": "SKU100574922",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9401529",
+      "START_DATE": 1788361200.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Skin Protect Toilet Tissue Standard Rolls 4 Rolls",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": false,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5029053587462",
+      "BRAND": "Andrex",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "New",
+      "LABEL_START_DATE": 1787529600.0,
+      "LABEL_END_DATE": 1795305600.0,
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 2.48,
+        "WASPRICE": 5.0,
+        "PRICEPERUOM": 0.62,
+        "PRICEPERUOMFORMATTED": "62.0p/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215686354551",
+       "DEPT_NAME": "Toilet Roll",
+       "AISLE_ID": "1215686354558",
+       "AISLE_NAME": "Small Pack Toilet Rolls (2-6 Rolls)",
+       "SHELF_ID": "1215686354566",
+       "SHELF_NAME": "All Small Pack Toilet Rolls (2-6 Rolls)"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8316,
+      "RATING_COUNT": 95.0,
+      "PACK_SIZE": "4PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9401529"
+     },
+     {
+      "ID": "1000218932086",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "6721437",
+      "START_DATE": 1667649600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "So Soft 12 Long-Lasting Rolls",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5054781916352",
+      "BRAND": "Shades by ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 9.0,
+        "PRICEPERUOM": 0.75,
+        "PRICEPERUOMFORMATTED": "75.0p/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215686354551",
+       "DEPT_NAME": "Toilet Roll",
+       "AISLE_ID": "1215686354554",
+       "AISLE_NAME": "Standard Toilet Roll",
+       "SHELF_ID": "1215686354562",
+       "SHELF_NAME": "Standard Toilet Roll"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 3.0125,
+      "RATING_COUNT": 799.0,
+      "PROMOS": {
+       "EN": [
+        {
+         "ID": "10001211252",
+         "NAME": "Any 2 for \u00a315",
+         "END_DATE": 1809129599.0,
+         "START_DATE": 1790035200.0,
+         "TYPE": 15,
+         "PERFECTLINKSAVEPRICEPERUOM": "\u00a30.63/EA"
+        }
+       ]
+      },
+      "PACK_SIZE": "12R",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "6721437"
+     },
+     {
+      "ID": "1000218932036",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "6721435",
+      "START_DATE": 1667649600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "So Soft 6 Long-Lasting Rolls",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5054781916345",
+      "BRAND": "Shades by ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Dropped",
+        "PRICE": 4.83,
+        "WASPRICE": 4.83,
+        "PRICEPERUOM": 0.805,
+        "PRICEPERUOMFORMATTED": "80.5p/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215686354551",
+       "DEPT_NAME": "Toilet Roll",
+       "AISLE_ID": "1215686354554",
+       "AISLE_NAME": "Standard Toilet Roll",
+       "SHELF_ID": "1215686354562",
+       "SHELF_NAME": "Standard Toilet Roll"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.0496,
+      "RATING_COUNT": 222.0,
+      "PACK_SIZE": "6R",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "6721435"
+     },
+     {
+      "ID": "1000383238940",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9144311",
+      "START_DATE": 1724155200.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Complete Clean Toilet Tissue 12 MEGA Rolls 50% More sheets",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5029054251683",
+      "BRAND": "Andrex",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 11.75,
+        "PRICEPERUOM": 0.97917,
+        "PRICEPERUOMFORMATTED": "97.9p/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215686354551",
+       "DEPT_NAME": "Toilet Roll",
+       "AISLE_ID": "1215686354554",
+       "AISLE_NAME": "Standard Toilet Roll",
+       "SHELF_ID": "1215686354562",
+       "SHELF_NAME": "Standard Toilet Roll"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.786,
+      "RATING_COUNT": 785.0,
+      "PACK_SIZE": "12PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9144311"
+     },
+     {
+      "ID": "1000383238881",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9144308",
+      "START_DATE": 1724155200.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Complete Clean Toilet Tissue 6 MEGA Rolls 50% More sheets",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5029053581187",
+      "BRAND": "Andrex",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 5.0,
+        "WASPRICE": 5.95,
+        "PRICEPERUOM": 0.83333,
+        "PRICEPERUOMFORMATTED": "83.3p/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215686354551",
+       "DEPT_NAME": "Toilet Roll",
+       "AISLE_ID": "1215686354554",
+       "AISLE_NAME": "Standard Toilet Roll",
+       "SHELF_ID": "1215686354562",
+       "SHELF_NAME": "Standard Toilet Roll"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.77,
+      "RATING_COUNT": 787.0,
+      "PACK_SIZE": "6PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9144308"
+     }
+    ]
+   }
+  ]
+ },
+ "kitchen roll": {
+  "results": [
+   {
+    "index": "ASDA_PRODUCTS",
+    "nbHits": 11,
+    "hits": [
+     {
+      "ID": "910003242141",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "5871980",
+      "START_DATE": 1499774400.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "4 Durable Kitchen Towels Rolls",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5063717064272",
+      "BRAND": "ASDA Shades",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 3.7,
+        "WASPRICE": 3.9,
+        "PRICEPERUOM": 0.925,
+        "PRICEPERUOMFORMATTED": "92.5p/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215686354568",
+       "DEPT_NAME": "Kitchen Roll",
+       "AISLE_ID": "1215686354572",
+       "AISLE_NAME": "View All Kitchen Roll",
+       "SHELF_ID": "1215686354576",
+       "SHELF_NAME": "View All Kitchen Roll"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 3.9237,
+      "RATING_COUNT": 367.0,
+      "PACK_SIZE": "4 ROLL",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "5871980"
+     },
+     {
+      "ID": "1000018796219",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "6030775",
+      "START_DATE": 1517918400.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "2 Durable Kitchen Towels Rolls",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5063717064258",
+      "BRAND": "ASDA Shades",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 2.2,
+        "PRICEPERUOM": 1.1,
+        "PRICEPERUOMFORMATTED": "\u00a31.10/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215686354568",
+       "DEPT_NAME": "Kitchen Roll",
+       "AISLE_ID": "1215686354572",
+       "AISLE_NAME": "View All Kitchen Roll",
+       "SHELF_ID": "1215686354576",
+       "SHELF_NAME": "View All Kitchen Roll"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.2381,
+      "RATING_COUNT": 231.0,
+      "PACK_SIZE": "2ROLL",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "6030775"
+     },
+     {
+      "ID": "910001184791",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "4451925",
+      "START_DATE": 1707739200.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Blitz Household Towel",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "8004260452816",
+      "BRAND": "Regina",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 2.0,
+        "PRICEPERUOM": 2.0,
+        "PRICEPERUOMFORMATTED": "\u00a32.00/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215686354568",
+       "DEPT_NAME": "Kitchen Roll",
+       "AISLE_ID": "1215686354569",
+       "AISLE_NAME": "1-2 Rolls",
+       "SHELF_ID": "1215686354573",
+       "SHELF_NAME": "1-2 Rolls"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8059,
+      "RATING_COUNT": 474.0,
+      "PACK_SIZE": "1 ROLL",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "4451925"
+     },
+     {
+      "ID": "910003126079",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "5814770",
+      "START_DATE": 1499774400.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "4 Super Absorbent Power Towels Rolls",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5063717064333",
+      "BRAND": "ASDA Shades",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Dropped",
+        "PRICE": 5.0,
+        "WASPRICE": 5.92,
+        "PRICEPERUOM": 1.25,
+        "PRICEPERUOMFORMATTED": "\u00a31.25/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215686354568",
+       "DEPT_NAME": "Kitchen Roll",
+       "AISLE_ID": "1215686354570",
+       "AISLE_NAME": "3 - 4 Rolls",
+       "SHELF_ID": "1215686354574",
+       "SHELF_NAME": "3 - 4 Rolls"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.2606,
+      "RATING_COUNT": 142.0,
+      "PACK_SIZE": "4 ROLL",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "5814770"
+     },
+     {
+      "ID": "SKU100537628",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9302118",
+      "START_DATE": 1757937600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Blitz Household Towel",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "8004260436748",
+      "BRAND": "Regina",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "New",
+      "LABEL_START_DATE": 1757894400.0,
+      "LABEL_END_DATE": 1765670400.0,
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 3.0,
+        "WASPRICE": 4.74,
+        "PRICEPERUOM": 1.5,
+        "PRICEPERUOMFORMATTED": "\u00a31.50/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215686354568",
+       "DEPT_NAME": "Kitchen Roll",
+       "AISLE_ID": "1215686354569",
+       "AISLE_NAME": "1-2 Rolls",
+       "SHELF_ID": "1215686354573",
+       "SHELF_NAME": "1-2 Rolls"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8991,
+      "RATING_COUNT": 109.0,
+      "PACK_SIZE": "2PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9302118"
+     },
+     {
+      "ID": "910001256415",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "4545215",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Blitz Household Towel 3 Roll",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "8004260210485",
+      "BRAND": "Regina",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 6.64,
+        "PRICEPERUOM": 2.21333,
+        "PRICEPERUOMFORMATTED": "\u00a32.21/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215686354568",
+       "DEPT_NAME": "Kitchen Roll",
+       "AISLE_ID": "1215686354570",
+       "AISLE_NAME": "3 - 4 Rolls",
+       "SHELF_ID": "1215686354574",
+       "SHELF_NAME": "3 - 4 Rolls"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.4952,
+      "RATING_COUNT": 420.0,
+      "PACK_SIZE": "3 ROLL",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "4545215"
+     }
+    ]
+   }
+  ]
+ },
+ "spaghetti": {
+  "results": [
+   {
+    "index": "ASDA_PRODUCTS",
+    "nbHits": 80,
+    "hits": [
+     {
+      "ID": "1000241397326",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "6788784",
+      "START_DATE": 1619438400.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Spaghetti 500g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5000232024602",
+      "BRAND": "Napolina",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 1.5,
+        "PRICEPERUOM": 3.0,
+        "PRICEPERUOMFORMATTED": "\u00a33.00/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215337189669",
+       "DEPT_NAME": "Rice, Pasta & Noodles",
+       "AISLE_ID": "1215337189706",
+       "AISLE_NAME": "Pasta",
+       "SHELF_ID": "1215337191187",
+       "SHELF_NAME": "Spaghetti & Tagliatelle"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.6977,
+      "RATING_COUNT": 43.0,
+      "PROMOS": {
+       "EN": [
+        {
+         "ID": "10001263997",
+         "NAME": "Any 2 for \u00a32",
+         "END_DATE": 1796169599.0,
+         "START_DATE": 1792022400.0,
+         "TYPE": 15,
+         "PERFECTLINKSAVEPRICEPERUOM": "\u00a32.00/KG"
+        }
+       ]
+      },
+      "PACK_SIZE": "500G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "6788784"
+     },
+     {
+      "ID": "36628",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "12943",
+      "START_DATE": 1648555200.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Spaghetti 500g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "21043062",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 0.75,
+        "PRICEPERUOM": 1.5,
+        "PRICEPERUOMFORMATTED": "\u00a31.50/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215337189669",
+       "DEPT_NAME": "Rice, Pasta & Noodles",
+       "AISLE_ID": "1215337189706",
+       "AISLE_NAME": "Pasta",
+       "SHELF_ID": "1215337191187",
+       "SHELF_NAME": "Spaghetti & Tagliatelle"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.5833,
+      "RATING_COUNT": 180.0,
+      "PROMOS": {
+       "EN": [
+        {
+         "ID": "10000738910",
+         "NAME": "Any 2 for \u00a31.20",
+         "END_DATE": 1798761599.0,
+         "START_DATE": 1766448000.0,
+         "TYPE": 15
+        }
+       ]
+      },
+      "PACK_SIZE": "500G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "12943"
+     },
+     {
+      "ID": "1000383291506",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9242472",
+      "START_DATE": 1753358400.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Italian Spaghettoni 500g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5063089870556",
+      "BRAND": "Exceptional by ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "New",
+      "LABEL_START_DATE": 1751328000.0,
+      "LABEL_END_DATE": 1759104000.0,
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 1.9,
+        "PRICEPERUOM": 3.8,
+        "PRICEPERUOMFORMATTED": "\u00a33.80/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "79883790",
+       "CAT_NAME": "Exceptional By Asda",
+       "DEPT_ID": "79896114",
+       "DEPT_NAME": "Exceptional Food Cupboard & Drinks",
+       "AISLE_ID": "91187589",
+       "AISLE_NAME": "Exceptional Food Cupboard",
+       "SHELF_ID": "91187697",
+       "SHELF_NAME": "Exceptional Pasta & Sauces"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 0.0,
+      "RATING_COUNT": 0.0,
+      "PACK_SIZE": "500G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9242472"
+     },
+     {
+      "ID": "23814",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "561789",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Spaghetti Bolognese 400g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5000157025050",
+      "BRAND": "Heinz",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 1.98,
+        "PRICEPERUOM": 4.95,
+        "PRICEPERUOMFORMATTED": "\u00a34.95/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215165876400",
+       "DEPT_NAME": "Tinned Food",
+       "AISLE_ID": "1215685891277",
+       "AISLE_NAME": "Tinned Pasta & Spaghetti",
+       "SHELF_ID": "1215664344584",
+       "SHELF_NAME": "Tinned Pasta"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 3.9583,
+      "RATING_COUNT": 144.0,
+      "PROMOS": {
+       "EN": [
+        {
+         "ID": "10001264182",
+         "NAME": "Any 5 for \u00a35",
+         "END_DATE": 1801007999.0,
+         "START_DATE": 1792108800.0,
+         "TYPE": 15
+        }
+       ]
+      },
+      "PACK_SIZE": "400G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "561789"
+     },
+     {
+      "ID": "19289",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "14119",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Spaghetti 400g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5000157006875",
+      "BRAND": "Heinz",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 1.25,
+        "PRICEPERUOM": 3.125,
+        "PRICEPERUOMFORMATTED": "\u00a33.13/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215165876400",
+       "DEPT_NAME": "Tinned Food",
+       "AISLE_ID": "1215685891277",
+       "AISLE_NAME": "Tinned Pasta & Spaghetti",
+       "SHELF_ID": "1215664344584",
+       "SHELF_NAME": "Tinned Pasta"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.5286,
+      "RATING_COUNT": 70.0,
+      "PROMOS": {
+       "EN": [
+        {
+         "ID": "10001264182",
+         "NAME": "Any 5 for \u00a35",
+         "END_DATE": 1801007999.0,
+         "START_DATE": 1792108800.0,
+         "TYPE": 15
+        }
+       ]
+      },
+      "PACK_SIZE": "400G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "14119"
+     },
+     {
+      "ID": "1000288781200",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "6996572",
+      "START_DATE": 1625572800.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Spaghetti 1kg",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5000232024800",
+      "BRAND": "Napolina",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 2.85,
+        "PRICEPERUOM": 2.85,
+        "PRICEPERUOMFORMATTED": "\u00a32.85/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215337189669",
+       "DEPT_NAME": "Rice, Pasta & Noodles",
+       "AISLE_ID": "1215337189706",
+       "AISLE_NAME": "Pasta",
+       "SHELF_ID": "1215337191187",
+       "SHELF_NAME": "Spaghetti & Tagliatelle"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8333,
+      "RATING_COUNT": 12.0,
+      "PACK_SIZE": "1KG",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "6996572"
+     }
+    ]
+   }
+  ]
+ },
+ "baked beans": {
+  "results": [
+   {
+    "index": "ASDA_PRODUCTS",
+    "nbHits": 43,
+    "hits": [
+     {
+      "ID": "910002524713",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "5498507",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Baked Beans 4 x 410g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5000232875303",
+      "BRAND": "Branston",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 3.0,
+        "PRICEPERUOM": 1.82927,
+        "PRICEPERUOMFORMATTED": "\u00a31.83/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215165876400",
+       "DEPT_NAME": "Tinned Food",
+       "AISLE_ID": "910000975571",
+       "AISLE_NAME": "Baked Beans",
+       "SHELF_ID": "910000976941",
+       "SHELF_NAME": "Baked Beans"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.6498,
+      "RATING_COUNT": 414.0,
+      "PACK_SIZE": "4X410G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "5498507"
+     },
+     {
+      "ID": "1000296357160",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "7031726",
+      "START_DATE": 1717502400.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Baked Beans 6 x 410g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5000232882035",
+      "BRAND": "Branston",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 3.5,
+        "WASPRICE": 3.75,
+        "PRICEPERUOM": 1.42276,
+        "PRICEPERUOMFORMATTED": "\u00a31.42/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215165876400",
+       "DEPT_NAME": "Tinned Food",
+       "AISLE_ID": "910000975571",
+       "AISLE_NAME": "Baked Beans",
+       "SHELF_ID": "910000976941",
+       "SHELF_NAME": "Baked Beans"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8571,
+      "RATING_COUNT": 42.0,
+      "PACK_SIZE": "6X410G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "7031726"
+     },
+     {
+      "ID": "910000868522",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "4039429",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Baked Beans Barbecue 390g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5000157072931",
+      "BRAND": "Heinz",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 1.38,
+        "PRICEPERUOM": 3.53846,
+        "PRICEPERUOMFORMATTED": "\u00a33.54/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215165876400",
+       "DEPT_NAME": "Tinned Food",
+       "AISLE_ID": "910000975571",
+       "AISLE_NAME": "Baked Beans",
+       "SHELF_ID": "910000976941",
+       "SHELF_NAME": "Baked Beans"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.3247,
+      "RATING_COUNT": 77.0,
+      "PROMOS": {
+       "EN": [
+        {
+         "ID": "10001264182",
+         "NAME": "Any 5 for \u00a35",
+         "END_DATE": 1801007999.0,
+         "START_DATE": 1792108800.0,
+         "TYPE": 15
+        }
+       ]
+      },
+      "PACK_SIZE": "390G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "4039429"
+     },
+     {
+      "ID": "23579",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "549486",
+      "START_DATE": 1731153600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Baked Beans 4 x 415g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5000157024886",
+      "BRAND": "Heinz",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 3.88,
+        "PRICEPERUOM": 2.33735,
+        "PRICEPERUOMFORMATTED": "\u00a32.34/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215165876400",
+       "DEPT_NAME": "Tinned Food",
+       "AISLE_ID": "910000975571",
+       "AISLE_NAME": "Baked Beans",
+       "SHELF_ID": "910000976941",
+       "SHELF_NAME": "Baked Beans"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.5761,
+      "RATING_COUNT": 309.0,
+      "PACK_SIZE": "4X415G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "549486"
+     },
+     {
+      "ID": "23577",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "549443",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Baked Beans 415g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5000157024671",
+      "BRAND": "Heinz",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 1.38,
+        "PRICEPERUOM": 3.3253,
+        "PRICEPERUOMFORMATTED": "\u00a33.33/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215165876400",
+       "DEPT_NAME": "Tinned Food",
+       "AISLE_ID": "910000975571",
+       "AISLE_NAME": "Baked Beans",
+       "SHELF_ID": "910000976941",
+       "SHELF_NAME": "Baked Beans"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.7368,
+      "RATING_COUNT": 152.0,
+      "PROMOS": {
+       "EN": [
+        {
+         "ID": "10001264182",
+         "NAME": "Any 5 for \u00a35",
+         "END_DATE": 1801007999.0,
+         "START_DATE": 1792108800.0,
+         "TYPE": 15
+        }
+       ]
+      },
+      "PACK_SIZE": "415G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "549443"
+     },
+     {
+      "ID": "910000904055",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "4086154",
+      "START_DATE": 1665489600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Baked Beans in a Rich, Thick, Tomatoey Sauce 410g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5000232902450",
+      "BRAND": "Branston",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 0.85,
+        "PRICEPERUOM": 2.07317,
+        "PRICEPERUOMFORMATTED": "\u00a32.07/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215165876400",
+       "DEPT_NAME": "Tinned Food",
+       "AISLE_ID": "910000975571",
+       "AISLE_NAME": "Baked Beans",
+       "SHELF_ID": "910000976941",
+       "SHELF_NAME": "Baked Beans"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.6221,
+      "RATING_COUNT": 172.0,
+      "PACK_SIZE": "410G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "4086154"
+     }
+    ]
+   }
+  ]
+ },
+ "chopped tomatoes": {
+  "results": [
+   {
+    "index": "ASDA_PRODUCTS",
+    "nbHits": 25,
+    "hits": [
+     {
+      "ID": "910000385975",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "3503331",
+      "START_DATE": 1460635200.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Chopped Tomatoes in a Rich Tomato Juice 4 x 400g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5010061241699",
+      "BRAND": "Napolina",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 3.5,
+        "PRICEPERUOM": 2.1875,
+        "PRICEPERUOMFORMATTED": "\u00a32.19/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215165876400",
+       "DEPT_NAME": "Tinned Food",
+       "AISLE_ID": "910000975480",
+       "AISLE_NAME": "Tinned Tomatoes",
+       "SHELF_ID": "910000976347",
+       "SHELF_NAME": "Tinned Tomatoes"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.6353,
+      "RATING_COUNT": 85.0,
+      "PACK_SIZE": "4X400G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "3503331"
+     },
+     {
+      "ID": "1000216498072",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "6711617",
+      "START_DATE": 1626177600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Finely Chopped Tomatoes 400g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "80042556",
+      "BRAND": "Mutti",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 1.55,
+        "PRICEPERUOM": 3.875,
+        "PRICEPERUOMFORMATTED": "\u00a33.88/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215165876400",
+       "DEPT_NAME": "Tinned Food",
+       "AISLE_ID": "910000975480",
+       "AISLE_NAME": "Tinned Tomatoes",
+       "SHELF_ID": "910000976347",
+       "SHELF_NAME": "Tinned Tomatoes"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8378,
+      "RATING_COUNT": 74.0,
+      "PACK_SIZE": "400G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "6711617"
+     },
+     {
+      "ID": "19537",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "22232",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Chopped Tomatoes in a Rich Tomato Juice 400g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5010061001613",
+      "BRAND": "Napolina",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 1.0,
+        "PRICEPERUOM": 2.5,
+        "PRICEPERUOMFORMATTED": "\u00a32.50/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215165876400",
+       "DEPT_NAME": "Tinned Food",
+       "AISLE_ID": "910000975480",
+       "AISLE_NAME": "Tinned Tomatoes",
+       "SHELF_ID": "910000976347",
+       "SHELF_NAME": "Tinned Tomatoes"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.4444,
+      "RATING_COUNT": 45.0,
+      "PACK_SIZE": "400G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "22232"
+     },
+     {
+      "ID": "SKU100551096",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9335557",
+      "START_DATE": 1774267200.0,
+      "END_DATE": 2240568000.0,
+      "NAME": "Finely Chopped Tomatoes with Garlic 400g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": false,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "8005110170461",
+      "BRAND": "Mutti",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "New",
+      "LABEL_START_DATE": 1773705600.0,
+      "LABEL_END_DATE": 1782000000.0,
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 1.82,
+        "PRICEPERUOM": 4.55,
+        "PRICEPERUOMFORMATTED": "\u00a34.55/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215165876400",
+       "DEPT_NAME": "Tinned Food",
+       "AISLE_ID": "910000975480",
+       "AISLE_NAME": "Tinned Tomatoes",
+       "SHELF_ID": "910000976347",
+       "SHELF_NAME": "Tinned Tomatoes"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 0.0,
+      "RATING_COUNT": 0.0,
+      "PACK_SIZE": "400g",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9335557"
+     },
+     {
+      "ID": "1000298969659",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "7043635",
+      "START_DATE": 1626177600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Finely Chopped Tomatoes 4x400g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "8005110170348",
+      "BRAND": "Mutti",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 5.85,
+        "PRICEPERUOM": 3.65625,
+        "PRICEPERUOMFORMATTED": "\u00a33.66/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215165876400",
+       "DEPT_NAME": "Tinned Food",
+       "AISLE_ID": "910000975480",
+       "AISLE_NAME": "Tinned Tomatoes",
+       "SHELF_ID": "910000976347",
+       "SHELF_NAME": "Tinned Tomatoes"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8152,
+      "RATING_COUNT": 92.0,
+      "PACK_SIZE": "4X400G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "7043635"
+     },
+     {
+      "ID": "SKU100570018",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9389519",
+      "START_DATE": 1783263600.0,
+      "END_DATE": 1924948805.0,
+      "NAME": "Pomodoro San Marzano 400g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": false,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "8003716001493",
+      "BRAND": "Rega",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "New",
+      "LABEL_START_DATE": 1781395200.0,
+      "LABEL_END_DATE": 1789171200.0,
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 1.65,
+        "PRICEPERUOM": 4.125,
+        "PRICEPERUOMFORMATTED": "\u00a34.13/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215165876400",
+       "DEPT_NAME": "Tinned Food",
+       "AISLE_ID": "910000975480",
+       "AISLE_NAME": "Tinned Tomatoes",
+       "SHELF_ID": "910000976347",
+       "SHELF_NAME": "Tinned Tomatoes"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 5.0,
+      "RATING_COUNT": 2.0,
+      "PACK_SIZE": "400g",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9389519"
+     }
+    ]
+   }
+  ]
+ },
+ "tea bags": {
+  "results": [
+   {
+    "index": "ASDA_PRODUCTS",
+    "nbHits": 124,
+    "hits": [
+     {
+      "ID": "19840",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "45529",
+      "START_DATE": 1705406400.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "160 Tea Bags 500g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5010357112085",
+      "BRAND": "Taylors of Harrogate",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 4.5,
+        "WASPRICE": 6.17,
+        "PRICEPERUOM": 9.0,
+        "PRICEPERUOMFORMATTED": "\u00a39.00/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215684651165",
+       "DEPT_NAME": "Coffee, Tea & Hot Chocolate",
+       "AISLE_ID": "1215656936139",
+       "AISLE_NAME": "Tea",
+       "SHELF_ID": "1215656936190",
+       "SHELF_NAME": "Everyday Tea"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.7203,
+      "RATING_COUNT": 143.0,
+      "PACK_SIZE": "160PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "45529"
+     },
+     {
+      "ID": "25830",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "453157",
+      "START_DATE": 1777809600.0,
+      "END_DATE": 2240568000.0,
+      "NAME": "Original 160 Tea Bags 500g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5000208014316",
+      "BRAND": "Tetley",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "New",
+      "LABEL_START_DATE": 1776643200.0,
+      "LABEL_END_DATE": 1785024000.0,
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 3.5,
+        "WASPRICE": 4.94,
+        "PRICEPERUOM": 7.0,
+        "PRICEPERUOMFORMATTED": "\u00a37.00/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215684651165",
+       "DEPT_NAME": "Coffee, Tea & Hot Chocolate",
+       "AISLE_ID": "1215656936139",
+       "AISLE_NAME": "Tea",
+       "SHELF_ID": "1215656936190",
+       "SHELF_NAME": "Everyday Tea"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.9474,
+      "RATING_COUNT": 57.0,
+      "PACK_SIZE": "160PK",
+      "STOCK": {
+       "4647": 0
+      },
+      "MAX_QTY": 10,
+      "objectID": "453157"
+     },
+     {
+      "ID": "32744",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "453160",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "240 Original Tea Bags 750g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5000208069897",
+      "BRAND": "Tetley",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 5.25,
+        "PRICEPERUOM": 7.0,
+        "PRICEPERUOMFORMATTED": "\u00a37.00/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215684651165",
+       "DEPT_NAME": "Coffee, Tea & Hot Chocolate",
+       "AISLE_ID": "1215656936139",
+       "AISLE_NAME": "Tea",
+       "SHELF_ID": "1215656936190",
+       "SHELF_NAME": "Everyday Tea"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8,
+      "RATING_COUNT": 225.0,
+      "PACK_SIZE": "240PK",
+      "STOCK": {
+       "4647": 0
+      },
+      "MAX_QTY": 10,
+      "objectID": "453160"
+     },
+     {
+      "ID": "1000383114130",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "7427807",
+      "START_DATE": 1668513600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "40 Yorkshire Tea Bags 125g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5010357112009",
+      "BRAND": "Taylors of Harrogate",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Dropped",
+        "PRICE": 2.16,
+        "WASPRICE": 2.18,
+        "PRICEPERUOM": 17.28,
+        "PRICEPERUOMFORMATTED": "\u00a317.28/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215684651165",
+       "DEPT_NAME": "Coffee, Tea & Hot Chocolate",
+       "AISLE_ID": "1215656936139",
+       "AISLE_NAME": "Tea",
+       "SHELF_ID": "1215656936190",
+       "SHELF_NAME": "Everyday Tea"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8333,
+      "RATING_COUNT": 60.0,
+      "PACK_SIZE": "40PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "7427807"
+     },
+     {
+      "ID": "1000326338218",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "7171220",
+      "START_DATE": 1726747200.0,
+      "END_DATE": 2240568000.0,
+      "NAME": "Everyday 240 Tea Bags 696g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5057172733149",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 3.17,
+        "PRICEPERUOM": 4.5546,
+        "PRICEPERUOMFORMATTED": "\u00a34.55/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215684651165",
+       "DEPT_NAME": "Coffee, Tea & Hot Chocolate",
+       "AISLE_ID": "1215656936139",
+       "AISLE_NAME": "Tea",
+       "SHELF_ID": "1215656936190",
+       "SHELF_NAME": "Everyday Tea"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 3.2976,
+      "RATING_COUNT": 205.0,
+      "PACK_SIZE": "240PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "7171220"
+     },
+     {
+      "ID": "1000138209069",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "6455569",
+      "START_DATE": 1561464000.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Asda Peppermint Tea 40 Bags",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5057172086849_T1",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Dropped",
+        "PRICE": 1.66,
+        "WASPRICE": 1.7,
+        "PRICEPERUOM": 20.75,
+        "PRICEPERUOMFORMATTED": "\u00a320.75/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215684651165",
+       "DEPT_NAME": "Coffee, Tea & Hot Chocolate",
+       "AISLE_ID": "1215656936139",
+       "AISLE_NAME": "Tea",
+       "SHELF_ID": "1215656942047",
+       "SHELF_NAME": "Mint Tea"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.3067,
+      "RATING_COUNT": 75.0,
+      "PACK_SIZE": "40PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "6455569"
+     }
+    ]
+   }
+  ]
+ },
+ "olive oil": {
+  "results": [
+   {
+    "index": "ASDA_PRODUCTS",
+    "nbHits": 67,
+    "hits": [
+     {
+      "ID": "1000219339224",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "6722813",
+      "START_DATE": 1593000000.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Extra Virgin Olive Oil 1 Litre",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5057172338665",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Dropped",
+        "PRICE": 7.5,
+        "WASPRICE": 7.5,
+        "PRICEPERUOM": 7.5,
+        "PRICEPERUOMFORMATTED": "\u00a37.50/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215354523758",
+       "DEPT_NAME": "Condiments & Cooking Ingredients",
+       "AISLE_ID": "910000975649",
+       "AISLE_NAME": "Oil & Vinegar",
+       "SHELF_ID": "910000977208",
+       "SHELF_NAME": "Olive Oil"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.2615,
+      "RATING_COUNT": 130.0,
+      "PACK_SIZE": "1L",
+      "STOCK": {
+       "4647": 0
+      },
+      "MAX_QTY": 10,
+      "objectID": "6722813"
+     },
+     {
+      "ID": "1000219339167",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "6722819",
+      "START_DATE": 1593000000.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Olive Oil 1 Litre",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5057172338696",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Dropped",
+        "PRICE": 7.0,
+        "WASPRICE": 7.0,
+        "PRICEPERUOM": 7.0,
+        "PRICEPERUOMFORMATTED": "\u00a37.00/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215354523758",
+       "DEPT_NAME": "Condiments & Cooking Ingredients",
+       "AISLE_ID": "910000975649",
+       "AISLE_NAME": "Oil & Vinegar",
+       "SHELF_ID": "910000977208",
+       "SHELF_NAME": "Olive Oil"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.1488,
+      "RATING_COUNT": 121.0,
+      "PACK_SIZE": "1L",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "6722819"
+     },
+     {
+      "ID": "910000258500",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "3206475",
+      "START_DATE": 1620129600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Extra Virgin Olive Oil 250ml",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "8002210500105",
+      "BRAND": "Filippo Berio",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 2.98,
+        "WASPRICE": 3.98,
+        "PRICEPERUOM": 11.92,
+        "PRICEPERUOMFORMATTED": "\u00a311.92/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215354523758",
+       "DEPT_NAME": "Condiments & Cooking Ingredients",
+       "AISLE_ID": "910000975649",
+       "AISLE_NAME": "Oil & Vinegar",
+       "SHELF_ID": "910000977208",
+       "SHELF_NAME": "Olive Oil"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.7727,
+      "RATING_COUNT": 22.0,
+      "PACK_SIZE": "250ML",
+      "STOCK": {
+       "4647": 0
+      },
+      "MAX_QTY": 10,
+      "objectID": "3206475"
+     },
+     {
+      "ID": "910000258501",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "3206477",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Extra Virgin Olive Oil 750ml",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "8002210560000",
+      "BRAND": "Filippo Berio",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 6.98,
+        "WASPRICE": 10.48,
+        "PRICEPERUOM": 9.30667,
+        "PRICEPERUOMFORMATTED": "\u00a39.31/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215354523758",
+       "DEPT_NAME": "Condiments & Cooking Ingredients",
+       "AISLE_ID": "910000975649",
+       "AISLE_NAME": "Oil & Vinegar",
+       "SHELF_ID": "910000977208",
+       "SHELF_NAME": "Olive Oil"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.2586,
+      "RATING_COUNT": 58.0,
+      "PACK_SIZE": "750ML",
+      "STOCK": {
+       "4647": 0
+      },
+      "MAX_QTY": 10,
+      "objectID": "3206477"
+     },
+     {
+      "ID": "1000383191671",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9019027",
+      "START_DATE": 1692878400.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Greek Koroneiki Extra Virgin Olive Oil 500ml",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5063089966501",
+      "BRAND": "Exceptional by ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 6.6,
+        "WASPRICE": 7.0,
+        "PRICEPERUOM": 13.2,
+        "PRICEPERUOMFORMATTED": "\u00a313.20/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "79883790",
+       "CAT_NAME": "Exceptional By Asda",
+       "DEPT_ID": "79896114",
+       "DEPT_NAME": "Exceptional Food Cupboard & Drinks",
+       "AISLE_ID": "91187589",
+       "AISLE_NAME": "Exceptional Food Cupboard",
+       "SHELF_ID": "91187685",
+       "SHELF_NAME": "Exceptional Condiments, Chutney & Gravy"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.4286,
+      "RATING_COUNT": 21.0,
+      "PACK_SIZE": "500ML",
+      "STOCK": {
+       "4647": 0
+      },
+      "MAX_QTY": 10,
+      "objectID": "9019027"
+     },
+     {
+      "ID": "910002843521",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "5644932",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Spanish Picual Extra Virgin Olive Oil 500ml",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5063089966525",
+      "BRAND": "Exceptional by ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 6.6,
+        "WASPRICE": 7.0,
+        "PRICEPERUOM": 13.2,
+        "PRICEPERUOMFORMATTED": "\u00a313.20/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "79883790",
+       "CAT_NAME": "Exceptional By Asda",
+       "DEPT_ID": "79896114",
+       "DEPT_NAME": "Exceptional Food Cupboard & Drinks",
+       "AISLE_ID": "91187589",
+       "AISLE_NAME": "Exceptional Food Cupboard",
+       "SHELF_ID": "91187685",
+       "SHELF_NAME": "Exceptional Condiments, Chutney & Gravy"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.7,
+      "RATING_COUNT": 50.0,
+      "PACK_SIZE": "500ML",
+      "STOCK": {
+       "4647": 0
+      },
+      "MAX_QTY": 10,
+      "objectID": "5644932"
+     }
+    ]
+   }
+  ]
+ },
+ "laundry liquid": {
+  "results": [
+   {
+    "index": "ASDA_PRODUCTS",
+    "nbHits": 98,
+    "hits": [
+     {
+      "ID": "SKU100557055",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9352727",
+      "START_DATE": 1780228800.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Sensitive Non-Bio Laundry Liquid 60 Washes",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5063089823576",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "New",
+      "LABEL_START_DATE": 1777852800.0,
+      "LABEL_END_DATE": 1785628800.0,
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 2.84,
+        "PRICEPERUOM": 1.89333,
+        "PRICEPERUOMFORMATTED": "\u00a31.89/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215662122237",
+       "DEPT_NAME": "Laundry",
+       "AISLE_ID": "1215662758502",
+       "AISLE_NAME": "Laundry Detergents",
+       "SHELF_ID": "910000976446",
+       "SHELF_NAME": "Washing Liquid & Gel"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 5.0,
+      "RATING_COUNT": 1.0,
+      "PACK_SIZE": "1.5L",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9352727"
+     },
+     {
+      "ID": "SKU100557056",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9355019",
+      "START_DATE": 1780228800.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Tropical Laundry Liquid 60 Washes",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5063089823590",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "New",
+      "LABEL_START_DATE": 1777852800.0,
+      "LABEL_END_DATE": 1785628800.0,
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 2.84,
+        "PRICEPERUOM": 1.89333,
+        "PRICEPERUOMFORMATTED": "\u00a31.89/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215662122237",
+       "DEPT_NAME": "Laundry",
+       "AISLE_ID": "1215662758502",
+       "AISLE_NAME": "Laundry Detergents",
+       "SHELF_ID": "910000976446",
+       "SHELF_NAME": "Washing Liquid & Gel"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.0,
+      "RATING_COUNT": 4.0,
+      "PACK_SIZE": "1.5L",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9355019"
+     },
+     {
+      "ID": "1000368085666",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "7331151",
+      "START_DATE": 1661860800.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Non Bio Liquid Detergent 53 washes (1.431 L)",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "8720181006371",
+      "BRAND": "Persil",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 8.0,
+        "WASPRICE": 10.0,
+        "PRICEPERUOM": 5.5905,
+        "PRICEPERUOMFORMATTED": "\u00a35.59/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215662122237",
+       "DEPT_NAME": "Laundry",
+       "AISLE_ID": "1215662758502",
+       "AISLE_NAME": "Laundry Detergents",
+       "SHELF_ID": "910000976446",
+       "SHELF_NAME": "Washing Liquid & Gel"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.7638,
+      "RATING_COUNT": 1156.0,
+      "PACK_SIZE": "1.431L",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "7331151"
+     },
+     {
+      "ID": "1000383270015",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9236571",
+      "START_DATE": 1748433600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Non Bio Liquid Detergent 63 Washes",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "8700216689328",
+      "BRAND": "Fairy",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "New",
+      "LABEL_START_DATE": 1748217600.0,
+      "LABEL_END_DATE": 1755993600.0,
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 11.98,
+        "PRICEPERUOM": 6.13415,
+        "PRICEPERUOMFORMATTED": "\u00a36.13/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215662122237",
+       "DEPT_NAME": "Laundry",
+       "AISLE_ID": "1215662758502",
+       "AISLE_NAME": "Laundry Detergents",
+       "SHELF_ID": "910000976446",
+       "SHELF_NAME": "Washing Liquid & Gel"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8094,
+      "RATING_COUNT": 425.0,
+      "PACK_SIZE": "1.953L",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9236571"
+     },
+     {
+      "ID": "1000383237359",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9139614",
+      "START_DATE": 1724155200.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Tropical Lily Laundry Washing 24 washes",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "8720181532788",
+      "BRAND": "Surf",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 3.2,
+        "PRICEPERUOM": 4.93827,
+        "PRICEPERUOMFORMATTED": "\u00a34.94/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215662122237",
+       "DEPT_NAME": "Laundry",
+       "AISLE_ID": "1215662758502",
+       "AISLE_NAME": "Laundry Detergents",
+       "SHELF_ID": "910000976446",
+       "SHELF_NAME": "Washing Liquid & Gel"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.7783,
+      "RATING_COUNT": 785.0,
+      "PACK_SIZE": "648ML",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9139614"
+     },
+     {
+      "ID": "1000383276859",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9236183",
+      "START_DATE": 1756900800.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Non Bio Liquid Detergent 43 Washes",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "8006530178860",
+      "BRAND": "Fairy",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 8.98,
+        "PRICEPERUOM": 6.75188,
+        "PRICEPERUOMFORMATTED": "\u00a36.75/LT"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215662122237",
+       "DEPT_NAME": "Laundry",
+       "AISLE_ID": "1215662758502",
+       "AISLE_NAME": "Laundry Detergents",
+       "SHELF_ID": "910000976446",
+       "SHELF_NAME": "Washing Liquid & Gel"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.6471,
+      "RATING_COUNT": 34.0,
+      "PACK_SIZE": "1.33L",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9236183"
+     }
+    ]
+   }
+  ]
+ },
+ "dishwasher tablets": {
+  "results": [
+   {
+    "index": "ASDA_PRODUCTS",
+    "nbHits": 36,
+    "hits": [
+     {
+      "ID": "1000383226431",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9108205",
+      "START_DATE": 1714478400.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "All in 1 Citrus Dishwasher Tablets 40 x 14g (560g)",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5063089481479",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Dropped",
+        "PRICE": 3.5,
+        "WASPRICE": 3.5,
+        "PRICEPERUOM": 0.0875,
+        "PRICEPERUOMFORMATTED": "8.8p/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215662122279",
+       "DEPT_NAME": "Cleaning",
+       "AISLE_ID": "1215662764753",
+       "AISLE_NAME": "Dishwasher & Washing Up",
+       "SHELF_ID": "1215662854328",
+       "SHELF_NAME": "Dishwasher Tablets"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.1633,
+      "RATING_COUNT": 49.0,
+      "PACK_SIZE": "40PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9108205"
+     },
+     {
+      "ID": "1000383224813",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9103542",
+      "START_DATE": 1714478400.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Ultimate All in 1 Citrus Dishwasher Tablets 40 x 12.5g (500g)",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5063089481493",
+      "BRAND": "ASDA",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 5.0,
+        "PRICEPERUOM": 0.125,
+        "PRICEPERUOMFORMATTED": "12.5p/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215662122279",
+       "DEPT_NAME": "Cleaning",
+       "AISLE_ID": "1215662764753",
+       "AISLE_NAME": "Dishwasher & Washing Up",
+       "SHELF_ID": "1215662854328",
+       "SHELF_NAME": "Dishwasher Tablets"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.119,
+      "RATING_COUNT": 42.0,
+      "PACK_SIZE": "40PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9103542"
+     },
+     {
+      "ID": "1000383221992",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9095784",
+      "START_DATE": 1714478400.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Quantum All In One Dishwasher Tablets  Fresh - 36 Tabs",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5059001024008",
+      "BRAND": "Finish",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 7.0,
+        "WASPRICE": 9.48,
+        "PRICEPERUOM": 0.19444,
+        "PRICEPERUOMFORMATTED": "19.4p/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215662122279",
+       "DEPT_NAME": "Cleaning",
+       "AISLE_ID": "1215662764753",
+       "AISLE_NAME": "Dishwasher & Washing Up",
+       "SHELF_ID": "1215662854328",
+       "SHELF_NAME": "Dishwasher Tablets"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8205,
+      "RATING_COUNT": 156.0,
+      "PACK_SIZE": "36PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9095784"
+     },
+     {
+      "ID": "SKU100574320",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9390995",
+      "START_DATE": 1786892400.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Original Power  Dishwasher Tablets, Lemon, 84 Capsules",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": false,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "8006530191586",
+      "BRAND": "Fairy",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "New",
+      "LABEL_START_DATE": 1784592000.0,
+      "LABEL_END_DATE": 1792368000.0,
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 11.5,
+        "WASPRICE": 15.0,
+        "PRICEPERUOM": 0.1369,
+        "PRICEPERUOMFORMATTED": "13.7p/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215662122279",
+       "DEPT_NAME": "Cleaning",
+       "AISLE_ID": "1215662764753",
+       "AISLE_NAME": "Dishwasher & Washing Up",
+       "SHELF_ID": "1215662854328",
+       "SHELF_NAME": "Dishwasher Tablets"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 0.0,
+      "RATING_COUNT": 0.0,
+      "PACK_SIZE": "84PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9390995"
+     },
+     {
+      "ID": "SKU100574319",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9399399",
+      "START_DATE": 1786892400.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Original Power  Dishwasher Tablets, Lemon, 49 Capsules",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": false,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "8006530191692",
+      "BRAND": "Fairy",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "New",
+      "LABEL_START_DATE": 1784592000.0,
+      "LABEL_END_DATE": 1792368000.0,
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 11.47,
+        "PRICEPERUOM": 0.23408,
+        "PRICEPERUOMFORMATTED": "23.4p/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215662122279",
+       "DEPT_NAME": "Cleaning",
+       "AISLE_ID": "1215662764753",
+       "AISLE_NAME": "Dishwasher & Washing Up",
+       "SHELF_ID": "1215662854328",
+       "SHELF_NAME": "Dishwasher Tablets"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 0.0,
+      "RATING_COUNT": 0.0,
+      "PACK_SIZE": "49PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9399399"
+     },
+     {
+      "ID": "1000383233038",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9127234",
+      "START_DATE": 1714478400.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Ultimate All In One Dishwasher Tablets Fresh - 55 Tabs",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5059001017376",
+      "BRAND": "Finish",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 12.6,
+        "PRICEPERUOM": 0.22909,
+        "PRICEPERUOMFORMATTED": "22.9p/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215135760665",
+       "CAT_NAME": "Laundry & Household",
+       "DEPT_ID": "1215662122279",
+       "DEPT_NAME": "Cleaning",
+       "AISLE_ID": "1215662764753",
+       "AISLE_NAME": "Dishwasher & Washing Up",
+       "SHELF_ID": "1215662854328",
+       "SHELF_NAME": "Dishwasher Tablets"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8889,
+      "RATING_COUNT": 189.0,
+      "PACK_SIZE": "55PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9127234"
+     }
+    ]
+   }
+  ]
+ },
+ "cereal": {
+  "results": [
+   {
+    "index": "ASDA_PRODUCTS",
+    "nbHits": 417,
+    "hits": [
+     {
+      "ID": "19192",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "8543",
+      "START_DATE": -2208945600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Cereal 48 Pack",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5010029000801",
+      "BRAND": "Weetabix",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 4.5,
+        "WASPRICE": 5.48,
+        "PRICEPERUOM": 0.09375,
+        "PRICEPERUOMFORMATTED": "9.4p/EA"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215337194729",
+       "DEPT_NAME": "Cereals & Cereal Bars",
+       "AISLE_ID": "1215650880276",
+       "AISLE_NAME": "Everyday & Family Cereals",
+       "SHELF_ID": "1215650674475",
+       "SHELF_NAME": "Wheat Biscuits & Mini Wheats"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8116,
+      "RATING_COUNT": 138.0,
+      "PACK_SIZE": "48PK",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "8543"
+     },
+     {
+      "ID": "1000383195736",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9028236",
+      "START_DATE": 1692619200.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Coco Pops Chocolate Breakfast Cereal 420g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5059319041995",
+      "BRAND": "Kellogg's",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 3.5,
+        "PRICEPERUOM": 8.33333,
+        "PRICEPERUOMFORMATTED": "\u00a38.33/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215337194729",
+       "DEPT_NAME": "Cereals & Cereal Bars",
+       "AISLE_ID": "1215650880276",
+       "AISLE_NAME": "Everyday & Family Cereals",
+       "SHELF_ID": "1215651064839",
+       "SHELF_NAME": "Family Cereals"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.7117,
+      "RATING_COUNT": 111.0,
+      "PACK_SIZE": "420G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9028236"
+     },
+     {
+      "ID": "1000383167428",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "7651114",
+      "START_DATE": 1716206400.0,
+      "END_DATE": 2240568000.0,
+      "NAME": "Crispy Minis Chocolate Chip 500g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5010029229035",
+      "BRAND": "Weetabix",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 3.8,
+        "PRICEPERUOM": 7.6,
+        "PRICEPERUOMFORMATTED": "\u00a37.60/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215337194729",
+       "DEPT_NAME": "Cereals & Cereal Bars",
+       "AISLE_ID": "1215650880276",
+       "AISLE_NAME": "Everyday & Family Cereals",
+       "SHELF_ID": "1215651064839",
+       "SHELF_NAME": "Family Cereals"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.7692,
+      "RATING_COUNT": 78.0,
+      "PACK_SIZE": "500G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "7651114"
+     },
+     {
+      "ID": "1000383169718",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "7673253",
+      "START_DATE": 1719748800.0,
+      "END_DATE": 2240568000.0,
+      "NAME": "Frosties Breakfast Cereal 470g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5059319024196",
+      "BRAND": "Kellogg's",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "List",
+        "PRICE": 3.5,
+        "PRICEPERUOM": 7.44681,
+        "PRICEPERUOMFORMATTED": "\u00a37.45/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215337194729",
+       "DEPT_NAME": "Cereals & Cereal Bars",
+       "AISLE_ID": "1215650880276",
+       "AISLE_NAME": "Everyday & Family Cereals",
+       "SHELF_ID": "1215650674188",
+       "SHELF_NAME": "Cornflakes, Honey & Nut"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8016,
+      "RATING_COUNT": 252.0,
+      "PACK_SIZE": "470G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "7673253"
+     },
+     {
+      "ID": "1000383151858",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "7560972",
+      "START_DATE": 1668513600.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Nestl\u00e9  Multigrain Hoop Breakfast Cereal 800g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "8445290345608",
+      "BRAND": "Nestle",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 3.8,
+        "WASPRICE": 4.0,
+        "PRICEPERUOM": 4.75,
+        "PRICEPERUOMFORMATTED": "\u00a34.75/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215337194729",
+       "DEPT_NAME": "Cereals & Cereal Bars",
+       "AISLE_ID": "1215650880276",
+       "AISLE_NAME": "Everyday & Family Cereals",
+       "SHELF_ID": "1215651064839",
+       "SHELF_NAME": "Family Cereals"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.7308,
+      "RATING_COUNT": 1300.0,
+      "PACK_SIZE": "800G",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "7560972"
+     },
+     {
+      "ID": "1000383238153",
+      "STATUS": "A",
+      "PHARMACY_RESTRICTED": false,
+      "CIN": "9141564",
+      "START_DATE": 1721044800.0,
+      "END_DATE": 1924948800.0,
+      "NAME": "Corn Flakes 670g",
+      "CS_YES": false,
+      "SHOW_PRICE_CS": true,
+      "SALES_TYPE": "Each",
+      "IMAGE_ID": "5059319033501",
+      "BRAND": "Kellogg's",
+      "IS_BWS": false,
+      "IS_FROZEN": false,
+      "IS_SPONSORED": false,
+      "LABEL": "",
+      "PRICES": {
+       "EN": {
+        "OFFER": "Rollback",
+        "PRICE": 2.85,
+        "WASPRICE": 3.5,
+        "PRICEPERUOM": 4.25373,
+        "PRICEPERUOMFORMATTED": "\u00a34.25/KG"
+       }
+      },
+      "PRIMARY_TAXONOMY": {
+       "CAT_ID": "1215337189632",
+       "CAT_NAME": "Food Cupboard",
+       "DEPT_ID": "1215337194729",
+       "DEPT_NAME": "Cereals & Cereal Bars",
+       "AISLE_ID": "1215650880276",
+       "AISLE_NAME": "Everyday & Family Cereals",
+       "SHELF_ID": "1215650674188",
+       "SHELF_NAME": "Cornflakes, Honey & Nut"
+      },
+      "IS_FTO": false,
+      "PRODUCT_TYPE": "STANDARD",
+      "AVG_RATING": 4.8463,
+      "RATING_COUNT": 449.0,
+      "PACK_SIZE": "670",
+      "STOCK": {
+       "4647": 999
+      },
+      "MAX_QTY": 10,
+      "objectID": "9141564"
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -1,0 +1,2067 @@
+{
+ "baked beans": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 4,
+   "sort": "relevance",
+   "totalPages": 2,
+   "totalResults": 6
+  },
+  "products": [
+   {
+    "code": "3074",
+    "name": "Heinz Baked Beans, 24 x 415g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a330.58",
+     "formattedValue": "\u00a315.29",
+     "intValue": 1529,
+     "priceType": "BUY",
+     "value": 15.29
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a31.54",
+     "intValue": 154,
+     "priceType": "BUY",
+     "value": 1.54
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Heinz-Baked-Beans-24-x-415g/p/3074",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "143625",
+    "name": "Branston Baked Beans In Tomato Sauce, 24 x 410g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a328.98",
+     "formattedValue": "\u00a314.49",
+     "intValue": 1449,
+     "priceType": "BUY",
+     "value": 14.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a30.61",
+     "intValue": 61,
+     "priceType": "BUY",
+     "value": 0.61
+    },
+    "unitType": "PER_UNIT",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Food-Cupboard/Branston-Baked-Beans-In-Tomato-Sauce-24-x-410g/p/143625",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "649879",
+    "name": "Baque Cafe Coffee Beans, 1kg",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a323.98",
+     "formattedValue": "\u00a311.99",
+     "intValue": 1199,
+     "priceType": "BUY",
+     "value": 11.99
+    },
+    "pricePerUnit": null,
+    "unitType": null,
+    "hasPricePerUnit": false,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Baque-Cafe-Coffee-Beans-1kg/p/649879",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "554205",
+    "name": "Segafredo Zanetti Italian Roast Whole Beans, 1kg",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a329.98",
+     "formattedValue": "\u00a314.99",
+     "intValue": 1499,
+     "priceType": "BUY",
+     "value": 14.99
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a314.99",
+     "intValue": 1499,
+     "priceType": "BUY",
+     "value": 14.99
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Tea-Coffee-Hot-Drinks/Tea-Coffee/Segafredo-Zanetti-Italian-Roast-Whole-Beans-1kg/p/554205",
+    "purchasable": true,
+    "shippingIncluded": false
+   }
+  ]
+ },
+ "basmati rice": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 4,
+   "sort": "relevance",
+   "totalPages": 1,
+   "totalResults": 1
+  },
+  "products": [
+   {
+    "code": "324836",
+    "name": "Tilda Pure Basmati Rice, 6 x 250g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a310.38",
+     "formattedValue": "\u00a35.19",
+     "intValue": 519,
+     "priceType": "BUY",
+     "value": 5.19
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a33.47",
+     "intValue": 347,
+     "priceType": "BUY",
+     "value": 3.47
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Food-Cupboard/Pasta-Rice-Noodles/Tilda-Pure-Basmati-Rice-6-x-250g/p/324836",
+    "purchasable": true,
+    "shippingIncluded": false
+   }
+  ]
+ },
+ "cereal": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 4,
+   "sort": "relevance",
+   "totalPages": 3,
+   "totalResults": 12
+  },
+  "products": [
+   {
+    "code": "36372",
+    "name": "Kellogg's Special K, 2 x 750g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a315.98",
+     "formattedValue": "\u00a37.99",
+     "intValue": 799,
+     "priceType": "BUY",
+     "value": 7.99
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a35.33",
+     "intValue": 533,
+     "priceType": "BUY",
+     "value": 5.33
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Kelloggs-Special-K-2-x-750g/p/36372",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "436642",
+    "name": "Kellogg's Coco Pops, 2 x 650g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a315.58",
+     "formattedValue": "\u00a37.79",
+     "intValue": 779,
+     "priceType": "BUY",
+     "value": 7.79
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a36.00",
+     "intValue": 600,
+     "priceType": "BUY",
+     "value": 6.0
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Food-Cupboard/Cereals/Kelloggs-Coco-Pops-2-x-650g/p/436642",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "1478520",
+    "name": "Prana Overnight Oats & Chia, 800g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a314.98",
+     "formattedValue": "\u00a37.49",
+     "intValue": 749,
+     "priceType": "BUY",
+     "value": 7.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a39.37",
+     "intValue": 937,
+     "priceType": "BUY",
+     "value": 9.37
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Food-Cupboard/Cereals/Prana-Overnight-Oats-Chia-800g/p/1478520",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "162928",
+    "name": "Quaker Oat So Simple Original, 60 x 27g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a318.98",
+     "formattedValue": "\u00a39.49",
+     "intValue": 949,
+     "priceType": "BUY",
+     "value": 9.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a35.86",
+     "intValue": 586,
+     "priceType": "BUY",
+     "value": 5.86
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Quaker-Oat-So-Simple-Original-60-x-27g/p/162928",
+    "purchasable": true,
+    "shippingIncluded": false
+   }
+  ]
+ },
+ "chopped tomatoes": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 4,
+   "sort": "relevance",
+   "totalPages": 2,
+   "totalResults": 5
+  },
+  "products": [
+   {
+    "code": "17345",
+    "name": "Valfrutta Chopped Tomatoes, 12 x 400g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a314.38",
+     "formattedValue": "\u00a37.19",
+     "intValue": 719,
+     "priceType": "BUY",
+     "value": 7.19
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a31.50",
+     "intValue": 150,
+     "priceType": "BUY",
+     "value": 1.5
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Valfrutta-Chopped-Tomatoes-12-x-400g/p/17345",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "221654",
+    "name": "Valfrutta Organic Chopped Tomatoes, 12 x 400g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a318.38",
+     "formattedValue": "\u00a39.19",
+     "intValue": 919,
+     "priceType": "BUY",
+     "value": 9.19
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a31.92",
+     "intValue": 192,
+     "priceType": "BUY",
+     "value": 1.92
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Valfrutta-Organic-Chopped-Tomatoes-12-x-400g/p/221654",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "2988",
+    "name": "Valfrutta Italian Peeled Plum Tomatoes, 12 x 400g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a314.98",
+     "formattedValue": "\u00a37.49",
+     "intValue": 749,
+     "priceType": "BUY",
+     "value": 7.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a31.57",
+     "intValue": 157,
+     "priceType": "BUY",
+     "value": 1.57
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Valfrutta-Italian-Peeled-Plum-Tomatoes-12-x-400g/p/2988",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "41753",
+    "name": "Cirio Tomato Puree Tubes, 12 x 140g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a322.98",
+     "formattedValue": "\u00a311.49",
+     "intValue": 1149,
+     "priceType": "BUY",
+     "value": 11.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a36.84",
+     "intValue": 684,
+     "priceType": "BUY",
+     "value": 6.84
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Food-Cupboard/Cirio-Tomato-Puree-Tubes-12-x-140g/p/41753",
+    "purchasable": true,
+    "shippingIncluded": false
+   }
+  ]
+ },
+ "coffee": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 4,
+   "sort": "relevance",
+   "totalPages": 11,
+   "totalResults": 43
+  },
+  "products": [
+   {
+    "code": "422420",
+    "name": "Kenco Latte Coffee, 1kg",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a328.58",
+     "formattedValue": "\u00a314.29",
+     "intValue": 1429,
+     "priceType": "BUY",
+     "value": 14.29
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a314.29",
+     "intValue": 1429,
+     "priceType": "BUY",
+     "value": 14.29
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Kenco-Latte-Coffee-1kg/p/422420",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "973566",
+    "name": "Costa Tassimo Americano Coffee Pods, 80 Servings",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a355.98",
+     "formattedValue": "\u00a327.99",
+     "intValue": 2799,
+     "priceType": "BUY",
+     "value": 27.99
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a33.89",
+     "intValue": 389,
+     "priceType": "BUY",
+     "value": 3.89
+    },
+    "unitType": "PER_CAPSULE",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Costa-Tassimo-Americano-Coffee-Pods-80-Servings/p/973566",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "605280",
+    "name": "Barista Coffee Espresso Shot Hazelnut, 40 capsules",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a319.78",
+     "formattedValue": "\u00a39.89",
+     "intValue": 989,
+     "priceType": "BUY",
+     "value": 9.89
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a315.46",
+     "intValue": 1546,
+     "priceType": "BUY",
+     "value": 15.46
+    },
+    "unitType": "PER_LITRE",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Barista-Coffee-Espresso-Shot-Hazelnut-40-capsules/p/605280",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "327364",
+    "name": "Douwe Egberts Pure Gold Instant Coffee, 750g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a352.98",
+     "formattedValue": "\u00a326.49",
+     "intValue": 2649,
+     "priceType": "BUY",
+     "value": 26.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a335.32",
+     "intValue": 3532,
+     "priceType": "BUY",
+     "value": 35.32
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Douwe-Egberts-Pure-Gold-Instant-Coffee-750g/p/327364",
+    "purchasable": true,
+    "shippingIncluded": false
+   }
+  ]
+ },
+ "dishwasher tablets": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 4,
+   "sort": "relevance",
+   "totalPages": 2,
+   "totalResults": 5
+  },
+  "products": [
+   {
+    "code": "449209",
+    "name": "Crystale Dishwasher Salt, 4 x 2kg",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a315.78",
+     "formattedValue": "\u00a37.89",
+     "intValue": 789,
+     "priceType": "BUY",
+     "value": 7.89
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a30.99",
+     "intValue": 99,
+     "priceType": "BUY",
+     "value": 0.99
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Cleaning-Laundry-Products/Dishwashing/Crystale-Dishwasher-Salt-4-x-2kg/p/449209",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "515561",
+    "name": "Finish Quantum All in One Lemon Dishwasher Tablets, 2 x 100 Pack",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a344.78",
+     "formattedValue": "\u00a322.39",
+     "intValue": 2239,
+     "priceType": "BUY",
+     "value": 22.39
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a30.12",
+     "intValue": 12,
+     "priceType": "BUY",
+     "value": 0.12
+    },
+    "unitType": "PER_TABLET",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Cleaning-Laundry-Products/Dishwashing/Finish-Quantum-All-in-One-Lemon-Dishwasher-Tablets-2-x-100-Pack/p/515561",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "1717264",
+    "name": "Kirkland Signature Ultra Shine Dishwasher Pacs, 115 Count",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a329.58",
+     "formattedValue": "\u00a314.79",
+     "intValue": 1479,
+     "priceType": "BUY",
+     "value": 14.79
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a30.13",
+     "intValue": 13,
+     "priceType": "BUY",
+     "value": 0.13
+    },
+    "unitType": "PER_UNIT",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Cleaning-Laundry-Products/Dishwashing/Kirkland-Signature-Ultra-Shine-Dishwasher-Pacs-115-Count/p/1717264",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "116056",
+    "name": "Finish Dishwasher Fresh Rinse And Shine Aid, 2 x 800ml",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a313.98",
+     "formattedValue": "\u00a36.99",
+     "intValue": 699,
+     "priceType": "BUY",
+     "value": 6.99
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a34.37",
+     "intValue": 437,
+     "priceType": "BUY",
+     "value": 4.37
+    },
+    "unitType": "PER_LITRE",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Cleaning-Laundry-Products/Dishwashing/Finish-Dishwasher-Fresh-Rinse-And-Shine-Aid-2-x-800ml/p/116056",
+    "purchasable": true,
+    "shippingIncluded": false
+   }
+  ]
+ },
+ "kitchen roll": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 4,
+   "sort": "relevance",
+   "totalPages": 0,
+   "totalResults": 0
+  },
+  "products": []
+ },
+ "olive oil": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 4,
+   "sort": "relevance",
+   "totalPages": 3,
+   "totalResults": 11
+  },
+  "products": [
+   {
+    "code": "587095",
+    "name": "1896 Extra Virgin Olive Oil, 1L",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a326.98",
+     "formattedValue": "\u00a313.49",
+     "intValue": 1349,
+     "priceType": "BUY",
+     "value": 13.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a313.49",
+     "intValue": 1349,
+     "priceType": "BUY",
+     "value": 13.49
+    },
+    "unitType": "PER_LITRE",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Food-Cupboard/Oils-Vinegars-Dressings/1896-Extra-Virgin-Olive-Oil-1L/p/587095",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "28970",
+    "name": "Filippo Berio Classic Olive Oil, 5L",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a352.78",
+     "formattedValue": "\u00a326.39",
+     "intValue": 2639,
+     "priceType": "BUY",
+     "value": 26.39
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a35.28",
+     "intValue": 528,
+     "priceType": "BUY",
+     "value": 5.28
+    },
+    "unitType": "PER_LITRE",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Filippo-Berio-Classic-Olive-Oil-5L/p/28970",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "290004",
+    "name": "Filippo Berio Chilli Flavoured Olive Oil, 1L",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a328.78",
+     "formattedValue": "\u00a314.39",
+     "intValue": 1439,
+     "priceType": "BUY",
+     "value": 14.39
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a314.39",
+     "intValue": 1439,
+     "priceType": "BUY",
+     "value": 14.39
+    },
+    "unitType": "PER_LITRE",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Food-Cupboard/Oils-Vinegars-Dressings/Filippo-Berio-Chilli-Flavoured-Olive-Oil-1L/p/290004",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "1862921",
+    "name": "Kirkland Signature Spanish Extra Virgin Olive Oil, 5L",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a345.98",
+     "formattedValue": "\u00a322.99",
+     "intValue": 2299,
+     "priceType": "BUY",
+     "value": 22.99
+    },
+    "pricePerUnit": null,
+    "unitType": null,
+    "hasPricePerUnit": false,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Kirkland-Signature-Spanish-Extra-Virgin-Olive-Oil-5L/p/1862921",
+    "purchasable": true,
+    "shippingIncluded": false
+   }
+  ]
+ },
+ "pasta": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 4,
+   "sort": "relevance",
+   "totalPages": 3,
+   "totalResults": 11
+  },
+  "products": [
+   {
+    "code": "437461",
+    "name": "Garofalo Gluten Free Pasta Variety Pack, 6 x 400g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a318.58",
+     "formattedValue": "\u00a39.29",
+     "intValue": 929,
+     "priceType": "BUY",
+     "value": 9.29
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a33.88",
+     "intValue": 388,
+     "priceType": "BUY",
+     "value": 3.88
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Food-Cupboard/Pasta-Rice-Noodles/Garofalo-Gluten-Free-Pasta-Variety-Pack-6-x-400g/p/437461",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "8560785",
+    "name": "La Molisana Spaghetti, 6 x 500g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a315.98",
+     "formattedValue": "\u00a37.99",
+     "intValue": 799,
+     "priceType": "BUY",
+     "value": 7.99
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a32.67",
+     "intValue": 267,
+     "priceType": "BUY",
+     "value": 2.67
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Food-Cupboard/Pasta-Rice-Noodles/La-Molisana-Spaghetti-6-x-500g/p/8560785",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "296684",
+    "name": "Aperol Aperitivo, 1L",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a333.78",
+     "formattedValue": "\u00a316.89",
+     "intValue": 1689,
+     "priceType": "BUY",
+     "value": 16.89
+    },
+    "pricePerUnit": null,
+    "unitType": null,
+    "hasPricePerUnit": false,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Aperol-Aperitivo-1L/p/296684",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "504713",
+    "name": "Quaranta Assorted Italian Soft Nougat, 900g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a329.18",
+     "formattedValue": "\u00a314.59",
+     "intValue": 1459,
+     "priceType": "BUY",
+     "value": 14.59
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a316.22",
+     "intValue": 1622,
+     "priceType": "BUY",
+     "value": 16.22
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Nuts-Snacks-Confectionery/Sweets/Quaranta-Assorted-Italian-Soft-Nougat-900g/p/504713",
+    "purchasable": true,
+    "shippingIncluded": false
+   }
+  ]
+ },
+ "tea bags": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 4,
+   "sort": "relevance",
+   "totalPages": 3,
+   "totalResults": 12
+  },
+  "products": [
+   {
+    "code": "532743",
+    "name": "Taylors of Harrogate Yorkshire Tea, 600 Tea Bags",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a329.98",
+     "formattedValue": "\u00a314.99",
+     "intValue": 1499,
+     "priceType": "BUY",
+     "value": 14.99
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a30.03",
+     "intValue": 3,
+     "priceType": "BUY",
+     "value": 0.03
+    },
+    "unitType": "PER_UNIT",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Tea-Coffee-Hot-Drinks/Tea-Coffee/Taylors-of-Harrogate-Yorkshire-Tea-600-Tea-Bags/p/532743",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "148843",
+    "name": "Kirkland Signature Green Tea Matcha Blend, 100 Tea Bags",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a322.98",
+     "formattedValue": "\u00a311.49",
+     "intValue": 1149,
+     "priceType": "BUY",
+     "value": 11.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a37.66",
+     "intValue": 766,
+     "priceType": "BUY",
+     "value": 7.66
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Kirkland-Signature-Green-Tea-Matcha-Blend-100-Tea-Bags/p/148843",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "524081",
+    "name": "Twinings English Breakfast Tea Bags, 300 Pack",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a318.98",
+     "formattedValue": "\u00a39.49",
+     "intValue": 949,
+     "priceType": "BUY",
+     "value": 9.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a30.04",
+     "intValue": 4,
+     "priceType": "BUY",
+     "value": 0.04
+    },
+    "unitType": "PER_UNIT",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Tea-Coffee-Hot-Drinks/Tea-Coffee/Twinings-English-Breakfast-Tea-Bags-300-Pack/p/524081",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "34138",
+    "name": "Tetley 1 Cup Tea Bags, 1100 Pack",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a338.98",
+     "formattedValue": "\u00a319.49",
+     "intValue": 1949,
+     "priceType": "BUY",
+     "value": 19.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a38.86",
+     "intValue": 886,
+     "priceType": "BUY",
+     "value": 8.86
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Tetley-1-Cup-Tea-Bags-1100-Pack/p/34138",
+    "purchasable": true,
+    "shippingIncluded": false
+   }
+  ]
+ },
+ "toilet tissue": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 4,
+   "sort": "relevance",
+   "totalPages": 1,
+   "totalResults": 3
+  },
+  "products": [
+   {
+    "code": "575076",
+    "name": "Cushelle Quilted 3-Ply Toilet Tissue, 24 Pack (157 Sheets)",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a323.96",
+     "formattedValue": "\u00a311.98",
+     "intValue": 1198,
+     "priceType": "BUY",
+     "value": 11.98
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a30.50",
+     "intValue": 50,
+     "priceType": "BUY",
+     "value": 0.5
+    },
+    "unitType": "PER_ROLL",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Business-Office-Supplies/Cleaning-Care/Paper-Products-Tissues-Wipes/Cushelle-Quilted-3-Ply-Toilet-Tissue-24-Pack-157-Sheets/p/575076",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "426280",
+    "name": "Andrex Ultimate Fresh Hygiene Wipes Mega Odour Control Moist Toilet Tissue 10 x 56 wipes",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a318.98",
+     "formattedValue": "\u00a39.49",
+     "intValue": 949,
+     "priceType": "BUY",
+     "value": 9.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a30.95",
+     "intValue": 95,
+     "priceType": "BUY",
+     "value": 0.95
+    },
+    "unitType": "PER_PACK",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Business-Office-Supplies/Cleaning-Care/Paper-Products-Tissues-Wipes/Andrex-Ultimate-Fresh-Hygiene-Wipes-Mega-Odour-Control-Moist-Toilet-Tissue-10-x-56-wipes/p/426280",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "653373",
+    "name": "Bloo Self Active Toilet Rim Blocks, 3 x 3 Pack",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a324.98",
+     "formattedValue": "\u00a312.49",
+     "intValue": 1249,
+     "priceType": "BUY",
+     "value": 12.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a34.17",
+     "intValue": 417,
+     "priceType": "BUY",
+     "value": 4.17
+    },
+    "unitType": "PER_PACK",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Cleaning-Laundry-Products/Cleaning-Products/Bloo-Self-Active-Toilet-Rim-Blocks-3-x-3-Pack/p/653373",
+    "purchasable": true,
+    "shippingIncluded": false
+   }
+  ]
+ },
+ "washing liquid": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 4,
+   "sort": "relevance",
+   "totalPages": 6,
+   "totalResults": 21
+  },
+  "products": [
+   {
+    "code": "563796",
+    "name": "Ariel Laundry Liquid, 172 Wash, 4.988L",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a342.98",
+     "formattedValue": "\u00a321.49",
+     "intValue": 2149,
+     "priceType": "BUY",
+     "value": 21.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a34.31",
+     "intValue": 431,
+     "priceType": "BUY",
+     "value": 4.31
+    },
+    "unitType": "PER_LITRE",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Cleaning-Laundry-Products/Laundry/Ariel-Laundry-Liquid-172-Wash-4988L/p/563796",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "581114",
+    "name": "Surf Tropical Lily Laundry Liquid, 95 Wash",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a318.38",
+     "formattedValue": "\u00a39.19",
+     "intValue": 919,
+     "priceType": "BUY",
+     "value": 9.19
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a30.10",
+     "intValue": 10,
+     "priceType": "BUY",
+     "value": 0.1
+    },
+    "unitType": "PER_WASH",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Cleaning-Laundry-Products/Laundry/Surf-Tropical-Lily-Laundry-Liquid-95-Wash/p/581114",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "505111",
+    "name": "Persil Bio Laundry Liquid, 95 Washes (2.565L)",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a320.78",
+     "formattedValue": "\u00a310.39",
+     "intValue": 1039,
+     "priceType": "BUY",
+     "value": 10.39
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a30.11",
+     "intValue": 11,
+     "priceType": "BUY",
+     "value": 0.11
+    },
+    "unitType": "PER_WASH",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Cleaning-Laundry-Products/Laundry/Persil-Bio-Laundry-Liquid-95-Washes-2565L/p/505111",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "505115",
+    "name": "Persil Non Bio Laundry Liquid, 95 Washes (2.565L)",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a320.78",
+     "formattedValue": "\u00a310.39",
+     "intValue": 1039,
+     "priceType": "BUY",
+     "value": 10.39
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a30.11",
+     "intValue": 11,
+     "priceType": "BUY",
+     "value": 0.11
+    },
+    "unitType": "PER_WASH",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Cleaning-Laundry-Products/Laundry/Persil-Non-Bio-Laundry-Liquid-95-Washes-2565L/p/505115",
+    "purchasable": true,
+    "shippingIncluded": false
+   }
+  ]
+ },
+ "butter": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 6,
+   "sort": "relevance",
+   "totalPages": 3,
+   "totalResults": 14
+  },
+  "products": [
+   {
+    "code": "106056",
+    "name": "KTC Pure Butter Ghee, 2kg",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a325.98",
+     "formattedValue": "\u00a312.99",
+     "intValue": 1299,
+     "priceType": "BUY",
+     "value": 12.99
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a36.50",
+     "intValue": 650,
+     "priceType": "BUY",
+     "value": 6.5
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/KTC-Pure-Butter-Ghee-2kg/p/106056",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "606673",
+    "name": "Kinder's Cowboy Butter, 326g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a312.78",
+     "formattedValue": "\u00a36.39",
+     "intValue": 639,
+     "priceType": "BUY",
+     "value": 6.39
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a319.61",
+     "intValue": 1961,
+     "priceType": "BUY",
+     "value": 19.61
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Kinders-Cowboy-Butter-326g/p/606673",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "74017",
+    "name": "Skippy Smooth Peanut Butter, 1.13kg",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a311.78",
+     "formattedValue": "\u00a35.89",
+     "intValue": 589,
+     "priceType": "BUY",
+     "value": 5.89
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a35.22",
+     "intValue": 522,
+     "priceType": "BUY",
+     "value": 5.22
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Skippy-Smooth-Peanut-Butter-113kg/p/74017",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "646414",
+    "name": "Natco Pure Butter Ghee, 2kg",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a330.78",
+     "formattedValue": "\u00a315.39",
+     "intValue": 1539,
+     "priceType": "BUY",
+     "value": 15.39
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a37.70",
+     "intValue": 770,
+     "priceType": "BUY",
+     "value": 7.7
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Food-Cupboard/Natco-Pure-Butter-Ghee-2kg/p/646414",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "100728",
+    "name": "Kelsen Danish Butter Cookies, 1.8kg",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a327.98",
+     "formattedValue": "\u00a313.99",
+     "intValue": 1399,
+     "priceType": "BUY",
+     "value": 13.99
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a37.78",
+     "intValue": 778,
+     "priceType": "BUY",
+     "value": 7.78
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Kelsen-Danish-Butter-Cookies-18kg/p/100728",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "335436",
+    "name": "Pip & Nut Crunchy Peanut Butter, 1kg",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a313.78",
+     "formattedValue": "\u00a36.89",
+     "intValue": 689,
+     "priceType": "BUY",
+     "value": 6.89
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a36.89",
+     "intValue": 689,
+     "priceType": "BUY",
+     "value": 6.89
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Food-Cupboard/Spreads-Condiments/Pip-Nut-Crunchy-Peanut-Butter-1kg/p/335436",
+    "purchasable": true,
+    "shippingIncluded": false
+   }
+  ]
+ },
+ "chicken breast": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 6,
+   "sort": "relevance",
+   "totalPages": 1,
+   "totalResults": 2
+  },
+  "products": [
+   {
+    "code": "651923",
+    "name": "Whiskas Poultry Feasts 7+, 80 x 85g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a343.98",
+     "formattedValue": "\u00a321.99",
+     "intValue": 2199,
+     "priceType": "BUY",
+     "value": 21.99
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a33.24",
+     "intValue": 324,
+     "priceType": "BUY",
+     "value": 3.24
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Pets-Wildlife/Whiskas-Poultry-Feasts-7-80-x-85g/p/651923",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "651940",
+    "name": "Whiskas Poultry Feasts 1+, 80 x 85g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a343.98",
+     "formattedValue": "\u00a321.99",
+     "intValue": 2199,
+     "priceType": "BUY",
+     "value": 21.99
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a33.24",
+     "intValue": 324,
+     "priceType": "BUY",
+     "value": 3.24
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Pets-Wildlife/Whiskas-Poultry-Feasts-1-80-x-85g/p/651940",
+    "purchasable": true,
+    "shippingIncluded": false
+   }
+  ]
+ },
+ "eggs": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 6,
+   "sort": "relevance",
+   "totalPages": 1,
+   "totalResults": 6
+  },
+  "products": [
+   {
+    "code": "545042",
+    "name": "Trefin Assorted Eggs, 1kg",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a319.98",
+     "formattedValue": "\u00a39.99",
+     "intValue": 999,
+     "priceType": "BUY",
+     "value": 9.99
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a39.99",
+     "intValue": 999,
+     "priceType": "BUY",
+     "value": 9.99
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Nuts-Snacks-Confectionery/Novelty-Confectionery/Trefin-Assorted-Eggs-1kg/p/545042",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "613214",
+    "name": "Evan Williams Egg Nog, 70cl",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a326.78",
+     "formattedValue": "\u00a313.39",
+     "intValue": 1339,
+     "priceType": "BUY",
+     "value": 13.39
+    },
+    "pricePerUnit": null,
+    "unitType": null,
+    "hasPricePerUnit": false,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Wines-Spirits-Beer/Spirits/Liqueurs/Evan-Williams-Egg-Nog-70cl/p/613214",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "8523735",
+    "name": "Shen Dan Boiled Salted Duck Eggs x 12",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a310.98",
+     "formattedValue": "\u00a35.49",
+     "intValue": 549,
+     "priceType": "BUY",
+     "value": 5.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a36.54",
+     "intValue": 654,
+     "priceType": "BUY",
+     "value": 6.54
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Food-Cupboard/Shen-Dan-Boiled-Salted-Duck-Eggs-x-12/p/8523735",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "573388",
+    "name": "Biffi Smoked Bacon Mayonnaise, 800ml",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a311.78",
+     "formattedValue": "\u00a35.89",
+     "intValue": 589,
+     "priceType": "BUY",
+     "value": 5.89
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a37.37",
+     "intValue": 737,
+     "priceType": "BUY",
+     "value": 7.37
+    },
+    "unitType": "PER_LITRE",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Biffi-Smoked-Bacon-Mayonnaise-800ml/p/573388",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "1654327",
+    "name": "Gudrun Belgian Chocolates Bag, 427g in 2 Options",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a319.98",
+     "formattedValue": "\u00a39.99",
+     "intValue": 999,
+     "priceType": "BUY",
+     "value": 9.99
+    },
+    "pricePerUnit": null,
+    "unitType": null,
+    "hasPricePerUnit": false,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Nuts-Snacks-Confectionery/Boxed-Chocolate/Gudrun-Belgian-Chocolates-Bag-427g-in-2-Options/p/1654327",
+    "purchasable": false,
+    "shippingIncluded": false
+   },
+   {
+    "code": "213227",
+    "name": "Hellmann's Real Squeezy Mayonnaise, 2 x 750ml",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a312.78",
+     "formattedValue": "\u00a36.39",
+     "intValue": 639,
+     "priceType": "BUY",
+     "value": 6.39
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a34.26",
+     "intValue": 426,
+     "priceType": "BUY",
+     "value": 4.26
+    },
+    "unitType": "PER_LITRE",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Hellmanns-Real-Squeezy-Mayonnaise-2-x-750ml/p/213227",
+    "purchasable": true,
+    "shippingIncluded": false
+   }
+  ]
+ },
+ "milk": {
+  "pagination": {
+   "currentPage": 0,
+   "pageSize": 6,
+   "sort": "relevance",
+   "totalPages": 6,
+   "totalResults": 32
+  },
+  "products": [
+   {
+    "code": "493711",
+    "name": "Nestle Milo Malted Milk, 2 x 400g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a315.38",
+     "formattedValue": "\u00a37.69",
+     "intValue": 769,
+     "priceType": "BUY",
+     "value": 7.69
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a39.62",
+     "intValue": 962,
+     "priceType": "BUY",
+     "value": 9.62
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Tea-Coffee-Hot-Drinks/Other-Hot-Drinks/Nestle-Milo-Malted-Milk-2-x-400g/p/493711",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "927496",
+    "name": "Cow & Gate 1st Milk Ready To Drink, 12 x 200ml",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a321.98",
+     "formattedValue": "\u00a310.99",
+     "intValue": 1099,
+     "priceType": "BUY",
+     "value": 10.99
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a34.58",
+     "intValue": 458,
+     "priceType": "BUY",
+     "value": 4.58
+    },
+    "unitType": "PER_LITRE",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Toys-Baby-Child/Nursery-Baby/Baby-Feeding-Accessories/Cow-Gate-1st-Milk-Ready-To-Drink-12-x-200ml/p/927496",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "350342",
+    "name": "Kingfisher Oriental Coconut Milk, 6 x 400ml",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a313.38",
+     "formattedValue": "\u00a36.69",
+     "intValue": 669,
+     "priceType": "BUY",
+     "value": 6.69
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a32.79",
+     "intValue": 279,
+     "priceType": "BUY",
+     "value": 2.79
+    },
+    "unitType": "PER_LITRE",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Grocery-Delivery/Kingfisher-Oriental-Coconut-Milk-6-x-400ml/p/350342",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "291427",
+    "name": "Aptamil Stage 1 Milk Powder, 3 x 700g",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a363.98",
+     "formattedValue": "\u00a331.99",
+     "intValue": 3199,
+     "priceType": "BUY",
+     "value": 31.99
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a315.24",
+     "intValue": 1524,
+     "priceType": "BUY",
+     "value": 15.24
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Toys-Baby-Child/Nursery-Baby/Baby-Feeding-Accessories/Aptamil-Stage-1-Milk-Powder-3-x-700g/p/291427",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "640097",
+    "name": "Plenish Organic Oat Milk, 8 x 1L",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a322.98",
+     "formattedValue": "\u00a311.49",
+     "intValue": 1149,
+     "priceType": "BUY",
+     "value": 11.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a31.44",
+     "intValue": 144,
+     "priceType": "BUY",
+     "value": 1.44
+    },
+    "unitType": "PER_LITRE",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Tea-Coffee-Hot-Drinks/Milk-Cream-Sugar/Plenish-Organic-Oat-Milk-8-x-1L/p/640097",
+    "purchasable": true,
+    "shippingIncluded": false
+   },
+   {
+    "code": "856733",
+    "name": "Havanna Dulce De Leche Milk Caramel Spread, 1kg",
+    "price": {
+     "currencyIso": "GBP",
+     "formattedPriceForSetOfTwoQuantities": "\u00a312.98",
+     "formattedValue": "\u00a36.49",
+     "intValue": 649,
+     "priceType": "BUY",
+     "value": 6.49
+    },
+    "pricePerUnit": {
+     "currencyIso": "GBP",
+     "formattedValue": "\u00a36.49",
+     "intValue": 649,
+     "priceType": "BUY",
+     "value": 6.49
+    },
+    "unitType": "PER_KG",
+    "hasPricePerUnit": true,
+    "stock": {
+     "contactDay": 0,
+     "deliveryLeadTime": 0,
+     "stockLevelStatus": "inStock"
+    },
+    "potentialPromotions": [],
+    "membershipRestrictionApplied": false,
+    "businessDelivery": false,
+    "url": "/Grocery-Household/Food-Cupboard/Spreads-Condiments/Havanna-Dulce-De-Leche-Milk-Caramel-Spread-1kg/p/856733",
+    "purchasable": true,
+    "shippingIncluded": false
+   }
+  ]
+ }
+}
