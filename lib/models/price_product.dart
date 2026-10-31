@@ -136,6 +136,13 @@ class PriceProduct {
 
   /// Asda SHELF_NAME.
   final String? shelf;
+
+  /// Asda AISLE_NAME (the group of shelves the shelf sits in). Null for
+  /// Costco.
+  final String? aisle;
+
+  /// Asda DEPT_NAME (the group of aisles). Null for Costco.
+  final String? dept;
   final String? url;
   final DateTime fetchedAt;
 
@@ -152,6 +159,8 @@ class PriceProduct {
     this.quantity,
     this.inStock = true,
     this.shelf,
+    this.aisle,
+    this.dept,
     this.url,
     required this.fetchedAt,
   });
@@ -177,6 +186,8 @@ class PriceProduct {
     'quantity': quantity?.toMap(),
     'inStock': inStock,
     'shelf': shelf,
+    'aisle': aisle,
+    'dept': dept,
     'url': url,
     'fetchedAt': Timestamp.fromDate(fetchedAt),
   };
@@ -198,6 +209,8 @@ class PriceProduct {
         : PackQuantity.fromMap(Map<String, dynamic>.from(d['quantity'] as Map)),
     inStock: d['inStock'] as bool? ?? true,
     shelf: d['shelf'] as String?,
+    aisle: d['aisle'] as String?,
+    dept: d['dept'] as String?,
     url: d['url'] as String?,
     fetchedAt:
         priceDateFromAny(d['fetchedAt']) ??

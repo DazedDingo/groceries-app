@@ -185,6 +185,8 @@ void main() {
       expect(p.offer, isNull);
       expect(p.wasPrice, isNull);
       expect(p.shelf, isNotNull);
+      expect(p.aisle, isNotNull);
+      expect(p.dept, isNotNull);
       expect(p.inStock, isTrue);
     });
   });

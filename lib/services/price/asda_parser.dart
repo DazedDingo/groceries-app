@@ -112,6 +112,8 @@ PriceProduct? _parseHit(Map<String, dynamic> h, DateTime fetchedAt) {
     quantity: quantity,
     inStock: inStock,
     shelf: (h['PRIMARY_TAXONOMY'] as Map?)?['SHELF_NAME'] as String?,
+    aisle: (h['PRIMARY_TAXONOMY'] as Map?)?['AISLE_NAME'] as String?,
+    dept: (h['PRIMARY_TAXONOMY'] as Map?)?['DEPT_NAME'] as String?,
     // TODO: placeholder URL pattern; verify against real Asda product pages.
     url: 'https://www.asda.com/groceries/product/$id',
     fetchedAt: fetchedAt,

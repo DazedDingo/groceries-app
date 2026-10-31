@@ -481,6 +481,78 @@ void main() {
       );
       expect(r.bestAsda!.id, 'large');
     });
+
+    group('multibuy-aware pick (qty >= multibuy quantity)', () {
+      // Same 500g pack: 'deal' is 1.50 alone but 1.00 each on 2 for £2.
+      final plain = _asda('plain', 1.2, q: _g500);
+      final deal = _asda('deal', 1.5, q: _g500, promo: 'Any 2 for £2');
+      final costco = _costco('big', 9.0, q: _g3000);
+
+      PriceLink link() => _link(
+        'x',
+        mode: LinkMode.anyOf,
+        asda: [plain, deal],
+        costco: [costco],
+      );
+
+      test('qty 1 ignores the multibuy: list price wins', () {
+        final r = compareLine(_line('x', link()));
+        expect(r.bestAsda!.id, 'plain');
+      });
+
+      test('qty below the multibuy quantity ignores it too', () {
+        final r = compareLine(_line('x', link(), qty: 1));
+        expect(r.bestAsda!.id, 'plain');
+      });
+
+      test('qty at the multibuy quantity uses the effective cost', () {
+        final r = compareLine(_line('x', link(), qty: 2));
+        expect(r.bestAsda!.id, 'deal'); // 2 for £2 = 1.00 each < 1.20
+      });
+
+      test('qty above the multibuy quantity still uses the deal', () {
+        final r = compareLine(_line('x', link(), qty: 3));
+        // 3 packs: deal = 2.00 + 1.50 = 3.50 (1.17 each) vs plain 3.60.
+        expect(r.bestAsda!.id, 'deal');
+      });
+
+      test('a multibuy dearer than singles is capped at the single price', () {
+        final bad = _asda('bad', 1.5, q: _g500, promo: 'Any 2 for £4');
+        final r = compareLine(
+          _line(
+            'x',
+            _link('x', mode: LinkMode.anyOf, asda: [plain, bad]),
+            qty: 2,
+          ),
+        );
+        expect(r.bestAsda!.id, 'plain'); // bad is 1.50 each, not 2.00
+      });
+
+      test('applies to an Asda-only line as well', () {
+        final r = compareLine(
+          _line(
+            'x',
+            _link('x', mode: LinkMode.anyOf, asda: [plain, deal]),
+            qty: 2,
+          ),
+        );
+        expect(r.status, LineStatus.asdaOnly);
+        expect(r.bestAsda!.id, 'deal');
+        expect(r.asdaCost, closeTo(2.0, 1e-9));
+      });
+
+      test('Costco side is unaffected by multibuy parsing', () {
+        final c1 = _costco('c-plain', 9.0, q: _g3000);
+        final r = compareLine(
+          _line(
+            'x',
+            _link('x', mode: LinkMode.anyOf, asda: [plain], costco: [c1]),
+            qty: 2,
+          ),
+        );
+        expect(r.bestCostco!.id, 'c-plain');
+      });
+    });
   });
 
   group('real products from fixtures', () {

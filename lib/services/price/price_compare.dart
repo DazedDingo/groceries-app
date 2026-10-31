@@ -255,12 +255,31 @@ List<PriceProduct> _candidates(
   return inStock.isNotEmpty ? inStock : acceptable;
 }
 
+// Cost per unit used to rank Asda candidates. When [qty] packs would trigger
+// the product's multi-buy, it is the multi-buy-effective cost of those packs
+// per unit; otherwise the list-price unit cost.
+double? _rankCost(PriceProduct p, CompareBasis basis, int qty, bool multiBuys) {
+  final u = unitCost(p, basis);
+  if (u == null || !multiBuys) return u;
+  final mb = p.multiBuy;
+  if (mb == null || qty < mb.quantity) return u;
+  final amount = amountIn(p.quantity!, basis)!;
+  return effectiveCost(p.price, qty, mb) / (qty * amount);
+}
+
 // Lowest cost first; ties go to the cheaper pack, then the earlier entry in
 // the link's list (the sort is stable, so list order is the last tie-break).
-PriceProduct? _cheapest(List<PriceProduct> c, CompareBasis basis) {
+// With [multiBuys] (Asda), a candidate whose multi-buy applies to [qty] packs
+// is ranked by its multi-buy-effective unit cost.
+PriceProduct? _cheapest(
+  List<PriceProduct> c,
+  CompareBasis basis, {
+  int qty = 1,
+  bool multiBuys = false,
+}) {
   final scored = <(PriceProduct, double)>[];
   for (final p in c) {
-    final u = unitCost(p, basis);
+    final u = _rankCost(p, basis, qty, multiBuys);
     if (u != null) scored.add((p, u));
   }
   if (scored.isEmpty) return null;
@@ -284,12 +303,16 @@ PriceProduct _lowestPrice(List<PriceProduct> c) {
 
 // Best product from one store alone: the highest-priority basis that every
 // candidate expresses, else the lowest pack price.
-PriceProduct _bestOfOneStore(List<PriceProduct> c) {
+PriceProduct _bestOfOneStore(
+  List<PriceProduct> c, {
+  int qty = 1,
+  bool multiBuys = false,
+}) {
   for (final basis in CompareBasis.values) {
     if (c.every(
       (p) => p.quantity != null && amountIn(p.quantity!, basis) != null,
     )) {
-      return _cheapest(c, basis)!;
+      return _cheapest(c, basis, qty: qty, multiBuys: multiBuys)!;
     }
   }
   return _lowestPrice(c);
@@ -302,7 +325,10 @@ PriceProduct _bestOfOneStore(List<PriceProduct> c) {
 ///     [CompareBasis] that some Asda/Costco pair shares ([chooseBasis]).
 ///  3. On that basis each store picks its lowest list-price unit cost; ties go
 ///     to the cheaper pack, then to the earlier entry in the link's list.
-///     (Multi-buys do not affect which product is picked, only the cost.)
+///     At Asda, when [CompareLine.qty] reaches a product's multi-buy
+///     quantity, that product is ranked by its multi-buy-effective unit cost
+///     (so "2 for £1.80" can beat a cheaper-looking single). Below the
+///     multi-buy quantity, and always at Costco, list price decides.
 ///  4. With no shared basis each store picks its lowest pack price and
 ///     cheaperStore / costcoSaving stay null.
 LineComparison compareLine(CompareLine line) {
@@ -325,7 +351,7 @@ LineComparison compareLine(CompareLine line) {
     );
   }
   if (costcoC.isEmpty) {
-    final best = _bestOfOneStore(asdaC);
+    final best = _bestOfOneStore(asdaC, qty: line.qty, multiBuys: true);
     return LineComparison(
       line: line,
       status: LineStatus.asdaOnly,
@@ -355,7 +381,7 @@ LineComparison compareLine(CompareLine line) {
   PriceProduct? bestA;
   PriceProduct? bestC;
   if (basis != null) {
-    bestA = _cheapest(asdaC, basis);
+    bestA = _cheapest(asdaC, basis, qty: line.qty, multiBuys: true);
     bestC = _cheapest(costcoC, basis);
   }
   if (basis == null || bestA == null || bestC == null) {

@@ -32,6 +32,10 @@ class PriceLink {
   /// Costco); the engine ignores that store's list.
   final bool asdaUnavailable;
   final bool costcoUnavailable;
+
+  /// True once the user has confirmed or corrected the match; false for
+  /// links built by the auto-matcher.
+  final bool userConfirmed;
   final DateTime updatedAt;
 
   const PriceLink({
@@ -41,6 +45,7 @@ class PriceLink {
     this.costco = const [],
     this.asdaUnavailable = false,
     this.costcoUnavailable = false,
+    this.userConfirmed = false,
     required this.updatedAt,
   });
 
@@ -55,6 +60,7 @@ class PriceLink {
     'costco': costco.map((p) => p.toMap()).toList(),
     'asdaUnavailable': asdaUnavailable,
     'costcoUnavailable': costcoUnavailable,
+    'userConfirmed': userConfirmed,
     'updatedAt': Timestamp.fromDate(updatedAt),
   };
 
@@ -69,6 +75,7 @@ class PriceLink {
     costco: _products(d['costco']),
     asdaUnavailable: d['asdaUnavailable'] as bool? ?? false,
     costcoUnavailable: d['costcoUnavailable'] as bool? ?? false,
+    userConfirmed: d['userConfirmed'] as bool? ?? false,
     updatedAt:
         priceDateFromAny(d['updatedAt']) ??
         DateTime.fromMillisecondsSinceEpoch(0),

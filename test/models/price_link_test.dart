@@ -24,6 +24,8 @@ void main() {
     quantity: const PackQuantity(grams: 1000, count: 2, countUnit: 'bag'),
     inStock: false,
     shelf: 'Shelf',
+    aisle: 'Aisle',
+    dept: 'Dept',
     url: 'https://x/$id',
     fetchedAt: t,
   );
@@ -71,6 +73,8 @@ void main() {
     expect(p.offer, 'Rollback');
     expect(p.inStock, isFalse);
     expect(p.shelf, 'Shelf');
+    expect(p.aisle, 'Aisle');
+    expect(p.dept, 'Dept');
     expect(
       p.quantity,
       const PackQuantity(grams: 1000, count: 2, countUnit: 'bag'),
@@ -85,6 +89,14 @@ void main() {
     expect(back.costco, isEmpty);
     expect(back.mode, LinkMode.exact);
     expect(back.asdaUnavailable, isFalse);
+    expect(back.userConfirmed, isFalse);
+  });
+
+  test('userConfirmed defaults to false and round trips', () {
+    expect(PriceLink(itemKey: 'x', updatedAt: t).userConfirmed, isFalse);
+    final link = PriceLink(itemKey: 'x', userConfirmed: true, updatedAt: t);
+    expect(link.toMap()['userConfirmed'], isTrue);
+    expect(PriceLink.fromMap(link.toMap()).userConfirmed, isTrue);
   });
 
   test('PricePromo without end date round trips', () {
