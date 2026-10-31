@@ -61,8 +61,36 @@ which are still legacy cruft awaiting removal. Don't build on them.
 ## Asda findings
 
 - `asda.com/groceries/...` returns **Cloudflare 403** to plain requests from
-  the VPS. Its page structure and APIs are still unknown, which is why the
-  Price lab exists.
+  the VPS, so fetching runs in the in-app WebView on the phone.
+- **Search is Algolia** (from the first Price lab dump, 2026-10-31, 12 pages,
+  logged out). The page calls
+  `https://8i6wskccnv-dsn.algolia.net/1/indexes/*/queries` (multi-query;
+  index `ASDA_PRODUCTS`, 30 hits per page) and `…/indexes/ASDA_PRODUCTS/query`
+  (a 14-hit carousel). The API key is sent in request headers, not the URL.
+  We don't extract it: the app keeps reading the responses from inside the
+  WebView, exactly as the site does.
+- Each hit has clean structured fields: `NAME`, `BRAND`, `CIN`/`ID`,
+  `PACK_SIZE`, `SALES_TYPE`, `STATUS`, `STOCK.<storeId>` (logged-out
+  default store 4647), `PRIMARY_TAXONOMY` (dept/aisle/shelf), and
+  `PRICES.EN = {PRICE, WASPRICE, OFFER: List|Rollback|Dropped,
+  PRICEPERUOM, PRICEPERUOMFORMATTED ("£1.06/LT", "£4.00/KG", "8.8p/EA")}`.
+  Multibuys are in `PROMOS.EN[] = {NAME: "Any 5 for £5", TYPE, START_DATE,
+  END_DATE}`.
+- Prices are visible **without logging in**.
+- **Use the Algolia JSON, not the DOM heuristic.** The DOM pass grabbed the
+  *was* price for rollbacks (Taylors 160 bags showed £6.17; the real price
+  is £4.50).
+
+## First head-to-head (rough, hand-matched, 2026-10-31)
+
+| Item | Costco online | Asda | Cheaper |
+|---|---|---|---|
+| Olive oil (EVOO) | Kirkland 5L £22.99 = £4.60/L | ASDA 1L £7.50 | Costco |
+| Loo roll | Cushelle 24 £11.98 = 50p/roll | Shades 12 £9 = 75p (2 for £15 = 62.5p) | Costco |
+| Tea bags | Yorkshire 600 £14.99 = 2.5p/bag | Taylors 160 £4.50 (rollback) = 2.8p | Costco (just) |
+| Basmati (microwave) | Tilda 6×250g £5.19 = £3.46/kg | Tilda 250g £1.00 = £4/kg | Costco |
+| Dishwasher tabs | Kirkland 115 £14.79 = 12.9p | ASDA 40 £3.50 = 8.8p | Asda |
+| Laundry liquid | Persil 95 wash £10.39 = 10.9p/wash | ASDA 60 wash £2.84 = 4.7p (Persil 53 £10 = 18.9p) | Depends on brand |
 
 ## Using the Price lab (0.1.55+)
 
