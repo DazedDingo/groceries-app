@@ -94,6 +94,10 @@ Widget _wrap({required FakeFirebaseFirestore db, String householdId = 'hh1'}) {
         builder: (_, __) => const Scaffold(body: Text('locs')),
       ),
       GoRoute(
+        path: '/settings/price-lab',
+        builder: (_, __) => const Scaffold(body: Text('price lab page')),
+      ),
+      GoRoute(
         path: '/settings/report-issue',
         builder: (_, __) => const Scaffold(body: Text('report')),
       ),
@@ -389,5 +393,41 @@ void main() {
       );
       expect(find.text('No trigger yet'), findsOneWidget);
     });
+  });
+
+  testWidgets('7 quick taps on the About tile unlock the Price lab',
+      (tester) async {
+    final db = FakeFirebaseFirestore();
+    await tester.pumpWidget(_wrap(db: db));
+    await tester.pumpAndSettle();
+    final about = find.textContaining('by DazedDingo');
+    await tester.scrollUntilVisible(
+      about,
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    for (var i = 0; i < 7; i++) {
+      await tester.tap(about, warnIfMissed: false);
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    await tester.pumpAndSettle();
+    expect(find.text('price lab page'), findsOneWidget);
+  });
+
+  testWidgets('a single About tap shows the About dialog, not the Price lab',
+      (tester) async {
+    final db = FakeFirebaseFirestore();
+    await tester.pumpWidget(_wrap(db: db));
+    await tester.pumpAndSettle();
+    final about = find.textContaining('by DazedDingo');
+    await tester.scrollUntilVisible(
+      about,
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(about);
+    await tester.pumpAndSettle(const Duration(seconds: 1));
+    expect(find.text('price lab page'), findsNothing);
+    expect(find.byType(AboutDialog), findsOneWidget);
   });
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +12,7 @@ import '../../providers/gemini_key_provider.dart';
 import '../../providers/household_provider.dart';
 import '../../providers/recipe_search_provider.dart';
 import '../../providers/webhook_status_provider.dart';
+import '../../services/tap_unlock.dart';
 import '../../services/time_ago.dart';
 import '../../services/wallet_launcher.dart';
 import '../../services/notification_service.dart';
@@ -504,6 +507,14 @@ class _AboutTile extends StatefulWidget {
 
 class _AboutTileState extends State<_AboutTile> {
   String _versionLine = 'Loading…';
+  final _unlock = TapUnlock();
+  Timer? _aboutTimer;
+
+  @override
+  void dispose() {
+    _aboutTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -522,13 +533,29 @@ class _AboutTileState extends State<_AboutTile> {
       leading: const Icon(Icons.info_outline),
       title: const Text('About'),
       subtitle: Text('Groceries — $_versionLine · by DazedDingo'),
-      onTap: () => showAboutDialog(
-        context: context,
-        applicationName: 'Groceries',
-        applicationVersion: _versionLine,
-        applicationLegalese:
-            'A household grocery + pantry + recipe companion.\n\nAuthored by DazedDingo.',
-      ),
+      onTap: () {
+        // Hidden: 7 quick taps open the Price lab debug screen. The About
+        // dialog is deferred briefly so a rapid tap burst isn't interrupted
+        // by its modal barrier.
+        _aboutTimer?.cancel();
+        if (_unlock.tap()) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(const SnackBar(content: Text('Price lab unlocked')));
+          context.push('/settings/price-lab');
+          return;
+        }
+        _aboutTimer = Timer(const Duration(milliseconds: 600), () {
+          if (!mounted) return;
+          showAboutDialog(
+            context: context,
+            applicationName: 'Groceries',
+            applicationVersion: _versionLine,
+            applicationLegalese:
+                'A household grocery + pantry + recipe companion.\n\nAuthored by DazedDingo.',
+          );
+        });
+      },
     );
   }
 }

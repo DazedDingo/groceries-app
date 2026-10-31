@@ -17,6 +17,7 @@ import 'screens/settings/settings_screen.dart';
 import 'screens/settings/manage_categories_screen.dart';
 import 'screens/settings/manage_locations_screen.dart';
 import 'screens/settings/report_issue_screen.dart';
+import 'screens/settings/price_lab_screen.dart';
 import 'screens/shopping_list/history_screen.dart';
 import 'screens/shopping_list/templates_screen.dart';
 import 'screens/shopping_list/bulk_voice_screen.dart';
@@ -114,6 +115,7 @@ final _router = GoRouter(
               GoRoute(path: 'categories', builder: (_, __) => const ManageCategoriesScreen()),
               GoRoute(path: 'locations', builder: (_, __) => const ManageLocationsScreen()),
               GoRoute(path: 'report-issue', builder: (_, __) => const ReportIssueScreen()),
+              GoRoute(path: 'price-lab', builder: (_, __) => const PriceLabScreen()),
             ],
           ),
         ]),

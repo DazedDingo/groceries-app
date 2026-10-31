@@ -30,6 +30,13 @@ void main() {
               'silently no-ops with a permission error.');
     });
 
+    test('declares INTERNET explicitly (Price lab WebView, release builds)',
+        () {
+      // The debug/profile manifests add INTERNET for tooling; release builds
+      // only get it if main declares it (or a plugin merges it in).
+      expect(_hasPermission('INTERNET'), isTrue);
+    });
+
     test('declares CAMERA (barcode scanner)', () {
       // mobile_scanner can't initialize without it; the scan screen shows
       // a black box.
