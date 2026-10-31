@@ -17,15 +17,36 @@ which are still legacy cruft awaiting removal. Don't build on them.
   Asda's Cloudflare blocks datacenter IPs, and member/postcode pricing needs
   the user's session.
 
-## Planned shape
+## How it works (shipped 0.1.57)
 
-1. **Price lab** (shipped 0.1.55, hidden): capture real Asda pages so we can
-   write a reliable extractor.
-2. **Product matching:** link each list item to one product per shop. The
-   user confirms the match once and it's remembered. Compare on our *own*
-   £/kg, £/L or £/unit, computed from pack size.
-3. **Compare screen** on the shopping list: total per shop including
-   delivery fees, plus the cheapest split.
+Shopping list → **Compare prices** (`price_change` icon) → `/list/compare`.
+
+1. **Fully automatic.** For each list item (deduped, quantities summed)
+   the phone searches both shops by the item name:
+   - Asda: a hidden headless WebView loads `asda.com/groceries/search/<term>`
+     and reads the Algolia response (`asda_client.dart`).
+   - Costco: plain HTTP to the JSON endpoint (`costco_client.dart`).
+   Results are cached in memory for 6h.
+2. **Auto-matching** (`auto_match.dart`): aliases, a brand lock ("Heinz
+   beans" → Heinz only, plain "beans" → any brand), Asda shelf/aisle/dept
+   grouping with variant, modifier and pack-size guards. Costco only
+   matches when every core word matches, a comparison basis is shared and
+   no unrequested modifier appears. Otherwise the item is "not at Costco".
+3. **Compare** (`price_compare.dart`): own unit pricing (per wash, bag,
+   roll or tablet before per kg/L), Asda multibuys, and the Costco saving
+   vs the equivalent Asda amount. Split only when savings beat the Costco
+   fee.
+4. **Corrections:** tap an item to open the match sheet. Tick one product
+   (exact) or several (any of these, cheapest per unit wins), or mark
+   "Not sold here". Only corrections are saved
+   (`config/priceLinks`); everything else re-matches each run. Fees are
+   edited from the truck icon (`config/priceSettings`, default £6 / £5.99).
+5. **Resilience:** a circuit breaker stops a store after repeated failures
+   (Asda 2, Costco 3) and shows a banner. For Asda the fix is to open the
+   Price lab once to pass Cloudflare, then refresh.
+
+Not done yet: auto-filling the Asda/Costco baskets; Costco promotions
+(field shape unknown); the real Asda product URL pattern.
 
 ### Split rule
 

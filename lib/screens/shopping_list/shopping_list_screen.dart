@@ -1021,6 +1021,12 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                     body: 'Items linked to a high-priority pantry item show a star. When they\'re also low on stock they float to the top of the list.'),
               ],
             ),
+            IconButton(
+              key: const ValueKey('compare-prices-action'),
+              icon: const Icon(Icons.price_change_outlined),
+              tooltip: 'Compare prices',
+              onPressed: () => context.push('/list/compare'),
+            ),
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert),
               onSelected: (val) {

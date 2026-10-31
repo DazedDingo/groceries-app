@@ -187,4 +187,65 @@ void main() {
     await Future.wait([a, b]);
     expect(asda.calls, hasLength(1));
   });
+
+  test('updateFees recomputes totals without new searches', () async {
+    container = makeContainer([
+      shoppingItem('olive oil'),
+      shoppingItem('milk'),
+    ]);
+    await prime();
+    await ctrl().compare();
+    final before = st().last!;
+    final runAt = st().lastRunAt;
+    final calls = asda.calls.length + costco.calls.length;
+    expect(before.fees.costcoDelivery, 5.99);
+
+    ctrl().updateFees(const PriceFees(asdaDelivery: 1, costcoDelivery: 2));
+
+    final after = st().last!;
+    expect(after.fees.asdaDelivery, 1);
+    expect(after.fees.costcoDelivery, 2);
+    expect(after.result.splitPlan.costcoFee, 2);
+    expect(after.result.splitPlan.asdaFee, 1);
+    expect(after.result.lines, hasLength(before.result.lines.length));
+    // Same data, new fees: the saving grows by the fee difference.
+    expect(
+      after.result.splitNetSaving,
+      closeTo(before.result.splitNetSaving + 3.99, 0.01),
+    );
+    expect(after.auto, same(before.auto));
+    expect(after.effectiveLinks, same(before.effectiveLinks));
+    expect(st().lastRunAt, runAt);
+    expect(asda.calls.length + costco.calls.length, calls);
+  });
+
+  test('updateFees can flip the recommendation', () async {
+    container = makeContainer([shoppingItem('toilet roll')]);
+    await prime();
+    await ctrl().compare();
+    ctrl().updateFees(const PriceFees(costcoDelivery: 50));
+    expect(st().last!.result.recommendation, Recommendation.asdaOnly);
+    ctrl().updateFees(const PriceFees(costcoDelivery: 0));
+    expect(st().last!.result.recommendation, Recommendation.split);
+  });
+
+  test('updateFees before any run is a no-op', () async {
+    container = makeContainer([shoppingItem('milk')]);
+    await prime();
+    ctrl().updateFees(const PriceFees(asdaDelivery: 1));
+    expect(st().last, isNull);
+    expect(st().error, isNull);
+  });
+
+  test('updateFees keeps confirmed matches', () async {
+    container = makeContainer([shoppingItem('olive oil')]);
+    await prime();
+    await ctrl().compare();
+    await ctrl().confirmMatch('olive oil', costcoUnavailable: true);
+    ctrl().updateFees(const PriceFees(asdaDelivery: 2));
+    final r = st().last!;
+    expect(r.effectiveLinks['olive oil']!.userConfirmed, isTrue);
+    expect(r.result.lines.single.line.link!.costcoUnavailable, isTrue);
+    expect(r.fees.asdaDelivery, 2);
+  });
 }

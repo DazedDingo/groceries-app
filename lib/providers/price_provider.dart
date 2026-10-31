@@ -185,6 +185,24 @@ class PriceCompareController extends StateNotifier<PriceCompareState> {
     }
   }
 
+  /// Recomputes the comparison with new delivery [fees] from the last run's
+  /// data, without re-fetching. No-op before the first run.
+  void updateFees(PriceFees fees) {
+    final last = state.last;
+    if (last == null || !mounted) return;
+    state = state.copyWith(
+      last: PriceRunResult(
+        result: compareBasket([
+          for (final l in last.result.lines) l.line,
+        ], fees: fees),
+        auto: last.auto,
+        storeErrors: last.storeErrors,
+        effectiveLinks: last.effectiveLinks,
+        fees: fees,
+      ),
+    );
+  }
+
   Future<void> _applyLocally(String itemKey, PriceLink? link) async {
     final last = state.last;
     if (last == null || !last.effectiveLinks.containsKey(itemKey)) return;
