@@ -146,6 +146,10 @@ class PriceProduct {
   final String? url;
   final DateTime fetchedAt;
 
+  /// True when a price refresh could not find this product any more, so
+  /// [price] is the last known one and may be out of date.
+  final bool stale;
+
   const PriceProduct({
     required this.store,
     required this.id,
@@ -163,7 +167,29 @@ class PriceProduct {
     this.dept,
     this.url,
     required this.fetchedAt,
+    this.stale = false,
   });
+
+  /// Copy with only [stale] changed.
+  PriceProduct withStale(bool stale) => PriceProduct(
+    store: store,
+    id: id,
+    brand: brand,
+    name: name,
+    price: price,
+    wasPrice: wasPrice,
+    offer: offer,
+    promos: promos,
+    storeUnitPriceText: storeUnitPriceText,
+    quantity: quantity,
+    inStock: inStock,
+    shelf: shelf,
+    aisle: aisle,
+    dept: dept,
+    url: url,
+    fetchedAt: fetchedAt,
+    stale: stale,
+  );
 
   /// First recognised multi-buy among the promos.
   MultiBuy? get multiBuy {
@@ -190,6 +216,7 @@ class PriceProduct {
     'dept': dept,
     'url': url,
     'fetchedAt': Timestamp.fromDate(fetchedAt),
+    'stale': stale,
   };
 
   factory PriceProduct.fromMap(Map<String, dynamic> d) => PriceProduct(
@@ -215,5 +242,6 @@ class PriceProduct {
     fetchedAt:
         priceDateFromAny(d['fetchedAt']) ??
         DateTime.fromMillisecondsSinceEpoch(0),
+    stale: d['stale'] as bool? ?? false,
   );
 }

@@ -2,8 +2,9 @@
 // (raw, so JS regex escapes survive).
 
 /// Injected at AT_DOCUMENT_START. Hooks fetch + XHR and records JSON-ish
-/// responses that mention "price" into window.__priceLabNet (max 20, oldest
-/// dropped). Must never break the page.
+/// responses that mention "price" (or come from an Algolia /1/indexes/ URL)
+/// into window.__priceLabNet (max 20, oldest dropped). Must never break the
+/// page.
 const String priceLabHookJs = r'''
 (function () {
   try {
@@ -19,7 +20,11 @@ const String priceLabHookJs = r'''
         var jsonish = (ct && String(ct).toLowerCase().indexOf('json') >= 0) ||
           first === '{' || first === '[';
         if (!jsonish) return;
-        if (!/price/i.test(text)) return;
+        // Algolia search responses are always kept: a zero-hit result has no
+        // "price" in it but the Compare feature still needs to see it.
+        if (!/price/i.test(text) && String(url).indexOf('/1/indexes/') < 0) {
+          return;
+        }
         window.__priceLabNet.push({
           url: String(url),
           status: status,
