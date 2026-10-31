@@ -2,13 +2,17 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../models/price_lab_hit.dart';
+import '../../providers/household_provider.dart';
 import '../../services/price_lab_dump.dart';
+import '../../services/price_lab_upload.dart';
 import 'price_lab_js.dart';
 
 const _homeUrl = 'https://www.asda.com/groceries';
@@ -37,14 +41,14 @@ String priceLabSearchUrl(String term) =>
 /// Settings). Hosts an Asda WebView so the user can log in once, then runs
 /// heuristic price extraction and builds a raw dump to share for designing a
 /// real extractor.
-class PriceLabScreen extends StatefulWidget {
+class PriceLabScreen extends ConsumerStatefulWidget {
   const PriceLabScreen({super.key});
 
   @override
-  State<PriceLabScreen> createState() => _PriceLabScreenState();
+  ConsumerState<PriceLabScreen> createState() => _PriceLabScreenState();
 }
 
-class _PriceLabScreenState extends State<PriceLabScreen> {
+class _PriceLabScreenState extends ConsumerState<PriceLabScreen> {
   InAppWebViewController? _web;
   final _termCtrl = TextEditingController();
   final List<PriceLabPage> _pages = [];
@@ -52,6 +56,8 @@ class _PriceLabScreenState extends State<PriceLabScreen> {
   Completer<void>? _loadDone;
   String _currentUrl = _homeUrl;
   int _progress = 0;
+
+  bool _uploading = false;
 
   bool _batchRunning = false;
   bool _cancelBatch = false;
@@ -77,7 +83,8 @@ class _PriceLabScreenState extends State<PriceLabScreen> {
     if (term.isEmpty) return;
     FocusScope.of(context).unfocus();
     await _web?.loadUrl(
-        urlRequest: URLRequest(url: WebUri(priceLabSearchUrl(term))));
+      urlRequest: URLRequest(url: WebUri(priceLabSearchUrl(term))),
+    );
   }
 
   /// Installs the extractor functions into the current page and returns the
@@ -88,7 +95,8 @@ class _PriceLabScreenState extends State<PriceLabScreen> {
     try {
       await web.evaluateJavascript(source: priceLabExtractorJs);
       final res = await web.evaluateJavascript(
-          source: 'window.__priceLabSnapshot()');
+        source: 'window.__priceLabSnapshot()',
+      );
       return res is String ? res : null;
     } catch (e) {
       debugPrint('PriceLab snapshot failed: $e');
@@ -165,11 +173,14 @@ class _PriceLabScreenState extends State<PriceLabScreen> {
     try {
       for (final term in priceLabBatchTerms) {
         if (_cancelBatch || !mounted) break;
-        setState(() => _batchStatus =
-            '${done + 1}/${priceLabBatchTerms.length}: $term');
+        setState(
+          () =>
+              _batchStatus = '${done + 1}/${priceLabBatchTerms.length}: $term',
+        );
         final wait = _waitForLoad();
         await _web!.loadUrl(
-            urlRequest: URLRequest(url: WebUri(priceLabSearchUrl(term))));
+          urlRequest: URLRequest(url: WebUri(priceLabSearchUrl(term))),
+        );
         await wait;
         if (_cancelBatch || !mounted) break;
         await Future<void>.delayed(const Duration(seconds: 3));
@@ -190,32 +201,41 @@ class _PriceLabScreenState extends State<PriceLabScreen> {
           _batchFraction = null;
           _batchStatus = null;
         });
-        _toast(cancelled
-            ? 'Batch cancelled ($done captured)'
-            : 'Batch done: $done pages captured');
+        _toast(
+          cancelled
+              ? 'Batch cancelled ($done captured)'
+              : 'Batch done: $done pages captured',
+        );
       }
     }
   }
 
-  Future<void> _shareDump() async {
+  /// Builds the dump map (capturing the current page first if nothing has
+  /// been captured yet). Returns null when there is nothing to dump.
+  Future<Map<String, dynamic>?> _buildDump(DateTime now) async {
     if (_pages.isEmpty) await _capture();
-    if (_pages.isEmpty) {
-      _toast('Nothing to share yet');
-      return;
-    }
+    if (_pages.isEmpty) return null;
     String ua = '';
     try {
       final r = await _web?.evaluateJavascript(source: 'navigator.userAgent');
       ua = r?.toString() ?? '';
     } catch (_) {}
     final info = await PackageInfo.fromPlatform();
-    final now = DateTime.now();
-    final dump = buildPriceLabDump(
+    return buildPriceLabDump(
       generatedAt: now,
       appVersion: '${info.version}+${info.buildNumber}',
       userAgent: ua,
       pages: _pages,
     );
+  }
+
+  Future<void> _shareDump() async {
+    final now = DateTime.now();
+    final dump = await _buildDump(now);
+    if (dump == null) {
+      _toast('Nothing to share yet');
+      return;
+    }
     final bytes = utf8.encode(jsonEncode(dump));
     final name = priceLabDumpFilename(now);
     await Share.shareXFiles(
@@ -223,6 +243,37 @@ class _PriceLabScreenState extends State<PriceLabScreen> {
       fileNameOverrides: [name],
       subject: name,
     );
+  }
+
+  Future<void> _sendToClaude() async {
+    if (_uploading) return;
+    setState(() => _uploading = true);
+    try {
+      final hid = await ref.read(householdIdProvider.future);
+      if (hid == null) {
+        _toast('Send failed: no household found');
+        return;
+      }
+      final dump = await _buildDump(DateTime.now());
+      if (dump == null) {
+        _toast('Nothing to send yet');
+        return;
+      }
+      final res = await PriceLabUploader(FirebaseFirestore.instance).upload(
+        householdId: hid,
+        dump: dump,
+        appVersion: dump['appVersion']?.toString() ?? '',
+      );
+      final pages = (dump['pages'] as List?)?.length ?? 0;
+      _toast(
+        'Sent to Claude: $pages pages, '
+        '${(res.gzBytes / 1024).round()} KB compressed',
+      );
+    } catch (e) {
+      _toast('Send failed: $e');
+    } finally {
+      if (mounted) setState(() => _uploading = false);
+    }
   }
 
   @override
@@ -306,7 +357,10 @@ class _PriceLabScreenState extends State<PriceLabScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(_batchStatus ?? '', style: const TextStyle(fontSize: 12)),
+                  Text(
+                    _batchStatus ?? '',
+                    style: const TextStyle(fontSize: 12),
+                  ),
                   const SizedBox(height: 4),
                   LinearProgressIndicator(value: _batchFraction),
                 ],
@@ -316,35 +370,64 @@ class _PriceLabScreenState extends State<PriceLabScreen> {
             top: false,
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Row(
+              // Two rows so the labels never wrap on a narrow phone.
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: _batchRunning ? null : _extract,
-                      child: const Text('Extract'),
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: _batchRunning ? null : _extract,
+                          child: const Text('Extract'),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _batchRunning
+                            ? FilledButton.tonal(
+                                onPressed: () => setState(() {
+                                  _cancelBatch = true;
+                                  _batchStatus = 'Cancelling…';
+                                }),
+                                child: const Text('Cancel'),
+                              )
+                            : OutlinedButton(
+                                onPressed: _batch,
+                                child: const Text('Batch test'),
+                              ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: _batchRunning
-                        ? FilledButton.tonal(
-                            onPressed: () => setState(() {
-                              _cancelBatch = true;
-                              _batchStatus = 'Cancelling…';
-                            }),
-                            child: const Text('Cancel'),
-                          )
-                        : OutlinedButton(
-                            onPressed: _batch,
-                            child: const Text('Batch test'),
-                          ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: _batchRunning ? null : _shareDump,
-                      child: const Text('Share dump'),
-                    ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: _batchRunning || _uploading
+                              ? null
+                              : _shareDump,
+                          child: const Text('Share dump'),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: _batchRunning || _uploading
+                              ? null
+                              : _sendToClaude,
+                          child: _uploading
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text('Send to Claude'),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -391,7 +474,8 @@ class _HitsList extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.all(12),
             child: Text(
-                '${hits.length} items · $networkCount captured JSON responses'),
+              '${hits.length} items · $networkCount captured JSON responses',
+            ),
           );
         }
         final h = hits[i - 1];
@@ -401,13 +485,17 @@ class _HitsList extends StatelessWidget {
         return ListTile(
           isThreeLine: true,
           title: Text(h.name ?? '(no name)'),
-          trailing: Text(price,
-              style: const TextStyle(fontWeight: FontWeight.bold)),
-          subtitle: Text([
-            if (h.unitPriceText != null) 'Unit: ${h.unitPriceText}',
-            if (h.promoText != null) 'Promo: ${h.promoText}',
-            '[${h.source ?? '?'}] ${h.url ?? ''}',
-          ].join('\n')),
+          trailing: Text(
+            price,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text(
+            [
+              if (h.unitPriceText != null) 'Unit: ${h.unitPriceText}',
+              if (h.promoText != null) 'Promo: ${h.promoText}',
+              '[${h.source ?? '?'}] ${h.url ?? ''}',
+            ].join('\n'),
+          ),
         );
       },
     );

@@ -73,8 +73,12 @@ which are still legacy cruft awaiting removal. Don't build on them.
    kitchen roll, spaghetti, baked beans, chopped tomatoes, tea bags, olive
    oil, laundry liquid, dishwasher tablets, cereal) and captures each page.
    **Extract** captures just the current page and shows what was parsed.
-4. **Share dump** produces `asda_dump_<date>.json`. Save it to Google Drive
-   so Claude can read it and write the real extractor.
+4. **Send to Claude** (0.1.56+) uploads the dump into the household's
+   Firestore (`config/priceLabDump*`, gzipped and chunked). Claude pulls it on
+   the VPS through the Firebase CLI's MCP server (`firestore_get_document`): `python3 tools/fetch_price_lab_dump.py out.json`.
+   **Share dump** still saves `asda_dump_<date>.json` via the share sheet, but
+   the Drive connector can't download files that large (8 MB failed with
+   "session expired"), so prefer Send to Claude.
 
 The dump holds, per page: title, a logged-in hint, the parsed items (JSON-LD +
 DOM heuristic), up to 20 captured JSON network responses that mention
