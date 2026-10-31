@@ -23,6 +23,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ubuntu-latest now defaults to Java 25, which Gradle 8.14 rejects.
+      # Pin JDK 17 (same as the VPS toolchain + watchnext CI).
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
